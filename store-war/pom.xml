@@ -1,0 +1,144 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.cdlib.mrt</groupId>
+    <artifactId>mrt-storewar</artifactId>
+    <packaging>war</packaging>
+    <version>1.0-SNAPSHOT</version>
+    <name>UC3-mrtStorePub-war</name>
+
+    <url>http://uc3.cdlib.org</url>
+
+    <!-- force UTF-8 -->
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <propertyDir>test</propertyDir>
+    </properties>
+
+    <profiles>
+      <profile>
+          <id>notUC3</id>
+          <activation>
+            <activeByDefault>true</activeByDefault>
+          </activation>
+          <properties>
+              <warLocation>war</warLocation>
+              <warName>storage.war</warName>
+          </properties>
+      </profile>
+      <profile>
+          <id>uc3</id>
+          <properties>
+              <warLocation>${propertyDir}</warLocation>
+              <warName>storage.${propertyDir}.war</warName>
+          </properties>
+      </profile>
+    </profiles>
+
+    <build>
+        <plugins>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy</id>
+                        <phase>install</phase>
+
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>org.cdlib.mrt</groupId>
+                                    <artifactId>mrt-storewar</artifactId>
+
+                                    <version>1.0-SNAPSHOT</version>
+                                    <type>war</type>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>./${warLocation}</outputDirectory>
+                                    <destFileName>${warName}</destFileName>
+                                </artifactItem>
+
+                            </artifactItems>
+
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!--plugin>
+              <groupId>org.codehaus.mojo</groupId>
+              <artifactId>exec-maven-plugin</artifactId>
+              <version>1.1</version>
+              <executions>
+                <execution>
+                  <id>version</id>
+                  <phase>package</phase>
+                  <configuration>
+                    <executable>hg</executable>
+                    <arguments>
+                      <argument>id</argument>
+                    </arguments>
+                    <outputFile>${warLocation}/VERSION</outputFile>
+                  </configuration>
+                  <goals>
+                    <goal>exec</goal>
+                  </goals>
+                </execution>
+              </executions>
+            </plugin--> 
+
+        </plugins>
+    </build>
+
+    <dependencies>
+
+        <dependency>
+            <groupId>com.sun.jersey</groupId>
+            <artifactId>jersey-bundle</artifactId>
+            <version>1.5</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.sun.jersey.contribs</groupId>
+            <artifactId>jersey-multipart</artifactId>
+            <version>1.5</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.cdlib.mrt</groupId>
+            <artifactId>mrt-confstore</artifactId>
+            <version>${propertyDir}-1.0-SNAPSHOT</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.cdlib.mrt</groupId>
+            <artifactId>mrt-storepub-src</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.cdlib.mrt</groupId>
+            <artifactId>mrt-jena</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>asm</groupId>
+            <artifactId>asm</artifactId>
+            <version>3.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>javax.servlet</groupId>
+
+            <artifactId>servlet-api</artifactId>
+            <version>2.4</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+
+</project>
