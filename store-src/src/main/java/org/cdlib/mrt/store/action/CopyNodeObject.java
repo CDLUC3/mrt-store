@@ -41,8 +41,6 @@ import org.cdlib.mrt.core.Identifier;
 
 import org.cdlib.mrt.cloud.ManifestSAX;
 import org.cdlib.mrt.cloud.VersionData;
-import org.cdlib.mrt.store.ContextLocalID;
-import org.cdlib.mrt.store.LocalIDsState;
 import org.cdlib.mrt.store.ObjectState;
 
 import org.cdlib.mrt.core.FileContent;
@@ -136,21 +134,12 @@ public class CopyNodeObject
             if (DEBUG) System.out.println("Process versionData");
             int current = versionData.getCurrent();
             File manifest = new File(outputDir, "manifest");
-            LocalValues localValues = setLocalValues();
             for (long v=targetCurrent+1; v <= current; v++) {
                 String context = null;
                 String localIDs = null;
                 String name = "version-" + v + ".txt";
                 if (DEBUG) System.out.println("***building:" + name);
                 File manifestFile = new File(manifest, name);
-                if ((v==current) && (localValues != null)) {
-                    context = localValues.context;
-                    localIDs = localValues.localIDs;
-                    System.out.println("***set local IDs:"
-                            + " - context:" + context
-                            + " - localIDs:" + localIDs
-                    );
-                }
                 targetNode.addVersion(objectID, context, localIDs, manifestFile);
                 if (DEBUG) System.out.println("addversion:" + v);
             }
@@ -268,37 +257,6 @@ public class CopyNodeObject
             }
         }
         return objectState;
-    }
-    
-    public LocalValues setLocalValues()
-        throws TException
-    {
-        if (ignoreLocal) return null;
-        LocalIDsState sourceIDs = sourceNode.getLocalIDsState(objectID.getValue());
-        try {
-            
-            if (sourceIDs.getCountLocalIDs() == 0) {
-                System.out.println("No source");
-                return null;
-            }
-            List<ContextLocalID> ids = sourceIDs.getLocalIDs();
-            StringBuffer buf = new StringBuffer();
-            String context = "";
-            for (ContextLocalID id : ids) {
-                if (buf.length() > 0) buf.append(';');
-                buf.append(id.getLocalID());
-                context = id.getContext();
-            }
-           
-            String localIDConcat = buf.toString();
-            LocalValues local = new LocalValues(context, localIDConcat);
-            return local;
-            
-        } catch (Exception ex) {
-            throw new TException(ex);
-            
-        } 
-                
     }
 
     public void setIgnoreLocal(boolean ignoreLocal) {

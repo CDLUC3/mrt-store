@@ -133,12 +133,6 @@ public interface ObjectStateInf
      * @return local identifier
      */
     public String getLocalID();
-
-    /**
-     * DeleteID state from a deleteObject
-     * @return 
-     */
-    public DeleteIDState getDeleteIDState();
     
     /**
      * @return node identifier

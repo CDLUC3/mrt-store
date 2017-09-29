@@ -170,35 +170,6 @@ public interface NodeStateInf
     public boolean isVerifyOnWrite();
 
     /**
-     * Get approximate number of files in Node
-     * @return approximate number of files
-     */
-    public long getNumFiles();
-
-    /**
-     * Get approximate number of Version within Node
-     * @return approximate number of version
-     */
-    public long getNumVersions();
-
-    /**
-     * Get approximate number of Objects within Node
-     * @return approximate number of Objects
-     */
-    public long getNumObjects();
-
-    /**
-     * Number of files - not specifically components
-     * @return number of files
-     */
-    public long getNumActualFiles();
-    /**
-     * get the number of files - not specifically components
-     * @return number of files
-     */
-    public long getTotalActualSize() ;
-
-    /**
      * Get creation date-time for this Node
      * Corresponds to the date-time of the node directory file
      * @return creation date-time for this Node

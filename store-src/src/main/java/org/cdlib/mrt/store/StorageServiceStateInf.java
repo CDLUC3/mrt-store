@@ -96,24 +96,6 @@ public interface StorageServiceStateInf
     public LinkedHashList<String, String> getNodeStates();
 
     /**
-     * Get approximate number of files in Node
-     * @return approximate number of files
-     */
-    public long getNumFiles();
-
-    /**
-     * Get approximate number of Objects within Node
-     * @return approximate number of Objects
-     */
-    public long getNumObjects();
-
-    /**
-     * Get approximate number of Version within Node
-     * @return approximate number of version
-     */
-    public long getNumVersions();
-
-    /**
      * Last Access date-time to service
      * Not technically feasible
      * @return Access date-time
@@ -140,17 +122,6 @@ public interface StorageServiceStateInf
      * @return String of supported commands
      */
     public String getCommands();
-
-    /**
-     * Number of files - not specifically components
-     * @return number of files
-     */
-    public long getNumActualFiles();
-    /**
-     * get the number of files - not specifically components
-     * @return number of files
-     */
-    public long getTotalActualSize() ;
 
     /**
      * Dump of Service State dump information

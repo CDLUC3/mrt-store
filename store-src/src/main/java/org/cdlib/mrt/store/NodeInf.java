@@ -90,20 +90,6 @@ public interface NodeInf
             File manifestFile,
             String [] deleteList)
     throws TException;
-    
-    /**
-     * Reset local identifiers
-     * @param objectID object identifier
-     * @param context access group/profile for this item
-     * @param localID local identifier
-     * @return
-     * @throws TException Exception condition during storage service procssing
-     */
-    public LocalIDsState resetLocal(
-            Identifier objectID,
-            String context,
-            String localID)
-    throws TException;
 
     /**
      * Remove the current version from an object
@@ -162,47 +148,6 @@ public interface NodeInf
     public VersionState getVersionState (
             Identifier objectID,
             int versionID)
-        throws TException;
-
-    /**
-     * Return a primaryID if found for this localID
-     * @param context context group for localID
-     * @param localID local identifier
-     * @return primary identifier state
-     */
-    public PrimaryIDState getPrimaryID(
-            String context,
-            String localID)
-        throws TException;
-
-    /**
-     * Return list of localIDs mapped to this primaryID
-     * @param primaryID primary identifier
-     * @returnlist of localIDs
-     * @throws TException process exception
-     */
-    public LocalIDsState getLocalIDsState(
-            String primaryID)
-        throws TException;
-
-    /**
-     * Delete primaryID - localID maps using primaryID
-     * @param primaryID primaryID for maps to be deleted
-     * @return delete identifier state
-     */
-    public DeleteIDState deletePrimaryID(
-            String primaryID)
-        throws TException;
-
-    /**
-     * Delete primaryID - localID maps using localID
-     * @param context context group for localID
-     * @param localID local identifier
-     * @return  delete identifier state
-     */
-    public DeleteIDState deleteLocalID(
-            String context,
-            String localID)
         throws TException;
 
     /**

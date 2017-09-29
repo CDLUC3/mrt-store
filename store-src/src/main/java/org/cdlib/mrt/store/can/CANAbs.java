@@ -44,7 +44,6 @@ import org.cdlib.mrt.store.ObjectStoreInf;
 import org.cdlib.mrt.store.ObjectStoreAbs;
 import org.cdlib.mrt.store.NodeState;
 import org.cdlib.mrt.store.SpecScheme;
-import org.cdlib.mrt.store.je.LocalIDDatabase;
 import org.cdlib.mrt.utility.FileUtil;
 import org.cdlib.mrt.utility.LoggerInf;
 import org.cdlib.mrt.utility.TException;
@@ -233,39 +232,12 @@ public abstract class CANAbs
 
         if (DEBUG) System.out.println(MESSAGE + "setCAN - before new CAN"
                 + " - nodeID=" + nodeID);
-        setLocalIDDb(logger, nodeForm);
         CAN can = new CAN(logger, nodeForm, objectLocation, objectStore, nodeState);
         can.setNodeID(nodeState.getIdentifier());
 
         if (DEBUG) System.out.println(MESSAGE + "setCAN - after new CAN"
                 + " - nodeID=" + can.getNodeID());
         return can;
-    }
-
-    protected static void setLocalIDDb(
-            LoggerInf logger,
-            NodeForm nodeForm)
-        throws TException
-    {
-        try {
-            File canHome = nodeForm.getCanHome();
-            File localIDDbDir = new File(canHome, "admin/idmap");
-            if (!localIDDbDir.exists()) {
-                localIDDbDir.mkdirs();
-            }
-            LocalIDDatabase localIDDatabase
-                = LocalIDDatabase.getLocalIDDatabase(logger, localIDDbDir, false);
-            nodeForm.setLocalIDDb(localIDDatabase);
-
-        } catch (Exception ex) {
-            throw new TException.GENERAL_EXCEPTION(ex);
-        }
-
-    }
-
-    public LocalIDDatabase getLocalIDDb()
-    {
-        return nodeForm.getLocalIDDb();
     }
 
     /**

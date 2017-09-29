@@ -33,7 +33,6 @@ import java.io.File;
 import java.util.Properties;
 
 
-import org.cdlib.mrt.store.je.LocalIDDatabase;
 import org.cdlib.mrt.store.NodeState;
 
 
@@ -54,16 +53,6 @@ public class NodeForm {
     protected NodeState nodeState = null;
 
     protected int m_canHomeID = -1;
-
-    protected LocalIDDatabase localIDDb = null;
-
-    public LocalIDDatabase getLocalIDDb() {
-        return localIDDb;
-    }
-
-    public void setLocalIDDb(LocalIDDatabase localIDDb) {
-        this.localIDDb = localIDDb;
-    }
 
     /**
      * Get static node state

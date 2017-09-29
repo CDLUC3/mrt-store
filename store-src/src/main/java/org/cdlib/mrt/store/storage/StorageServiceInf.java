@@ -39,13 +39,10 @@ import org.cdlib.mrt.core.Identifier;
 import org.cdlib.mrt.core.FileContent;
 import org.cdlib.mrt.core.PingState;
 import org.cdlib.mrt.store.FileFixityState;
-import org.cdlib.mrt.store.DeleteIDState;
 import org.cdlib.mrt.store.FileState;
 import org.cdlib.mrt.store.NodeState;
 import org.cdlib.mrt.store.StorageServiceState;
 import org.cdlib.mrt.store.ObjectState;
-import org.cdlib.mrt.store.LocalIDsState;
-import org.cdlib.mrt.store.PrimaryIDState;
 import org.cdlib.mrt.store.VersionContent;
 import org.cdlib.mrt.store.VersionState;
 import org.cdlib.mrt.utility.LoggerInf;
@@ -93,22 +90,6 @@ public interface StorageServiceInf
             String localID,
             File manifestFile,
             String [] deleteList)
-    throws TException;
-    
-    /**
-     * Add an object to this storage service
-     * @param nodeID node identifier for object
-     * @param objectID object identifier
-     * @param context access group/profile for this item
-     * @param localIDs local identifiers
-     * @return Version state for added version
-     * @throws TException Exception condition during storage service procssing
-     */
-    public LocalIDsState resetLocal (
-            int nodeID,
-            Identifier objectID,
-            String context,
-            String localIDs)
     throws TException;
 
     /**
@@ -434,55 +415,6 @@ public interface StorageServiceInf
             int nodeID,
             Identifier objectID,
             int versionID)
-        throws TException;
-
-    /**
-     * Return a primaryID if found for this localID
-     * @param nodeID node identifier for state information
-     * @param context context group for localID
-     * @param localID local identifier
-     * @return primary identifier state
-     */
-    public PrimaryIDState getPrimaryID(
-            int nodeID,
-            String context,
-            String localID)
-        throws TException;
-
-    /**
-     * Return a primaryID if found for this localID
-     * @param nodeID node identifier for state information
-     * @param primary primary identifier
-     * @return local identifier state
-     */
-    public LocalIDsState getLocalIDs(
-            int nodeID,
-            String primaryID)
-        throws TException;
-
-    /**
-     * Delete localID-primaryID maps based on primaryID
-     * @param nodeID node identifier for state information
-     * @param context context group for localID
-     * @return deleteIDState
-     */
-    public DeleteIDState deletePrimaryID(
-            int nodeID,
-            String primaryID)
-        throws TException;
-
-
-    /**
-     * Delete localID-primaryID maps based on localID
-     * @param nodeID node identifier for state information
-     * @param context context group for localID
-     * @param localID local identifier
-     * @return deleteIDState
-     */
-    public DeleteIDState deleteLocalID(
-            int nodeID,
-            String context,
-            String localID)
         throws TException;
 
     /**

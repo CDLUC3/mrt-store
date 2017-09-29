@@ -29,7 +29,9 @@ OF THE POSSIBILITY OF SUCH DAMAGE.
 **********************************************************/
 package org.cdlib.mrt.store.app.jersey;
 
-import com.sun.jersey.multipart.FormDataParam;
+
+import org.glassfish.jersey.media.multipart.FormDataParam;
+import org.glassfish.jersey.server.CloseableService;
 import org.cdlib.mrt.store.app.ValidateCmdParms;
 import org.cdlib.mrt.store.app.*;
 import java.io.File;
@@ -44,7 +46,6 @@ import java.util.Properties;
 import javax.ws.rs.core.StreamingOutput;
 
 
-import com.sun.jersey.spi.CloseableService;
 import javax.servlet.ServletConfig;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.PathParam;
@@ -565,156 +566,6 @@ public class JerseyBase
         }
     }
 
-    /**
-     * Return a primaryID if found for this localID
-     * @param nodeID node identifier for state information
-     * @param context context group for localID
-     * @param localID local identifier
-     * @param formatType user provided format type
-     * @param cs on close actions
-     * @param sc ServletConfig used to get system configuration
-     * @return
-     * @throws TException
-     */
-    public Response getPrimaryIDProcess(
-            int nodeID,
-            String context,
-            String localID,
-            String formatType,
-            CloseableService cs,
-            ServletConfig sc)
-        throws TException
-    {
-        LoggerInf logger = defaultLogger;
-        try {
-            log("getPrimaryIDProcess entered:"
-                    + " - nodeID=" + nodeID
-                    + " - context=" + context
-                    + " - localID=" + localID
-                    + " - formatType=" + formatType
-                    );
-            context = StringUtil.normParm(context);
-            localID = StringUtil.normParm(localID);
-            StorageServiceInit storageServiceInit = StorageServiceInit.getStorageServiceInit(sc);
-            StorageServiceInf storageService = storageServiceInit.getStorageService();
-            logger = getNodeLogger(nodeID, storageService);
-            StateInf responseState = storageService.getPrimaryID(nodeID, context, localID);
-            return getStateResponse(responseState, formatType, logger, cs, sc);
-
-        } catch (TException tex) {
-            return getExceptionResponse(cs, tex, formatType, logger);
-
-        } catch (Exception ex) {
-            System.out.println("TRACE:" + StringUtil.stackTrace(ex));
-            throw new TException.GENERAL_EXCEPTION(MESSAGE + "Exception:" + ex);
-        }
-    }
-    /**
-     * Return a primaryID if found for this localID
-     * @param nodeID node identifier for state information
-     * @param primary primary identifier
-     * @param formatType user provided format type
-     * @param cs on close actions
-     * @param sc ServletConfig used to get system configuration
-     * @return
-     * @throws TException
-     */
-    public Response getLocalIDsProcess(
-            int nodeID,
-            String primaryID,
-            String formatType,
-            CloseableService cs,
-            ServletConfig sc)
-        throws TException
-    {
-        LoggerInf logger = defaultLogger;
-        try {
-            log("getPrimaryIDProcess entered:"
-                    + " - nodeID=" + nodeID
-                    + " - primaryID=" + primaryID
-                    + " - formatType=" + formatType
-                    );
-            primaryID = StringUtil.normParm(primaryID);
-            StorageServiceInit storageServiceInit = StorageServiceInit.getStorageServiceInit(sc);
-            StorageServiceInf storageService = storageServiceInit.getStorageService();
-            logger = getNodeLogger(nodeID, storageService);
-            StateInf responseState = storageService.getLocalIDs(nodeID, primaryID);
-            return getStateResponse(responseState, formatType, logger, cs, sc);
-
-        } catch (TException tex) {
-            return getExceptionResponse(cs, tex, formatType, logger);
-
-        } catch (Exception ex) {
-            System.out.println("TRACE:" + StringUtil.stackTrace(ex));
-            throw new TException.GENERAL_EXCEPTION(MESSAGE + "Exception:" + ex);
-        }
-    }
-
-    public Response deleteLocalID(
-            int nodeID,
-            String context,
-            String localID,
-            String formatType,
-            CloseableService cs,
-            ServletConfig sc)
-        throws TException
-    {
-        LoggerInf logger = defaultLogger;
-        try {
-            log("getPrimaryIDProcess entered:"
-                    + " - nodeID=" + nodeID
-                    + " - context=" + context
-                    + " - localID=" + localID
-                    + " - formatType=" + formatType
-                    );
-            context = StringUtil.normParm(context);
-            localID = StringUtil.normParm(localID);
-            StorageServiceInit storageServiceInit = StorageServiceInit.getStorageServiceInit(sc);
-            StorageServiceInf storageService = storageServiceInit.getStorageService();
-            logger = getNodeLogger(nodeID, storageService);
-            StateInf responseState = storageService.deleteLocalID(nodeID, context, localID);
-            return getStateResponse(responseState, formatType, logger, cs, sc);
-
-        } catch (TException tex) {
-            return getExceptionResponse(cs, tex, formatType, logger);
-
-        } catch (Exception ex) {
-            System.out.println("TRACE:" + StringUtil.stackTrace(ex));
-            throw new TException.GENERAL_EXCEPTION(MESSAGE + "Exception:" + ex);
-        }
-    }
-
-
-    public Response deletePrimaryID(
-            int nodeID,
-            String primaryID,
-            String formatType,
-            CloseableService cs,
-            ServletConfig sc)
-        throws TException
-    {
-        LoggerInf logger = defaultLogger;
-        try {
-            log("getPrimaryIDProcess entered:"
-                    + " - nodeID=" + nodeID
-                    + " - primary=" + primaryID
-                    + " - formatType=" + formatType
-                    );
-            primaryID = StringUtil.normParm(primaryID);
-            StorageServiceInit storageServiceInit = StorageServiceInit.getStorageServiceInit(sc);
-            StorageServiceInf storageService = storageServiceInit.getStorageService();
-            logger = getNodeLogger(nodeID, storageService);
-            StateInf responseState = storageService.deletePrimaryID(nodeID, primaryID);
-            return getStateResponse(responseState, formatType, logger, cs, sc);
-
-        } catch (TException tex) {
-            return getExceptionResponse(cs, tex, formatType, logger);
-
-        } catch (Exception ex) {
-            System.out.println("TRACE:" + StringUtil.stackTrace(ex));
-            throw new TException.GENERAL_EXCEPTION(MESSAGE + "Exception:" + ex);
-        }
-    }
 
     /**
      * Get file state information
@@ -1240,48 +1091,6 @@ public class JerseyBase
             throw new TException.GENERAL_EXCEPTION(MESSAGE + "Exception:" + ex);
         }
     }    
-    
-    public Response resetLocal(
-            int nodeID,
-            String objectIDS,
-            String localContext,
-            String localIDs,
-            String formatType,
-            CloseableService cs,
-            ServletConfig sc)
-        throws TException
-    {
-        LoggerInf logger = defaultLogger;
-        try {
-            log("resetLocal entered:"
-                    + " - formatType=" + formatType
-                    + " - nodeId=" + nodeID
-                    + " - objectIDS=" + objectIDS
-                    + " - localContext=" + localContext
-                    + " - localIDs=" + localIDs
-                    + " - t=" + formatType
-                    );
-
-            localContext = StringUtil.normParm(localContext);
-            localIDs = StringUtil.normParm(localIDs);
-            formatType = StringUtil.normParm(formatType);
-            if (StringUtil.isEmpty(formatType)) formatType = "xml";
-
-            Identifier objectID = getObjectID(objectIDS);
-            StorageServiceInit storageServiceInit = StorageServiceInit.getStorageServiceInit(sc);
-            StorageServiceInf storageService = storageServiceInit.getStorageService();
-            logger = getNodeLogger(nodeID, storageService);
-            StateInf responseState = storageService.resetLocal(nodeID, objectID, localContext, localIDs);
-            return getStateResponse(responseState, formatType, logger, cs, sc);
-
-        } catch (TException tex) {
-            return getExceptionResponse(cs, tex, formatType, logger);
-
-        } catch (Exception ex) {
-            System.out.println("TRACE:" + StringUtil.stackTrace(ex));
-            throw new TException.GENERAL_EXCEPTION(MESSAGE + "Exception:" + ex);
-        }
-    }
 
     /**
      * Update an object to this storage service

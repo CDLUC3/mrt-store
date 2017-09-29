@@ -97,6 +97,7 @@ public abstract class ObjectStoreAbs
             if ((accessProtocol != null) && accessProtocol.contains("s3")) {
                 return setCloudStore(logger, nodeState);
             }
+            /* no longer supported
             switch(dflatSpec.getScheme()) {
                 case dflat_1d0:
                     objectStore = getDflat_1d0(logger);
@@ -104,7 +105,7 @@ public abstract class ObjectStoreAbs
                     objectStore.setVerifyOnWrite(nodeState.isVerifyOnWrite());
                     return objectStore;
             }
-
+            */
             return null;
 
         } catch (Exception ex) {

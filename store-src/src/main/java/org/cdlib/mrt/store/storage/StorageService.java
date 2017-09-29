@@ -43,11 +43,8 @@ import org.cdlib.mrt.core.Identifier;
 import org.cdlib.mrt.core.FileContent;
 import org.cdlib.mrt.core.FileComponent;
 import org.cdlib.mrt.core.PingState;
-import org.cdlib.mrt.store.DeleteIDState;
 import org.cdlib.mrt.store.FileFixityState;
 import org.cdlib.mrt.store.FileState;
-import org.cdlib.mrt.store.LocalIDsState;
-import org.cdlib.mrt.store.PrimaryIDState;
 import org.cdlib.mrt.store.StoreNode;
 import org.cdlib.mrt.store.StorageServiceState;
 import org.cdlib.mrt.store.NodeState;
@@ -121,21 +118,6 @@ public class StorageService
         versionState.setAccess( getAccessNodeID(nodeID), storeURL, objectID);
         bump("updateVersion", startTime);
         return versionState;
-    }
-
-    @Override
-    public LocalIDsState resetLocal (
-            int nodeID,
-            Identifier objectID,
-            String context,
-            String localIDs)
-    throws TException
-    {
-        long startTime = DateUtil.getEpochUTCDate();
-        StoreNode node = nodeManager.getStoreNode(nodeID);
-        NodeInf can = node.getCan();
-        LocalIDsState localIDsState = can.resetLocal(objectID, context, localIDs);
-        return localIDsState;
     }
 
 
@@ -381,64 +363,6 @@ public class StorageService
         versionState.setAccess( getAccessNodeID(nodeID), storeURL, objectID);
         bump("getVersionState", startTime);
         return versionState;
-    }
-
-    @Override
-    public PrimaryIDState getPrimaryID(
-            int nodeID,
-            String context,
-            String localID)
-        throws TException
-    {
-        long startTime = DateUtil.getEpochUTCDate();
-        StoreNode node = nodeManager.getStoreNode(nodeID);
-        NodeInf can = node.getCan();
-        PrimaryIDState state = can.getPrimaryID(context, localID);
-        bump("getPrimaryID", startTime);
-        return state;
-    }
-
-    @Override
-    public LocalIDsState getLocalIDs(
-            int nodeID,
-            String primaryID)
-        throws TException
-    {
-        long startTime = DateUtil.getEpochUTCDate();
-        StoreNode node = nodeManager.getStoreNode(nodeID);
-        NodeInf can = node.getCan();
-        LocalIDsState state = can.getLocalIDsState(primaryID);
-        bump("getLocalIDs", startTime);
-        return state;
-    }
-
-    @Override
-    public DeleteIDState deletePrimaryID(
-            int nodeID,
-            String primaryID)
-        throws TException
-    {
-        long startTime = DateUtil.getEpochUTCDate();
-        StoreNode node = nodeManager.getStoreNode(nodeID);
-        NodeInf can = node.getCan();
-        DeleteIDState state = can.deletePrimaryID(primaryID);
-        bump("deletePrimaryID", startTime);
-        return state;
-    }
-
-    @Override
-    public DeleteIDState deleteLocalID(
-            int nodeID,
-            String context,
-            String localID)
-        throws TException
-    {
-        long startTime = DateUtil.getEpochUTCDate();
-        StoreNode node = nodeManager.getStoreNode(nodeID);
-        NodeInf can = node.getCan();
-        DeleteIDState state = can.deleteLocalID(context, localID);
-        bump("deleteLocalID", startTime);
-        return state;
     }
 
     @Override

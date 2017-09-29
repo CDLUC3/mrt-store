@@ -61,12 +61,6 @@ public class StorageServiceState
     protected DateState accessDateTime = null;
     protected DateState creationDateTime = null;
     protected DateState updateDateTime = null;
-    protected long numFiles = 0;
-    protected long numVersions = 0;
-    protected long numObjects = 0;
-    protected long totalSize = 0;
-    protected long numActualFiles = 0;
-    protected long totalActualSize = 0;
     protected String commands = null;
     protected String accessURI = null;
     protected String supportURI = null;
@@ -164,45 +158,6 @@ public class StorageServiceState
     }
 
     @Override
-    public long getNumFiles() {
-        return numFiles;
-    }
-
-    /**
-     * Set approximate number of files in Node
-     * @param numFiles approximate number of files in Node
-     */
-    public void setNumFiles(long numFiles) {
-        this.numFiles = numFiles;
-    }
-
-    @Override
-    public long getNumObjects() {
-        return numObjects;
-    }
-
-    /**
-     * Set approximate number of Objects within Node
-     * @param numObjects approximate number of Objects within Node
-     */
-    public void setNumObjects(long numObjects) {
-        this.numObjects = numObjects;
-    }
-
-    @Override
-    public long getNumVersions() {
-        return numVersions;
-    }
-
-    /**
-     * approximate number of Version within Node
-     * @param numVersions approximate number of Version within Node
-     */
-    public void setNumVersions(long numVersions) {
-        this.numVersions = numVersions;
-    }
-
-    @Override
     public DateState getUpdateDateTime() {
         return updateDateTime;
     }
@@ -226,12 +181,6 @@ public class StorageServiceState
         if (node == null) return;
         nodeStates.add(node);
         addNodeRef(node);
-        numFiles += node.getNumFiles();
-        numVersions += node.getNumVersions();
-        numObjects += node.getNumObjects();
-        totalSize += node.getTotalSize();
-        numActualFiles += node.getNumActualFiles();
-        totalActualSize += node.getTotalActualSize();
 
         accessDateTime = maxTime(accessDateTime, node.getAccessDateTime());
         creationDateTime = maxTime(creationDateTime, node.getCreated());
@@ -381,61 +330,12 @@ public class StorageServiceState
         this.setServiceScheme(spec);
     }
 
-    /**
-     * Get total size in bytes of service
-     * @return total size in bytes
-     */
-    public long getTotalSize() {
-        return totalSize;
-    }
-
-    /**
-     * Number of files - not specifically components
-     * @return number of files
-     */
-    public long getNumActualFiles() {
-        return numActualFiles;
-    }
-
-    /**
-     * set number of file - not specifically components
-     * @param numActualFiles
-     */
-    public void setNumActualFiles(long numActualFiles) {
-        this.numActualFiles = numActualFiles;
-    }
-
-    /**
-     * get the number of files - not specifically components
-     * @return number of files
-     */
-    public long getTotalActualSize() {
-        return totalActualSize;
-    }
-
-    public void setTotalActualSize(long totalActualSize) {
-        this.totalActualSize = totalActualSize;
-    }
-
-
-    /**
-     * Set total size in bytes of Service
-     * @param totalSize total size in bytes of Service
-     */
-    public void setTotalSize(long totalSize) {
-        this.totalSize = totalSize;
-    }
-
     public String dump(String header)
     {
         return header + ":"
                     + " - serviceName=" + getName()
                     + " - serviceID=" + getIdentifier()
                     + " - serviceVersion=" + getServiceScheme()
-                    + " - numObjects=" + getNumObjects()
-                    + " - numVersions=" + getNumVersions()
-                    + " - numFiles=" + getNumFiles()
-                    + " - totalSize=" + getTotalSize()
                     + " - accessDateTime=" + getAccessDateTime()
                     + " - creationDateTime=" + getCreated()
                     + " - updateDateTime=" + getUpdateDateTime()

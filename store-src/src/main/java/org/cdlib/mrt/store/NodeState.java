@@ -81,12 +81,6 @@ public class NodeState
     protected String description = null;
     protected boolean verifyOnRead = true;
     protected boolean verifyOnWrite = true;
-    protected long numFiles = 0;
-    protected long numVersions = 0;
-    protected long numObjects = 0;
-    protected long totalSize = 0;
-    protected long numActualFiles = 0;
-    protected long totalActualSize = 0;
     protected String baseURI = null;
     protected String supportURI = null;
     protected String logicalVolume = null;
@@ -204,18 +198,7 @@ public class NodeState
         File log = new File(nodeHome, "log");
         if ((log == null) && !log.exists()) {
             log.mkdir();
-        }
-        File statsFile = new File(log, CANSTATS);
-        CANStats stats = new CANStats(statsFile);
-        numObjects = stats.getCount(CANStats.OBJECTCNT);
-        numVersions = stats.getCount(CANStats.VERSIONCNT);
-        numFiles = stats.getCount(CANStats.COMPONENTFILECNT);
-        totalSize = stats.getCount(CANStats.COMPONENTTOTALSIZE);
-        numActualFiles = stats.getCount(CANStats.FILECNT);
-        totalActualSize = stats.getCount(CANStats.TOTALSIZE);
-
-        lastModified = new DateState(statsFile.lastModified());
-        creationDateTime = new DateState(nodeHome.lastModified());
+        };
     }
 
 
@@ -570,95 +553,6 @@ public class NodeState
     public void setLastModified(DateState lastModified)
     {
         this.lastModified = lastModified;
-    }
-
-    @Override
-    public long getNumFiles()
-    {
-        return numFiles;
-    }
-
-    /**
-     * Set total number of Files in this node
-     * @param numFiles total number of Files
-     */
-    public void setNumFiles(long numFiles)
-    {
-        this.numFiles = numFiles;
-    }
-
-    @Override
-    public long getNumVersions()
-    {
-        return numVersions;
-    }
-
-    /**
-     * Set total number of versions in this node
-     * @param numVersions total number of versions
-     */
-    public void setNumVersions(long numVersions)
-    {
-        this.numVersions = numVersions;
-    }
-
-    @Override
-    public long getNumObjects()
-    {
-        return numObjects;
-    }
-
-    /**
-     * Set total number of objects in Node
-     * @param numObjects number of objects
-     */
-    public void setNumObjects(int numObjects)
-    {
-        this.numObjects = numObjects;
-    }
-
-    /**
-     * Get total number bytes this node
-     * @return total number of bytes
-     */
-    public long getTotalSize() {
-        return totalSize;
-    }
-
-    /**
-     * Set Total number bytes for this node
-     * @param totalSize number of files in this node
-     */
-    public void setTotalSize(long totalSize) {
-        this.totalSize = totalSize;
-    }
-
-    /**
-     * Number of files - not specifically components
-     * @return number of files
-     */
-    public long getNumActualFiles() {
-        return numActualFiles;
-    }
-
-    /**
-     * set number of file - not specifically components
-     * @param numActualFiles
-     */
-    public void setNumActualFiles(long numActualFiles) {
-        this.numActualFiles = numActualFiles;
-    }
-
-    /**
-     * get the number of files - not specifically components
-     * @return number of files
-     */
-    public long getTotalActualSize() {
-        return totalActualSize;
-    }
-
-    public void setTotalActualSize(long totalActualSize) {
-        this.totalActualSize = totalActualSize;
     }
 
     /**

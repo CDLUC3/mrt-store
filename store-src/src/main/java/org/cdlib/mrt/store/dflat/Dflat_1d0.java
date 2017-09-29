@@ -55,7 +55,6 @@ import org.cdlib.mrt.utility.StringUtil;
  */
 public class Dflat_1d0
         extends ObjectStoreAbs
-        implements ObjectStoreInf
 {
     protected static final String NAME = "Dflat";
     protected static final String MESSAGE = NAME + ": ";
@@ -102,7 +101,7 @@ public class Dflat_1d0
         log(MESSAGE + "instantiation entered", 10);
     }
 
-    @Override
+    //@Override
     public VersionState addVersion (
                 File objectStoreBase,
                 Identifier objectID,
@@ -123,7 +122,7 @@ public class Dflat_1d0
         }
     }
     
-    @Override
+    //@Override
     public VersionState updateVersion (
             File objectStoreBase,
             Identifier objectID,
@@ -149,7 +148,7 @@ public class Dflat_1d0
         }
     }
 
-    @Override
+    //@Override
     public ObjectState copyObject (
             File storeFile,
             NodeInf fromNode,
@@ -159,7 +158,7 @@ public class Dflat_1d0
         throw new TException.UNIMPLEMENTED_CODE("copyObject not currently supported when toNode is d-flat");
     }
 
-    @Override
+    //@Override
     public VersionState deleteVersion (
                 File objectStoreBase,
                 Identifier objectID,
@@ -179,7 +178,7 @@ public class Dflat_1d0
         }
     }
 
-    @Override
+    //@Override
     public ObjectState deleteObject (
             File objectStoreBase,
             Identifier objectID)
@@ -210,7 +209,7 @@ public class Dflat_1d0
         return dflatSpec;
     }
 
-    @Override
+    //@Override
     public VersionContent getVersionContent (
             File objectStoreBase,
             Identifier objectID,
@@ -231,7 +230,7 @@ public class Dflat_1d0
         }
     }
 
-    @Override
+    //@Override
     public ObjectState getObjectState (
             File objectStoreBase,
             Identifier objectID)
@@ -251,7 +250,7 @@ public class Dflat_1d0
     }
 
 
-    @Override
+    //@Override
     public VersionState getVersionState (
             File objectStoreBase,
             Identifier objectID,
@@ -271,7 +270,7 @@ public class Dflat_1d0
         }
     }
 
-    @Override
+    //@Override
     public FileComponent getFileState (
             File objectStoreBase,
             Identifier objectID,
@@ -299,7 +298,7 @@ public class Dflat_1d0
         }
     }
 
-    @Override
+    //@Override
     public FileFixityState getFileFixityState (
             File objectStoreBase,
             Identifier objectID,
@@ -327,7 +326,7 @@ public class Dflat_1d0
         }
     }
 
-    @Override
+    //@Override
     public void keyToFile (
             File objectStoreBase,
             String key,
@@ -363,7 +362,7 @@ public class Dflat_1d0
         }
     }
 
-    @Override
+    //@Override
     public File getFile (
             File objectStoreBase,
             Identifier objectID,
@@ -386,7 +385,7 @@ public class Dflat_1d0
         }
     }
     
-    @Override
+    //@Override
     public void getFileStream (
             File objectStoreBase,
             Identifier objectID,
@@ -421,7 +420,7 @@ public class Dflat_1d0
         }
     }
 
-    @Override
+    //@Override
     public FileContent getObject(
             File objectStoreBase,
             Identifier objectID,
@@ -452,7 +451,7 @@ public class Dflat_1d0
 
     }
 
-    @Override
+    //@Override
     public void getObjectStream(
             File objectStoreBase,
             Identifier objectID,
@@ -482,7 +481,7 @@ public class Dflat_1d0
     }
 
 
-    @Override
+    //@Override
     public FileContent getVersionArchive(
             File objectStoreBase,
             Identifier objectID,
@@ -510,7 +509,7 @@ public class Dflat_1d0
     }
 
 
-    @Override
+    //@Override
     public void getVersionArchiveStream(
             File objectStoreBase,
             Identifier objectID,
@@ -534,7 +533,7 @@ public class Dflat_1d0
 
     }
 
-    @Override
+    //@Override
     public FileContent getVersionLink(
             File objectStoreBase,
             Identifier objectID,
@@ -558,7 +557,7 @@ public class Dflat_1d0
 
     }
 
-    @Override
+    //@Override
     public FileContent getObjectLink(
             File objectStoreBase,
             Identifier objectID,
@@ -580,7 +579,7 @@ public class Dflat_1d0
 
     }
     
-    @Override
+    //@Override
     public FileContent getCloudManifest(
             File objectStoreBase,
             Identifier objectID,
@@ -601,7 +600,7 @@ public class Dflat_1d0
         }
     }
     
-    @Override
+    //@Override
     public void getCloudManifestStream(
             File objectStoreBase,
             Identifier objectID,
@@ -697,13 +696,13 @@ public class Dflat_1d0
         return tex;
     }
     
-    @Override
+    //@Override
     public CloudStoreInf getCloudService()
     {
         return null;
     }
     
-    @Override
+    //@Override
     public String getCloudBucket()
     {
         return null;

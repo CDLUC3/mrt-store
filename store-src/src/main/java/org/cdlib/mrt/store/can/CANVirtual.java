@@ -34,41 +34,22 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.URL;
-import java.util.List;
-import org.cdlib.mrt.utility.URLEncoder;
-import java.util.Properties;
 import org.cdlib.mrt.cloud.ManifestSAX;
 
 
 
 import org.cdlib.mrt.core.Identifier;
-import org.cdlib.mrt.cloud.VersionData;
 import org.cdlib.mrt.cloud.VersionMap;
-import org.cdlib.mrt.store.app.jersey.KeyNameHttpInf;
-import org.cdlib.mrt.store.app.ValidateCmdParms;
 import org.cdlib.mrt.core.FileContent;
 import org.cdlib.mrt.store.FileFixityState;
 import org.cdlib.mrt.core.FileComponent;
-import org.cdlib.mrt.store.DeleteIDState;
-import org.cdlib.mrt.store.LastActivity;
-import org.cdlib.mrt.store.LocalIDsState;
 import org.cdlib.mrt.store.NodeState;
-import org.cdlib.mrt.store.ObjectLocationInf;
 import org.cdlib.mrt.store.ObjectState;
-import org.cdlib.mrt.store.ObjectStoreInf;
-import org.cdlib.mrt.store.PrimaryIDState;
 import org.cdlib.mrt.store.VersionContent;
 import org.cdlib.mrt.store.VersionState;
 import org.cdlib.mrt.store.action.CopyVirtualObject;
 import org.cdlib.mrt.store.action.CopyNodeObject;
-import org.cdlib.mrt.store.action.ProducerComponentList;
-import org.cdlib.mrt.utility.FileUtil;
-import org.cdlib.mrt.utility.HTTPUtil;
-import org.cdlib.mrt.utility.LinkedHashList;
 import org.cdlib.mrt.utility.LoggerInf;
-import org.cdlib.mrt.utility.SerializeUtil;
-import org.cdlib.mrt.utility.StringUtil;
 import org.cdlib.mrt.utility.TException;
 
 
@@ -169,20 +150,6 @@ public class CANVirtual
         return versionState;
     }
     
-
-    @Override
-    public LocalIDsState resetLocal (
-            Identifier objectID,
-            String context,
-            String localID)
-        throws TException
-    {
-      
-        throw new TException.UNIMPLEMENTED_CODE("Virtual node does not support resetLocal:"
-                + " - objectID=" + objectID.getValue()
-        );
-    }
-    
     @Override
     public VersionState deleteVersion (
             Identifier objectID,
@@ -205,39 +172,6 @@ public class CANVirtual
                 );
     }
 
-
-    /**
-     * Delete primaryID - localID maps using primaryID
-     * @param primaryID primaryID for maps to be deleted
-     * @return delete identifier state
-     */
-    @Override
-    public DeleteIDState deletePrimaryID(
-            String primaryID)
-        throws TException
-    {
-        throw new TException.UNIMPLEMENTED_CODE("Virtual node does not support delete:"
-                + " - primaryID=" + primaryID
-                );
-    }
-
-    /**
-     * Delete primaryID - localID maps using localID
-     * @param context context group for localID
-     * @param localID local identifier
-     * @return  delete identifier state
-     */
-    @Override
-    public DeleteIDState deleteLocalID(
-            String context,
-            String localID)
-        throws TException
-    { 
-        throw new TException.UNIMPLEMENTED_CODE("Virtual node does not support delete:"
-                + " - context=" + context
-                + " - localID=" + localID
-                );
-    }
 
     @Override
     public ObjectState getObjectState (
@@ -427,52 +361,6 @@ public class CANVirtual
         throws TException
     {
         return nodeState;
-    }
-
-
-    @Override
-    public PrimaryIDState getPrimaryID(
-            String context,
-            String localID)
-        throws TException
-    { 
-        String primaryID = null;
-        PrimaryIDState targetPIDS = targetNode.getPrimaryID(context, localID);
-        primaryID = targetPIDS.getPrimaryIdentifier();
-        if(!StringUtil.isAllBlank(primaryID)) {
-            targetPIDS.setPhysicalNode(targetNode.getNodeID());
-            return targetPIDS;
-        }
-        
-        PrimaryIDState sourcePIDS = sourceNode.getPrimaryID(context, localID);
-        primaryID = sourcePIDS.getPrimaryIdentifier();
-        sourcePIDS.setPhysicalNode(sourceNode.getNodeID());
-        return sourcePIDS;
-    }
-
-    @Override
-    public LocalIDsState getLocalIDsState(
-            String primaryID)
-        throws TException
-    {       VersionState versionState = null;
-        NodeInf physicalNode = null;
-        Identifier objectID = new Identifier(primaryID);
-        CanStatus status = getCanStatus(objectID);
-        if ((status == CanStatus.source_and_target) || (status == CanStatus.target_only)) {
-            physicalNode = targetNode;
-            
-        } else if (status == CanStatus.source_only) {
-            physicalNode = sourceNode;
-            
-        } else {
-            throw new TException.REQUESTED_ITEM_NOT_FOUND("getFileFixityState: object not found" 
-                + " - primaryID=" + primaryID 
-                );
-        }
-        
-        LocalIDsState localIDsState = physicalNode.getLocalIDsState(primaryID);
-        localIDsState.setPhysicalNode(physicalNode.getNodeID());
-        return localIDsState;
     }
     
     @Override

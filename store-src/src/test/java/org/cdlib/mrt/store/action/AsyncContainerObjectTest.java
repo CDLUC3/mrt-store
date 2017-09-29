@@ -5,7 +5,6 @@
 
 package org.cdlib.mrt.store.action;
 
-import org.cdlib.mrt.store.je.*;
 import java.io.File;
 import java.io.InputStream;
 import java.util.Properties;
@@ -22,7 +21,6 @@ import org.cdlib.mrt.utility.TException;
 import org.cdlib.mrt.utility.LoggerInf;
 import org.cdlib.mrt.utility.LoggerAbs;
 import org.cdlib.mrt.utility.PropertiesUtil;
-import org.cdlib.mrt.store.LocalIDsState;
 
 import static org.junit.Assert.*;
 
@@ -118,93 +116,6 @@ public class AsyncContainerObjectTest
             String out = AsyncContainerObject.insertHost(msg, "1033641266.tar.gz");
             System.out.println("OUT:\n" + out);
             
-            assertTrue(true);
-
-        } catch (Exception ex) {
-            assertFalse("Exception:" + ex, true);
-        }
-    }
-
-    //@Test
-    public void testStorageDeleteIDLocal()
-    {
-        //ark:/13030/j2rf56vz | Gearhart_6934 | ark:/13030/m5610x8b
-        try {
-            StorageIDClient client = new StorageIDClient();
-            Properties result = client.getPrimaryID(
-                    "http://localhost:28080/storage",
-                    "10",
-                    CONTEXT,
-                    LOCALID,
-                    "xml",
-                    10000
-                    );
-            System.out.println(PropertiesUtil.dumpProperties("testStorageDeleteID-get1", result));
-            assertTrue(true);
-
-            result = client.deleteLocalID(
-                   "http://localhost:28080/storage",
-                    "10",
-                    CONTEXT,
-                    LOCALID,
-                    "xml",
-                    10000
-                    );
-            System.out.println(PropertiesUtil.dumpProperties("testStorageDeleteID-delete", result));
-            assertTrue(true);
-
-
-            result = client.getPrimaryID(
-                    "http://localhost:28080/storage",
-                    "10",
-                    CONTEXT,
-                    LOCALID,
-                    "xml",
-                    10000
-                    );
-            System.out.println(PropertiesUtil.dumpProperties("testStorageDeleteID-get2", result));
-            assertTrue(true);
-
-        } catch (Exception ex) {
-            assertFalse("Exception:" + ex, true);
-        }
-    }
-
-    //@Test
-    public void testStorageDeleteIDPrimary()
-    {
-        //ark:/13030/j2rf56vz | Gearhart_6934 | ark:/13030/m5610x8b
-        try {
-            StorageIDClient client = new StorageIDClient();
-            Properties result = client.getLocalIDs(
-                    "http://localhost:28080/storage",
-                    "10",
-                    PRIMARYID,
-                    "xml",
-                    10000
-                    );
-            System.out.println(PropertiesUtil.dumpProperties("testStorageDeleteID-get1", result));
-            assertTrue(true);
-
-            result = client.deletePrimaryID(
-                   "http://localhost:28080/storage",
-                    "10",
-                    PRIMARYID,
-                    "xml",
-                    10000
-                    );
-            System.out.println(PropertiesUtil.dumpProperties("testStorageDeleteID-delete", result));
-            assertTrue(true);
-
-
-            result = client.getLocalIDs(
-                    "http://localhost:28080/storage",
-                    "10",
-                    PRIMARYID,
-                    "xml",
-                    10000
-                    );
-            System.out.println(PropertiesUtil.dumpProperties("testStorageDeleteID-get2", result));
             assertTrue(true);
 
         } catch (Exception ex) {

@@ -41,7 +41,6 @@ import org.cdlib.mrt.store.NodeInf;
 import org.cdlib.mrt.store.ObjectLocationInf;
 import org.cdlib.mrt.store.ObjectStoreInf;
 
-import com.sleepycat.je.Transaction;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.net.URL;
@@ -60,19 +59,14 @@ import org.cdlib.mrt.store.action.ProducerComponentList;
 import org.cdlib.mrt.cloud.CloudList;
 import org.cdlib.mrt.s3.service.CloudStoreInf;
 import org.cdlib.mrt.store.action.CloudArchive;
-import org.cdlib.mrt.store.ContextLocalID;
-import org.cdlib.mrt.store.DeleteIDState;
 import org.cdlib.mrt.store.LastActivity;
-import org.cdlib.mrt.store.LocalIDsState;
 import org.cdlib.mrt.store.NodeState;
 import org.cdlib.mrt.store.ObjectState;
-import org.cdlib.mrt.store.PrimaryIDState;
 import org.cdlib.mrt.store.SpecScheme;
 import org.cdlib.mrt.store.VersionContent;
 import org.cdlib.mrt.store.VersionState;
 import org.cdlib.mrt.store.action.CopyNodeObject;
 import org.cdlib.mrt.store.action.CopyVirtualObject;
-import org.cdlib.mrt.store.je.LocalIDDatabase;
 import org.cdlib.mrt.store.KeyFileInf;
 import org.cdlib.mrt.utility.ArchiveBuilder;
 import org.cdlib.mrt.utility.FileUtil;
@@ -140,7 +134,6 @@ public class CAN
                 throw new TException.INVALID_OR_MISSING_PARM(
                         MESSAGE + "addVersion - manifestFile missing");
             }
-            matchID(context, localID, objectID);
             
             objectLocationFile = objectLocation.getObjectLocation(objectID);
             objectAlreadyExists = objectLocationFile.exists();
@@ -149,7 +142,6 @@ public class CAN
             }
             versionState = objectStore.addVersion(objectLocationFile, objectID, manifestFile);
             versionState.setObjectID(objectID);
-            setLocalIDs(context, localID, objectID);
             updateCANStats(versionState);
             setLastActivity(LastActivity.Type.LASTADDVERSION);
 
@@ -197,7 +189,6 @@ public class CAN
                 throw new TException.INVALID_OR_MISSING_PARM(
                         MESSAGE + "updateVersion - either manifestFile or deleteList must be included");
             }
-            matchID(context, localID, objectID);
             
             objectLocationFile = objectLocation.getObjectLocation(objectID);
             objectAlreadyExists = objectLocationFile.exists();
@@ -206,7 +197,7 @@ public class CAN
             }
             versionState = objectStore.updateVersion(objectLocationFile, objectID, manifestFile, deleteList);
             versionState.setObjectID(objectID);
-            setLocalIDs(context, localID, objectID);
+            
             updateCANStats(versionState);
             setLastActivity(LastActivity.Type.LASTADDVERSION);
 
@@ -232,155 +223,6 @@ public class CAN
         }
     }
 
-    
-    
-    /**
-     * Reset local identifiers
-     * @param objectID object identifier
-     * @param context access group/profile for this item
-     * @param localID local identifier
-     * @return
-     * @throws TException Exception condition during storage service procssing
-     */
-    @Override
-    public LocalIDsState resetLocal(
-            Identifier objectID,
-            String context,
-            String localID)
-    throws TException
-    {
-        LocalIDsState state = null;
-        boolean objectAlreadyExists = false;
-        File objectLocationFile = null;
-        try {
-            setLocalIDs(context, localID, objectID);
-            state = getLocalIDsState(objectID.getValue());
-            log(MESSAGE + "resetLocal complete"
-                + " - objectID=" + objectID
-                , 10);
-            return state;
-
-        } catch (Exception ex) {
-            System.out.println("!!!!Exception:" + ex + "Trace:" + StringUtil.stackTrace(ex));
-            throw makeGeneralTException("addVersion", ex);
-        }
-    }
-    
-    protected boolean setLocalID(
-            String context, 
-            String localID,
-            Identifier objectID)
-        throws TException
-    {
-        boolean write = false;
-        if (!testLocalID(context, localID)) return write;
-
-        String objectIDS = objectID.getValue();
-        LocalIDDatabase localIDDatabase = getLocalIDDb();
-        log(MESSAGE + "setLocalID entered"
-            + " - context=" + context
-            + " - localID=" + localID
-            + " - objectID=" + objectIDS
-            , 10);
-
-        Transaction txn = null;
-        try {
-            txn = localIDDatabase.beginTransaction();
-            write = localIDDatabase.writeDb(context, localID, objectIDS);
-            localIDDatabase.commitTransaction(txn);
-            File idmap = localIDDatabase.getDbEnvPath();
-            File idmapBack = new File(idmap, "idmapback.txt");
-            localIDDatabase.appendBackup(context, localID, objectIDS, idmapBack);
-            try {
-                if (DEBUG) System.out.println(MESSAGE + "write to file:" + idmapBack.getCanonicalPath());
-            } catch (Exception e) { }
-            
-        } catch (TException ex) {
-            localIDDatabase.abortTransaction(txn);
-            throw ex;
-        }
-        PrimaryIDState primaryIDState
-                = localIDDatabase.getPrimaryIDState(context, localID);
-        return write;
-    }
-    
-    protected boolean matchID(
-            String context, 
-            String localID, 
-            Identifier objectID)
-        throws TException
-    {
-        boolean match = false;
-        if (!testLocalID(context, localID)) return match;
-        String objectIDS = objectID.getValue();
-
-        LocalIDDatabase localIDDatabase = getLocalIDDb();
-        log(MESSAGE + "matchID entered"
-            + " - context=" + context
-            + " - localID=" + localID
-            + " - objectID=" + objectIDS
-            , 10);
-        PrimaryIDState primaryIDState
-                = getPrimaryIDState(context, localID);
-
-        if (primaryIDState != null) {
-            String primaryID = primaryIDState.getPrimaryIdentifier();
-            if (StringUtil.isNotEmpty(primaryID)) {
-
-                if (!primaryID.equals(objectID.getValue())) {
-                    throw new TException.INVALID_OR_MISSING_PARM(
-                            MESSAGE + "addVersion - localID supplied but existing mapped objectID does match:"
-                            + " - context=" + context
-                            + " - localID=" + localID
-                            + " - primaryID=" + primaryID
-                            + " - objectID=" + objectID.getValue()
-                            );
-                }
-                match = true;
-            }
-        }
-
-        /*
-        LocalIDMap localIDMap = localIDDatabase.readPrimaryDb(objectIDS);
-
-        if (localIDMap != null) {
-            String matchContext = localIDMap.getContext();
-            String matchLocalID = localIDMap.getLocalID();
-            if (StringUtil.isNotEmpty(matchContext)
-                    && StringUtil.isNotEmpty(matchLocalID)) {
-
-                if (!localID.equals(matchLocalID)
-                        || !context.equals(matchContext)) {
-                    throw new TException.REQUEST_INVALID(
-                            MESSAGE + "matchID - saved context or localID already exists for this objectID and does not match"
-                            + " - context=" + context
-                            + " - matchContext=" + matchContext
-                            + " - localID=" + localID
-                            + " - matchLocalID=" + matchLocalID
-                            + " - objectID=" + objectIDS
-                            );
-                }
-            }
-        }
-         */
-        return match;
-            
-    }
-    
-    protected boolean testLocalID(String context, String localID)
-        throws TException
-    {
-        if (StringUtil.isNotEmpty(localID)) {
-            if (StringUtil.isEmpty(context)) {
-                throw new TException.INVALID_OR_MISSING_PARM(
-                        MESSAGE + "addVersion - if localID supplied then context is required"
-                        + " - localID=" + localID
-                        );
-            }
-            return true;
-        }
-        return false;
-    }
 
     /**
      * Delete the current version of an object
@@ -462,13 +304,6 @@ public class CAN
             objectState = objectStore.deleteObject(objectLocationFile, objectID);
             updateCANStatsDelete(objectState);
             setLastActivity(LastActivity.Type.LASTDELETEOBJECT);
-            DeleteIDState deleteState = null;
-            try {
-                deleteState = deletePrimaryID(objectID.getValue());
-                objectState.setDeleteIDState(deleteState);
-            } catch (Exception ex) {
-                System.out.println("WARNING: deletePrimaryID exception:" + ex);
-            }
             log(MESSAGE + "deleteObject complete"
                 + " - objectID=" + objectID
                 , 10);
@@ -812,36 +647,6 @@ public class CAN
             throw makeGeneralTException("getVersionState", ex);
         }
     }
-
-    @Override
-    public PrimaryIDState getPrimaryID(
-            String context,
-            String localID)
-        throws TException
-    {
-        PrimaryIDState primaryIDState = null;
-        try {
-            if (StringUtil.isEmpty(context)) {
-                throw new TException.INVALID_OR_MISSING_PARM(
-                        MESSAGE + "getPrimaryID - context required");
-            }
-
-            if (StringUtil.isEmpty(localID)) {
-                throw new TException.INVALID_OR_MISSING_PARM(
-                        MESSAGE + "getPrimaryID - localID required");
-            }
-            primaryIDState = getPrimaryIDState(context, localID);
-            log(MESSAGE + "getPrimaryID "
-                + " - " + primaryIDState.dump("primaryIDState")
-                , 10);
-            return primaryIDState;
-
-        } catch (Exception ex) {
-            throw makeGeneralTException("getObjectState", ex);
-        }
-    }
-
-
 
     @Override
     public ObjectState getObjectState (
@@ -1412,121 +1217,6 @@ public class CAN
         }
         return idList;
     }
-
-    /**
-     * get unique primaryID for multiple localID's
-     * @param context qualifying context for localID's
-     * @param localIDConcata collection of one or more localIDs separated by ;
-     * @return Primary Identifier state
-     * @throws TException
-     */
-    public PrimaryIDState getPrimaryIDState(
-            String context,
-            String localIDConcat)
-        throws TException
-    {
-        try {
-            if (!testLocalID(context, localIDConcat)) return null;
-            String primaryID = null;
-            String localID = null;
-            PrimaryIDState primaryIDState = null;
-            List<String> ids = getLocalIDs(localIDConcat);
-            LocalIDDatabase localIDDatabase = getLocalIDDb();
-            PrimaryIDState returnPrimaryIDState = new PrimaryIDState(context, localIDConcat);
-            for (String loopLocalID : ids) {
-                log("getPrimaryIDState test: \"" + loopLocalID + "\"", 5);
-                primaryIDState
-                    = localIDDatabase.getPrimaryIDState(context, loopLocalID);
-                String loopPrimaryID = primaryIDState.getPrimaryIdentifier();
-                if (primaryID == null) {
-                    primaryID = loopPrimaryID;
-                    localID = loopLocalID;
-                } else {
-                    if (StringUtil.isEmpty(loopPrimaryID)) { }
-                    else if (!primaryID.equals(loopPrimaryID)) {
-                        throw new TException.REQUEST_INVALID("Two or more local identifiers map to different primary identifiers:"
-                                + " - " + loopLocalID + "=" + loopPrimaryID
-                                + " - " + localID + "=" + primaryID);
-                    }
-                }
-            }
-            if (primaryID != null) {
-                returnPrimaryIDState.setPrimaryIdentifier(primaryID);
-                returnPrimaryIDState.setExists(true);
-            } else {
-                returnPrimaryIDState.setExists(false);
-            }
-            return returnPrimaryIDState;
-
-        } catch (Exception ex) {
-            throw makeGeneralTException("getObjectState", ex);
-        }
-    }
-
-
-
-    /**
-     * delete multiple localID maps from db using a single primaryID
-     * @param primaryID primary identifier use to map to localIDs
-     * @return list of localIDs
-     * @throws TException
-     */
-    @Override
-    public DeleteIDState deletePrimaryID(
-            String primaryID)
-        throws TException
-    {
-        DeleteIDState deleteIDState = null;
-        try {
-            if (StringUtil.isEmpty(primaryID)) return null;
-            deleteIDState = new DeleteIDState(primaryID);
-            LocalIDsState localIDsState = getLocalIDsState(primaryID);
-            deleteIDState.setDeletedPrimaryID(localIDsState.getPrimaryIdentifier());
-            deleteIDState.setExists(localIDsState.isExists());
-            deleteIDState.setDeletedLocalIDs(localIDsState.getLocalIDs());
-            LocalIDDatabase localIDDatabase = getLocalIDDb();
-            boolean delete = localIDDatabase.deletePrimaryID(primaryID);
-            deleteIDState.setDeleted(delete);
-            return deleteIDState;
-
-        } catch (Exception ex) {
-            throw makeGeneralTException("getLocalIDsState", ex);
-        }
-    }
-
-
-    /**
-     * Delete primaryID - localID maps using localID
-     * @param context context group for localID
-     * @param localID local identifier
-     * @return  delete identifier state
-     */
-    @Override
-    public DeleteIDState deleteLocalID(
-            String context,
-            String localID)
-        throws TException
-    {
-        DeleteIDState deleteIDState = new DeleteIDState(context, localID);
-        try {
-            if (StringUtil.isEmpty(context)) return null;
-            if (StringUtil.isEmpty(localID)) return null;
-            deleteIDState = new DeleteIDState(context, localID);
-            LocalIDDatabase localIDDatabase = getLocalIDDb();
-            PrimaryIDState primaryIDState
-                    = localIDDatabase.getPrimaryIDState(context, localID);
-            deleteIDState.setExists(primaryIDState.isExists());
-            deleteIDState.setDeletedPrimaryID(primaryIDState.getPrimaryIdentifier());
-            ContextLocalID contextLocalID = primaryIDState.retrieveContextLocalID();
-            deleteIDState.addContextLocalID(contextLocalID);
-            boolean delete = localIDDatabase.deleteLocalID(context, localID);
-            deleteIDState.setDeleted(delete);
-            return deleteIDState;
-
-        } catch (Exception ex) {
-            throw makeGeneralTException("getLocalIDsState", ex);
-        }
-    }
     
     @Override
     public ObjectState copyObject (
@@ -1622,58 +1312,6 @@ public class CAN
             
         } catch (Exception ex) {
             throw new TException(ex);
-        }
-    }
-    /**
-     * get multiple localIDs from db using a single primaryID
-     * @param primaryID primary identifier use to map to localIDs
-     * @return list of localIDs
-     * @throws TException
-     */
-    public LocalIDsState getLocalIDsState(
-            String primaryID)
-        throws TException
-    {
-        try {
-            if (StringUtil.isEmpty(primaryID)) return null;
-            LocalIDDatabase localIDDatabase = getLocalIDDb();
-            return localIDDatabase.readPrimaryArrayDb(primaryID);
-
-        } catch (Exception ex) {
-            throw makeGeneralTException("getLocalIDsState", ex);
-        }
-    }
-
-    /**
-     * update each primary-localid pair
-     * @param context qualifying context for localID's
-     * @param localIDConcata collection of one or more localIDs separated by ;
-     * @return Primary Identifier state
-     * @throws TException
-     */
-    public void setLocalIDs(
-            String context,
-            String localIDConcat,
-            Identifier objectID)
-        throws TException
-    {
-        if (!testLocalID(context, localIDConcat)) return;
-        try {
-            String primaryID = objectID.toString();
-            PrimaryIDState primaryIDState = null;
-            LocalIDDatabase localIDDatabase = getLocalIDDb();
-            List<String> ids = getLocalIDs(localIDConcat);
-            for (String loopLocalID : ids) {
-                primaryIDState
-                    = localIDDatabase.getPrimaryIDState(context, loopLocalID);
-                String loopPrimaryID = primaryIDState.getPrimaryIdentifier();
-                if (StringUtil.isEmpty(loopPrimaryID)) {
-                    setLocalID(context, loopLocalID, objectID);
-                }
-            }
-
-        } catch (Exception ex) {
-            throw makeGeneralTException("getObjectState", ex);
         }
     }
 }

@@ -54,7 +54,6 @@ public class ObjectState
     protected Long statsNumFiles = null;
     public Long statsSize = null;
     protected URL accessURL = null;
-    protected DeleteIDState deleteIDState = null;
     protected Integer nodeID = null;
     protected DateState lastFixity = null;
     protected DateState lastAddVersion = null;
@@ -280,15 +279,6 @@ public class ObjectState
 
     public void setLocalID(String localID) {
         this.localID = localID;
-    }
-
-    @Override
-    public DeleteIDState getDeleteIDState() {
-        return deleteIDState;
-    }
-
-    public void setDeleteIDState(DeleteIDState deleteIDState) {
-        this.deleteIDState = deleteIDState;
     }
 
     @Override

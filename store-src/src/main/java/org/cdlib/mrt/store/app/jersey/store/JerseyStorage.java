@@ -31,12 +31,11 @@ package org.cdlib.mrt.store.app.jersey.store;
 
 import org.cdlib.mrt.store.app.jersey.*;
 import org.cdlib.mrt.store.app.*;
-import java.io.InputStream;
 
 
 import javax.servlet.ServletConfig;
-import com.sun.jersey.spi.CloseableService;
-import javax.servlet.http.HttpServletRequest;
+import org.glassfish.jersey.media.multipart.FormDataParam;
+import org.glassfish.jersey.server.CloseableService;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
@@ -44,15 +43,11 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.StreamingOutput;
-
-import com.sun.jersey.multipart.FormDataParam;
 import org.cdlib.mrt.core.Identifier;
 
 import org.cdlib.mrt.formatter.FormatterInf;
@@ -60,7 +55,6 @@ import org.cdlib.mrt.store.storage.StorageServiceInf;
 import org.cdlib.mrt.store.app.jersey.KeyNameHttpInf;
 import org.cdlib.mrt.utility.StateInf;
 import org.cdlib.mrt.utility.TException;
-import org.cdlib.mrt.utility.TFrame;
 import org.cdlib.mrt.utility.LoggerInf;
 import org.cdlib.mrt.utility.StringUtil;
 
@@ -196,64 +190,6 @@ public class JerseyStorage
     {
         int nodeID = getNodeID(nodeIDS);
         return getFileState(nodeID, objectIDS, versionIDS, fileID, formatType, cs, sc);
-    }
-
-    @GET
-    @Path("primary/{nodeid}/{context}/{localidid}")
-    public Response getPrimaryID(
-            @PathParam("nodeid") String nodeIDS,
-            @PathParam("context") String context,
-            @PathParam("localidid") String localID,
-            @DefaultValue("xhtml") @QueryParam(KeyNameHttpInf.RESPONSEFORM) String formatType,
-            @Context CloseableService cs,
-            @Context ServletConfig sc)
-        throws TException
-    {
-        int nodeID = getNodeID(nodeIDS);
-        return getPrimaryIDProcess(nodeID, context, localID, formatType, cs, sc);
-    }
-
-    @GET
-    @Path("local/{nodeid}/{primaryid}")
-    public Response getLocalIDs(
-            @PathParam("nodeid") String nodeIDS,
-            @PathParam("primaryid") String primaryID,
-            @DefaultValue("xhtml") @QueryParam(KeyNameHttpInf.RESPONSEFORM) String formatType,
-            @Context CloseableService cs,
-            @Context ServletConfig sc)
-        throws TException
-    {
-        int nodeID = getNodeID(nodeIDS);
-        return getLocalIDsProcess(nodeID, primaryID, formatType, cs, sc);
-    }
-
-    @DELETE
-    @Path("primaryid/{nodeid}/{primaryid}")
-    public Response deletePrimaryID(
-            @PathParam("nodeid") String nodeIDS,
-            @PathParam("primaryid") String primaryID,
-            @DefaultValue("xhtml") @QueryParam(KeyNameHttpInf.RESPONSEFORM) String formatType,
-            @Context CloseableService cs,
-            @Context ServletConfig sc)
-        throws TException
-    {
-        int nodeID = getNodeID(nodeIDS);
-        return deletePrimaryID(nodeID, primaryID, formatType, cs, sc);
-    }
-
-    @DELETE
-    @Path("localid/{nodeid}/{context}/{localidid}")
-    public Response deleteLocalID(
-            @PathParam("nodeid") String nodeIDS,
-            @PathParam("context") String context,
-            @PathParam("localidid") String localID,
-            @DefaultValue("xhtml") @QueryParam(KeyNameHttpInf.RESPONSEFORM) String formatType,
-            @Context CloseableService cs,
-            @Context ServletConfig sc)
-        throws TException
-    {
-        int nodeID = getNodeID(nodeIDS);
-        return deleteLocalID(nodeID, context, localID, formatType, cs, sc);
     }
 
     @GET
@@ -468,35 +404,6 @@ public class JerseyStorage
         int sourceNode = getNodeID(sourceNodeS);
         int targetNode = getNodeID(targetNodeS);
         return copyObject(sourceNode, targetNode, objectIDS, formatType, cs, sc);
-    }
-
-    @POST
-    @Path("resetlocal/{nodeid}/{objectid}")
-    @Consumes(MediaType.MULTIPART_FORM_DATA)
-    public Response callResetLocalSpec(
-            @PathParam("nodeid") String nodeIDS,
-            @PathParam("objectid") String objectIDS,
-            @DefaultValue("") @FormDataParam("localContext") String localContext,
-            @DefaultValue("") @FormDataParam("localIdentifier") String localIDs,
-            @DefaultValue("xhtml") @FormDataParam("responseForm") String formatType,
-            @Context CloseableService cs,
-            @Context ServletConfig sc)
-        throws TException
-    {
-        if (DEBUG) System.out.println(MESSAGE + "ResetLocalSpec entered"
-                    + " - localContext=" + localContext + NL
-                    + " - localIDs=" + localIDs + NL
-                    );
-        if (DEBUG) System.out.println("callResetLocalSpec entered");
-        int nodeID = getNodeID(nodeIDS);
-        return resetLocal(
-                nodeID,
-                objectIDS,
-                localContext,
-                localIDs,
-                formatType,
-                cs,
-                sc);
     }
 
     /**
