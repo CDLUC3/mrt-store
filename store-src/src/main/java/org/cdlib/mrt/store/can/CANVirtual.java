@@ -42,6 +42,7 @@ import org.cdlib.mrt.core.Identifier;
 import org.cdlib.mrt.cloud.VersionMap;
 import org.cdlib.mrt.core.FileContent;
 import org.cdlib.mrt.store.FileFixityState;
+import org.cdlib.mrt.store.ObjectFixityState;
 import org.cdlib.mrt.core.FileComponent;
 import org.cdlib.mrt.store.NodeState;
 import org.cdlib.mrt.store.ObjectState;
@@ -353,6 +354,34 @@ public class CANVirtual
                 + " - objectID=" + objectID.getValue() 
                 + " - versionID=" + versionID 
                 + " - fileName=" + fileName
+                );
+    }
+    
+    /**
+     * Build call with serialization response
+     * Get response into object
+     * Return object
+     * @param objectID Object Identifier
+     * @param versionID Version Identifier
+     * @param fileName name of saved file
+     * @return
+     * @throws org.cdlib.mrt.utility.TException
+     */
+    @Override
+    public ObjectFixityState getObjectFixityState (
+            Identifier objectID)
+        throws TException
+    {
+ 
+        CanStatus status = getCanStatus(objectID);
+        if ((status == CanStatus.source_and_target) || (status == CanStatus.target_only)) {
+            return targetNode.getObjectFixityState(objectID);
+        }
+        if (status == CanStatus.source_only) {
+            return sourceNode.getObjectFixityState(objectID);
+        }
+        throw new TException.REQUESTED_ITEM_NOT_FOUND("getFileFixityState: object not found" 
+                + " - objectID=" + objectID.getValue() 
                 );
     }
 

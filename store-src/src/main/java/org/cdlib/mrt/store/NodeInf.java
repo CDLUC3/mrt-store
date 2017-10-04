@@ -194,6 +194,16 @@ public interface NodeInf
             int versionID,
             String fileName)
         throws TException;
+    
+    /**
+     * Perform a fixity test on a specific node-object
+     * @param objectID object identifier
+     * @return fixity state information from performing a fixity test
+     * @throws TException Exception condition during storage service procssing
+     */
+    public ObjectFixityState getObjectFixityState (
+            Identifier objectID)
+        throws TException;
 
     /**
      * Get file state information

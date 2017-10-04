@@ -54,13 +54,14 @@ import org.cdlib.mrt.core.Identifier;
 import org.cdlib.mrt.core.FileContent;
 import org.cdlib.mrt.store.FileFixityState;
 import org.cdlib.mrt.core.FileComponent;
-import org.cdlib.mrt.store.action.ArchiveComponent;
+import org.cdlib.mrt.cloud.action.FixityObject;
 import org.cdlib.mrt.store.action.ProducerComponentList;
 import org.cdlib.mrt.cloud.CloudList;
 import org.cdlib.mrt.s3.service.CloudStoreInf;
 import org.cdlib.mrt.store.action.CloudArchive;
 import org.cdlib.mrt.store.LastActivity;
 import org.cdlib.mrt.store.NodeState;
+import org.cdlib.mrt.store.ObjectFixityState;
 import org.cdlib.mrt.store.ObjectState;
 import org.cdlib.mrt.store.SpecScheme;
 import org.cdlib.mrt.store.VersionContent;
@@ -858,6 +859,30 @@ public class CAN
             fileFixityState.setVersionID(versionID);
             fileFixityState.setFileName(fileName);
             return fileFixityState;
+
+        } catch (Exception ex) {
+            throw makeGeneralTException("getFileFixityState", ex);
+        }
+    }
+
+    @Override
+    public ObjectFixityState getObjectFixityState (
+                Identifier objectID)
+        throws TException
+    {
+        try {
+            if (objectID == null) {
+                throw new TException.INVALID_OR_MISSING_PARM(
+                        MESSAGE + "getFileState - objectID required");
+            }
+            if (!objectLocation.objectExists(objectID)) {
+                throw new TException.REQUESTED_ITEM_NOT_FOUND(
+                        MESSAGE + "Object does not exist");
+            }
+            
+            File objectLocationFile = objectLocation.getObjectLocation(objectID);
+            ObjectFixityState objectFixityState = objectStore.getObjectFixityState(objectLocationFile, objectID);
+            return objectFixityState;
 
         } catch (Exception ex) {
             throw makeGeneralTException("getFileFixityState", ex);

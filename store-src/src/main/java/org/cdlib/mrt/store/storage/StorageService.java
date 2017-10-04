@@ -48,6 +48,7 @@ import org.cdlib.mrt.store.FileState;
 import org.cdlib.mrt.store.StoreNode;
 import org.cdlib.mrt.store.StorageServiceState;
 import org.cdlib.mrt.store.NodeState;
+import org.cdlib.mrt.store.ObjectFixityState;
 import org.cdlib.mrt.store.ObjectState;
 import org.cdlib.mrt.store.VersionContent;
 import org.cdlib.mrt.store.VersionState;
@@ -445,6 +446,24 @@ public class StorageService
         fileFixityState.setAccess( getAccessNodeID(nodeID), storeURL);
         bump("getFileFixityState", startTime);
         return fileFixityState;
+    }
+
+    @Override
+    public ObjectFixityState getObjectFixityState (
+            int nodeID,
+            Identifier objectID)
+        throws TException
+    {
+        long startTime = DateUtil.getEpochUTCDate();
+        StoreNode node = nodeManager.getStoreNode(nodeID);
+        if (node == null) {
+            throw new TException.REQUESTED_ITEM_NOT_FOUND("Requested node not found:" + nodeID);
+        }
+        NodeInf can = node.getCan();
+        ObjectFixityState objectFixityState =  can.getObjectFixityState(objectID);
+        objectFixityState.setPhysicalNode(nodeID);
+        bump("getObjectFixityState", startTime);
+        return objectFixityState;
     }
 
     @Override

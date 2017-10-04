@@ -60,6 +60,7 @@ import org.cdlib.mrt.cloud.action.CopyObject;
 import org.cdlib.mrt.cloud.action.DeleteCurrentVersion;
 import org.cdlib.mrt.cloud.action.DeleteObject;
 import org.cdlib.mrt.cloud.action.FixityFile;
+import org.cdlib.mrt.cloud.action.FixityObject;
 import org.cdlib.mrt.cloud.action.StateVersion;
 import org.cdlib.mrt.cloud.action.StateObject;
 import org.cdlib.mrt.cloud.action.StreamObject;
@@ -74,6 +75,7 @@ import org.cdlib.mrt.store.KeyFileInf;
 import org.cdlib.mrt.store.ObjectStoreAbs;
 import org.cdlib.mrt.store.ObjectStoreInf;
 import org.cdlib.mrt.store.FileFixityState;
+import org.cdlib.mrt.store.ObjectFixityState;
 import org.cdlib.mrt.store.ObjectState;
 import org.cdlib.mrt.store.VersionState;
 
@@ -369,6 +371,24 @@ public class CloudObjectService
                     + " - fileName=" + fileName
                     , 10);
             return (FileFixityState)fixityFile.callEx();
+
+        } catch (Exception ex) {
+            throw makeTException(ex);
+        }
+    }
+
+    @Override
+    public ObjectFixityState getObjectFixityState (
+            File objectStoreBase,
+            Identifier objectID)
+        throws TException
+    {
+        try {
+            FixityObject fixityObject = FixityObject.getFixityObject(s3service, bucket, objectID,logger);
+            log(MESSAGE + "FileFixityState entered"
+                    + " - objectID=" + objectID
+                    , 10);
+            return fixityObject.callEx();
 
         } catch (Exception ex) {
             throw makeTException(ex);
@@ -702,6 +722,7 @@ public class CloudObjectService
     
     protected TException makeTException(Exception ex)
     {
+        ex.printStackTrace();
         TException tex = null;
         if (ex instanceof TException) {
             tex = (TException)ex;

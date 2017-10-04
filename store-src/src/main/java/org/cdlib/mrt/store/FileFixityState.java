@@ -65,6 +65,8 @@ public class FileFixityState
     protected MessageDigest fileDigest = null;
     protected MessageDigest manifestDigest = null;
     protected Integer physicalNode = null;
+    protected String key = null;
+    protected Exception ex = null;
 
     protected URL accessURL = null;
     protected Integer nodeID = null;
@@ -188,4 +190,29 @@ public class FileFixityState
     public void setPhysicalNode(Integer physicalNode) {
         this.physicalNode = physicalNode;
     }
+
+    public Exception getEx() {
+        return ex;
+    }
+
+    public void setEx(Exception ex) {
+        this.ex = ex;
+    }
+
+    public boolean isSizeMatches() {
+        return sizeMatches;
+    }
+
+    public boolean isDigestMatches() {
+        return digestMatches;
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
+    }
+    
 }

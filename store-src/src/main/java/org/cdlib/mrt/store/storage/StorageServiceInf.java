@@ -41,6 +41,7 @@ import org.cdlib.mrt.core.PingState;
 import org.cdlib.mrt.store.FileFixityState;
 import org.cdlib.mrt.store.FileState;
 import org.cdlib.mrt.store.NodeState;
+import org.cdlib.mrt.store.ObjectFixityState;
 import org.cdlib.mrt.store.StorageServiceState;
 import org.cdlib.mrt.store.ObjectState;
 import org.cdlib.mrt.store.VersionContent;
@@ -433,6 +434,17 @@ public interface StorageServiceInf
             String fileName)
         throws TException;
 
+    /**
+     * Perform a fixity test on a specific node-object-version-file
+     * @param nodeID node identifier
+     * @param objectID object identifier
+     * @return fixity state information from performing a fixity test
+     * @throws TException Exception condition during storage service procssing
+     */
+    public ObjectFixityState getObjectFixityState (
+            int nodeID,
+            Identifier objectID)
+        throws TException;
 
     /**
      * Get file state information

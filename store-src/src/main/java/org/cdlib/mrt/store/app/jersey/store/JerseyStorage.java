@@ -209,6 +209,20 @@ public class JerseyStorage
     }
 
     @GET
+    @Path("fixity/{nodeid}/{objectid}")
+    public Response getObjectFixityState(
+            @PathParam("nodeid") String nodeIDS,
+            @PathParam("objectid") String objectIDS,
+            @DefaultValue("xhtml") @QueryParam(KeyNameHttpInf.RESPONSEFORM) String formatType,
+            @Context CloseableService cs,
+            @Context ServletConfig sc)
+        throws TException
+    {
+        int nodeID = getNodeID(nodeIDS);
+        return getObjectFixityState(nodeID, objectIDS, formatType, cs, sc);
+    }
+
+    @GET
     @Path("content/{nodeid}/{objectid}/{versionid}/{fileid}")
     public Response getFile(
             @PathParam("nodeid") String nodeIDS,

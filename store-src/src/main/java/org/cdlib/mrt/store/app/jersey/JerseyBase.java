@@ -665,6 +665,46 @@ public class JerseyBase
     }
 
     /**
+     * Perform a fixity test on a specific node-object-version-file
+     * @param nodeID node identifier
+     * @param objectIDS object identifier
+     * @param formatType user provided format type
+     * @param sc ServletConfig used to get system configuration
+     * @return formatted version state information
+     * @throws TException processing exception
+     */
+    public Response getObjectFixityState(
+            int nodeID,
+            String objectIDS,
+            String formatType,
+            CloseableService cs,
+            ServletConfig sc)
+        throws TException
+    {
+        LoggerInf logger = defaultLogger;
+        try {
+            Identifier objectID = getObjectID(objectIDS);
+            log("getObjectFixityState entered:"
+                    + " - formatType=" + formatType
+                    + " - nodeId=" + nodeID
+                    + " - objectID=" + objectID
+                    );
+            StorageServiceInit storageServiceInit = StorageServiceInit.getStorageServiceInit(sc);
+            StorageServiceInf storageService = storageServiceInit.getStorageService();
+            logger = getNodeLogger(nodeID, storageService);
+            StateInf responseState = storageService.getObjectFixityState(nodeID, objectID);
+            return getStateResponse(responseState, formatType, logger, cs, sc);
+
+        } catch (TException tex) {
+            return getExceptionResponse(cs, tex, formatType, logger);
+
+        } catch (Exception ex) {
+            System.out.println("TRACE:" + StringUtil.stackTrace(ex));
+            throw new TException.GENERAL_EXCEPTION(MESSAGE + "Exception:" + ex);
+        }
+    }
+
+    /**
      * Get a specific file for a node-object-version
      * @param nodeID node identifier
      * @param objectIDS object identifier
