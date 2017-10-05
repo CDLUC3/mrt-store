@@ -187,7 +187,7 @@ public class CloudUtil
     {
         try {
             if (StringUtil.isAllBlank(logicalVolume)) {
-                throw new TException.GENERAL_EXCEPTION(MESSAGE + "unable to load AWS Service logicalVolume required");
+                throw new TException.GENERAL_EXCEPTION(MESSAGE + "unable to load NodeIO Service logicalVolume required");
             }               
             String [] parts = logicalVolume.split("\\|");
             String nodeIOName = null;
