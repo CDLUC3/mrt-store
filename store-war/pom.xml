@@ -22,7 +22,7 @@
             <activeByDefault>true</activeByDefault>
           </activation>
           <properties>
-              <warLocation>${propertyDir}</warLocation>
+              <warLocation>war/${propertyDir}</warLocation>
               <warName>storage.war</warName>
           </properties>
       </profile>
