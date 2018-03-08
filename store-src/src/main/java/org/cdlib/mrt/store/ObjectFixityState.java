@@ -62,7 +62,7 @@ public class ObjectFixityState
     protected int errorCnt = 0;
     protected int exCnt = 0;
     protected boolean match = false;
-    protected ArrayList<FileFixityState> listErrors= new ArrayList();
+    protected ArrayList<FileFixityState> listErrors= new ArrayList<>();
 
     public ObjectFixityState() { }
     public Identifier getObjectID() {

@@ -78,7 +78,7 @@ public class StoreNodeManager
     protected Properties storeProperties = null;
     protected SpecScheme storageServiceSpec = null;
     protected PingState pingState = null;
-    protected ArrayList<Integer> virtual = new ArrayList();
+    protected ArrayList<Integer> virtual = new ArrayList<>();
     
     protected StoreNodeManager(LoggerInf logger, Properties conf)
         throws TException
@@ -601,7 +601,7 @@ public class StoreNodeManager
         return storeLink;
     }
     
-    public Map getNodeMap() {
+    public Map<Integer, StoreNode> getNodeMap() {
         return m_canTypes;
     }
     

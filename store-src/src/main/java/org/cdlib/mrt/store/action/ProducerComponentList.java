@@ -141,7 +141,7 @@ public class ProducerComponentList
         if (filterList == null) {
             filterHash = null;
         }
-        filterHash = new HashMap();
+        filterHash = new HashMap<>();
         for (String filterName : filterList) {
             filterHash.put(filterName, "p");
         }

@@ -80,7 +80,7 @@ public abstract class AddVersionContentAbs
     protected volatile long tallyCnt = 0;
     protected ThreadHandler threads = null;
     protected int nextVersion = -1;
-    protected ArrayList<EntryException> failList = new ArrayList();
+    protected ArrayList<EntryException> failList = new ArrayList<>();
     protected long failItem = -1;
     protected Tika tika = null;
     protected long contentAccumTime = 0;
@@ -275,7 +275,7 @@ public abstract class AddVersionContentAbs
         throws TException
     {   
         int failTries = 0;
-        ArrayList<FileComponent> processList = new ArrayList();
+        ArrayList<FileComponent> processList = new ArrayList<>();
         try {
             while(true) {
                 processList.clear();

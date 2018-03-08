@@ -78,7 +78,7 @@ public final class StorageEmail
     private static final boolean DEBUG = false;
     
     protected Session session = null;
-    protected ArrayList<String> recipientsBCC = new ArrayList();
+    protected ArrayList<String> recipientsBCC = new ArrayList<>();
     public StorageEmail(Properties emailProp)
     {
         setSession(emailProp, true);

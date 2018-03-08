@@ -111,7 +111,7 @@ public class NormVersionMap
         throws TException
     {   
         
-        HashMap<String,String> mimeList = new HashMap();
+        HashMap<String,String> mimeList = new HashMap<>();
         try {
             int current = map.getCurrent();
             if (DEBUG) System.out.println("setVersion"

@@ -86,7 +86,7 @@ public class CloudArchive
     
     protected File workBase = null;
     protected File copyBase = null;
-    protected ArrayList<ArchiveComponent> archiveList = new ArrayList();
+    protected ArrayList<ArchiveComponent> archiveList = new ArrayList<>();
     protected Tika tika = null;
     protected ArchiveBuilderBase.ArchiveType archiveType = null;
     protected String pairtreeName = null;

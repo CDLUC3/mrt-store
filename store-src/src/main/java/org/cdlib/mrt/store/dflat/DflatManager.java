@@ -935,7 +935,7 @@ public class DflatManager
             VersionContent versionContent)
         throws TException
     {
-        Vector<String> list = new Vector(100);
+        Vector<String> list = new Vector<>(100);
         getPOSTListManifest(list, baseURL, objectID, versionID, versionContent);
         return getManifestFileFromList(list);
     }

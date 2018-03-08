@@ -106,7 +106,7 @@ public class ArchiveComponentList
         throws TException
     {
         List<CloudList.CloudEntry> entryList = fullCloudList.getList();
-        editComponents = new ArrayList();
+        editComponents = new ArrayList<>();
         try {
             for (CloudList.CloudEntry entry: entryList) {
                 ArchiveComponent editComponent = getArchiveComponent(entry);

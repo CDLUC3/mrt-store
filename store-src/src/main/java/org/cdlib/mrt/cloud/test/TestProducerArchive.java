@@ -79,7 +79,7 @@ public class TestProducerArchive
                 "mrt-oaidc.xml"
             };
         
-        ArrayList<String> filterList = new ArrayList();
+        ArrayList<String> filterList = new ArrayList<>();
         for (String name : shortlist) {
             filterList.add(name);
         }

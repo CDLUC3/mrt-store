@@ -797,7 +797,7 @@ public class NodeState
      * @return list of producer file names to be excluded
      * @throws TException 
      */
-    public List setProducerFilter(Properties prop)
+    public List<String> setProducerFilter(Properties prop)
         throws TException
     {
         if (prop == null) {
@@ -818,10 +818,10 @@ public class NodeState
         return setProducerFilterDefault();
     }
     
-    protected List extractFilter(Properties prop)
+    protected List<String> extractFilter(Properties prop)
         throws TException
     {
-        ArrayList<String> producerFilter = new ArrayList();
+        ArrayList<String> producerFilter = new ArrayList<>();
         for(int i=1; i<=50; i++) {
             String value = prop.getProperty("producerFilter." + i);
             if (value != null) {
@@ -832,7 +832,7 @@ public class NodeState
         return producerFilter;
     }
     
-    protected List setProducerFilterDefault()
+    protected List<String> setProducerFilterDefault()
         throws TException
     {
         System.out.println("setProducerFilterDefault");
@@ -848,7 +848,7 @@ public class NodeState
                 "mrt-oaidc.xml",
                 "stash-wrapper.xml"
             };
-        ArrayList<String> producerFilter = new ArrayList();
+        ArrayList<String> producerFilter = new ArrayList<>();
         for (String name : shortlist) {
             producerFilter.add(name);
         }

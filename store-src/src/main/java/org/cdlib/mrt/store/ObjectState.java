@@ -47,7 +47,7 @@ public class ObjectState
 {
     private static final long serialVersionUID = 31L;
     protected Identifier objectID = null;
-    protected ArrayList<VersionState> versionList = new ArrayList(20);
+    protected ArrayList<VersionState> versionList = new ArrayList<>(20);
     protected int numVersions = 0;
     protected int numFiles = 0;
     public long size = 0;

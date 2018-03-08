@@ -100,7 +100,7 @@ public class AsyncContainerObject
     protected String body = null;
     protected String formatType = null;
     protected String name = null;
-    protected ArrayList<String> errBCC = new ArrayList();
+    protected ArrayList<String> errBCC = new ArrayList<>();
     protected String errMsg = null;
     protected CloudStoreInf cloudStore = null;
     protected String bucket = null;
