@@ -87,6 +87,9 @@ public class NodeState
     protected Integer targetNodeID = null;
     protected Integer sourceNodeID = null;
     protected Properties nodeStateProp = null;
+    protected Boolean testOk = null;
+    protected Boolean ok = null;
+    protected String error = null;
     
     /**
      * Empty constructor
@@ -133,6 +136,7 @@ public class NodeState
         setNodeForm(prop.getProperty(CNODEFORM));
         setSourceNodeID(prop.getProperty(CSOURCENODE));
         setTargetNodeID(prop.getProperty(CTARGETNODE));
+        setTestOk(prop.getProperty(CTESTOK));
         //setProducerFilter(prop);
         if (DEBUG) {
             System.out.println("!!!!Node(" + nodeID + "):" + dump("NodeState constructor"));
@@ -173,6 +177,7 @@ public class NodeState
         this.nodeForm = nodeState.nodeForm;
         this.sourceNodeID = nodeState.sourceNodeID;
         this.targetNodeID = nodeState.targetNodeID;
+        this.testOk = nodeState.testOk;
         setFileExtraction(nodeHome);
         /*
         System.out.println("Node(" + nodeID + "):" + dump("cmdtest"));
@@ -717,6 +722,44 @@ public class NodeState
         System.out.println ("sourcetNode:" + this.sourceNodeID);
     }
 
+
+    @Override
+    public Boolean getTestOk() {
+        return testOk;
+    }
+
+    public void setTestOk(Boolean testOk) {
+        this.testOk = testOk;
+    }
+    
+    public void setTestOk(String testOkS)
+        throws TException
+    {
+        this.testOk = testBoolean(testOkS, true);
+        System.out.println("***setTestOk"
+                + " - testOkS=" + testOkS
+                + " - testOk=" + testOk
+        );
+    }
+
+    @Override
+    public Boolean getOk() {
+        return ok;
+    }
+
+    public void setOk(Boolean ok) {
+        this.ok = ok;
+    }
+
+    @Override
+    public String getError() {
+        return error;
+    }
+
+    public void setError(String error) {
+        this.error = error;
+    }
+
     /**
      * Validate passed String for true/false/yes/no
      * @param boolS boolean value as string
@@ -728,6 +771,10 @@ public class NodeState
         throws TException
     {
         boolean localBool = defaultVal;
+        if (boolS == null) {
+            return localBool;
+        }
+        boolS = boolS.trim();
         if (StringUtil.isNotEmpty(boolS)) {
                 localBool = StringUtil.argIsTrue(boolS);
         }

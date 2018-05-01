@@ -207,6 +207,13 @@ public class CloudUtil
                 
             }
             NodeIO.AccessNode accessNode = NodeIO.getCloudNode(nodeIOName, nodeNumber, logger);
+            if (accessNode == null) {
+                throw new TException.REQUESTED_ITEM_NOT_FOUND(MESSAGE 
+                        + "NodeIO AccessNode not found for:"
+                        + " - nodeIOName=" + nodeIOName
+                        + " - nodeNumber=" + nodeNumber
+                );
+            }
             CloudStoreInf cloudService =  accessNode.service;
             return CloudObjectService.getCloudObjectState(cloudService, accessNode.container, logger);
 

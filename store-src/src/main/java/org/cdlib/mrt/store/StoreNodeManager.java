@@ -543,6 +543,12 @@ public class StoreNodeManager
                 storeNode = m_canTypes.get(nodeID);
                 try {
                     NodeState nodeState = storeNode.getCan().getNodeState();
+                    Boolean ok = nodeState.getOk();
+                    if ((ok != null) && !ok) {
+                        String msg = "Test state fails:" + nodeID;
+                        System.out.println(msg);
+                        throw new TException.EXTERNAL_SERVICE_UNAVAILABLE(msg);
+                    }
                     storageState.addNodeState(nodeState);
                     nodeCnt++;
                 } catch (TException.EXTERNAL_SERVICE_UNAVAILABLE esu) {

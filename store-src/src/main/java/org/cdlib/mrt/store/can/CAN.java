@@ -48,6 +48,7 @@ import java.util.ArrayList;
 import java.util.Properties;
 import org.cdlib.mrt.cloud.ManifestSAX;
 
+import org.cdlib.mrt.cloud.object.StateHandler;
 import org.cdlib.mrt.cloud.VersionMap;
 import org.cdlib.mrt.core.ComponentContent;
 import org.cdlib.mrt.core.Identifier;
@@ -76,6 +77,7 @@ import org.cdlib.mrt.utility.TException;
 import org.cdlib.mrt.utility.TLockFile;
 import org.cdlib.mrt.utility.LoggerInf;
 import org.cdlib.mrt.utility.StringUtil;
+import org.cdlib.mrt.store.cloud.CloudObjectService;
 
 /**
  * Specific Node level service
@@ -911,6 +913,23 @@ public class CAN
         currentNodeState.setLastAddVersion(lastActivity.getDate(LastActivity.Type.LASTADDVERSION));
         currentNodeState.setLastDeleteObject(lastActivity.getDate(LastActivity.Type.LASTDELETEOBJECT));
         currentNodeState.setLastDeleteVersion(lastActivity.getDate(LastActivity.Type.LASTDELETEVERSION));
+        if (objectStore instanceof CloudObjectService) {
+            if ((currentNodeState.getTestOk() == null) || currentNodeState.getTestOk()) {
+                CloudObjectService cos = (CloudObjectService)objectStore;
+                String bucket = cos.getCloudBucket();
+                CloudStoreInf cloudService = cos.getCloudService();
+                StateHandler.RetState returnCloudState = null;
+                try {
+                    returnCloudState = cloudService.getState(bucket);
+                } catch(Exception ex) {
+                    returnCloudState = new StateHandler.RetState(bucket, null, ex.toString());
+                }
+                if (returnCloudState != null) {
+                    currentNodeState.setOk(returnCloudState.getOk());
+                    currentNodeState.setError(returnCloudState.getError());
+                }
+            }
+        }
         return currentNodeState;
     }
 

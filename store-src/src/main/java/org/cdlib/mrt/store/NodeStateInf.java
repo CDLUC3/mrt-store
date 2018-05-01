@@ -65,6 +65,7 @@ public interface NodeStateInf
     public static final String CNODEFORM = "nodeForm";
     public static final String CSOURCENODE = "sourceNode";
     public static final String CTARGETNODE = "targetNode";
+    public static final String CTESTOK = "testOk";
 
     /**
      * Get assigned Node Name
@@ -220,6 +221,24 @@ public interface NodeStateInf
      * @return file, http
      */
     public String getNodeProtocol();
-            
+    
+    /**
+     * do full state test
+     * @return null=do test; true=do test; false=skip full state test
+     */
+    public Boolean getTestOk();
+    
+    /**
+     * test node
+     * @return status of node: null=unknown,true=running,false=error occurred
+     */
+    public Boolean getOk();
+    
+    /**
+     * test error
+     * @return null=no error; !null=error
+     */
+    public String getError();
+    
     public String dump(String header);
 }
