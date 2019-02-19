@@ -107,16 +107,30 @@ public class JerseyStorage
             throw new TException.GENERAL_EXCEPTION(MESSAGE + "Exception:" + ex);
         }
     }
-    
+        
     @GET
     @Path("ping")
     public Response getCallPingState(
+            @DefaultValue("") @QueryParam("SLEEP") String secondsS,
             @DefaultValue("false") @QueryParam("gc") String gcS,
             @DefaultValue("xhtml") @QueryParam(KeyNameHttpInf.RESPONSEFORM) String formatType,
             @Context CloseableService cs,
             @Context ServletConfig sc)
         throws TException
     {
+
+        if (!StringUtil.isAllBlank(secondsS)) {
+            try {
+                int seconds = 0;
+                seconds = Integer.parseInt(secondsS);
+                System.out.println("Ping sleep requested:" + seconds + "seconds");
+                Thread.sleep(seconds*1000);
+                
+            } catch (Exception ex) {
+                System.out.println("Sleep not performed Provided SLEEP seconds invalid:" 
+                            + secondsS);
+            }
+        }
         return getPingState(gcS, formatType, cs, sc);
     }
         
