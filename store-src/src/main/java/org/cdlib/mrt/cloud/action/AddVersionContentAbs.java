@@ -46,6 +46,8 @@ import org.cdlib.mrt.core.Identifier;
 
 
 import org.cdlib.mrt.cloud.utility.NormVersionMap;
+import org.cdlib.mrt.core.Manifest;
+import org.cdlib.mrt.core.ManifestRowAbs;
 import org.cdlib.mrt.core.Tika;
 import org.cdlib.mrt.store.VersionState;
 
@@ -149,6 +151,53 @@ public abstract class AddVersionContentAbs
                 System.out.println(MESSAGE + "****after - normVersionMap");
             }
             */
+            return map.getCurrent();
+
+        } catch(TException tex) {
+            throw tex;
+            
+        } catch(Exception ex) {
+            throw new TException(ex);
+        }
+    }
+    
+    public int writeContentUpdate(int nextVersion, InputStream manifestInputStream, String [] deleteList)
+        throws TException
+    {   
+        this.nextVersion = nextVersion;
+        List<FileComponent> inComponents = null;
+        try {
+            if (manifestInputStream != null) {
+                Manifest manifest = Manifest.getManifest(logger, ManifestRowAbs.ManifestType.add);
+                ComponentContent inVersionContent = new ComponentContent(
+                        logger,
+                        manifest,
+                    manifestInputStream);
+                inComponents = inVersionContent.getFileComponents();
+                writeComponents(inComponents);
+                writeFails();
+                finalStatus();
+                if (threadTException != null) {
+                    backOutPut(inVersionContent);
+                    throw threadTException;
+                }
+                if (DEBUG) System.out.println("Final Cnts"
+                                + " - runCnt=" + runCnt
+                                + " - tallyCnt=" + tallyCnt
+                                );
+                if (runCnt != tallyCnt) {
+                    throw new TException.INVALID_ARCHITECTURE(MESSAGE + "Mismatch counts"
+                            + " - runCnt=" + runCnt
+                            + " - threadCnt=" + tallyCnt
+                            );
+                }
+            //setCloudKey(map, objectID, nextVersion, inComponents);
+            }
+            map.updateVersion(inComponents, deleteList);
+            normVersionMap.normalize(map, bucket, objectID);
+            if (DEBUG) {
+                System.out.println(MESSAGE + "****after - map.updateVersion");
+            }
             return map.getCurrent();
 
         } catch(TException tex) {

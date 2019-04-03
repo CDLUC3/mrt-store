@@ -65,7 +65,7 @@ import org.cdlib.mrt.cloud.action.StateVersion;
 import org.cdlib.mrt.cloud.action.StateObject;
 import org.cdlib.mrt.cloud.action.StreamObject;
 import org.cdlib.mrt.cloud.action.StreamVersionArchive;
-import org.cdlib.mrt.cloud.action.UpdateVersion;
+import org.cdlib.mrt.cloud.action.UpdateVersionThread;
 import org.cdlib.mrt.cloud.action.ContentVersionComponents;
 import org.cdlib.mrt.cloud.utility.NormVersionMap;
 import org.cdlib.mrt.core.FileContent;
@@ -164,15 +164,16 @@ public class CloudObjectService
                 inStream = new FileInputStream(manifestFile);
             }
             if ((deleteList != null) && (deleteList.length == 0)) deleteList = null;
-            UpdateVersion addVersion = UpdateVersion.getUpdateVersion(
+            UpdateVersionThread updateVersion = UpdateVersionThread.getUpdateVersionThread(
                     s3service, 
                     bucket, 
                     objectID, 
                     verifyOnWrite,
                     inStream, 
                     deleteList,
+                    10,
                     logger);
-            VersionState versionState = addVersion.callEx();
+            VersionState versionState = updateVersion.callEx();
             
             log(MESSAGE + "addVersion entered"
                     + " - objectID=" + objectID
@@ -722,10 +723,11 @@ public class CloudObjectService
     
     protected TException makeTException(Exception ex)
     {
-        ex.printStackTrace();
+        //ex.printStackTrace();
         TException tex = null;
         if (ex instanceof TException) {
             tex = (TException)ex;
+            System.out.println(MESSAGE + "Run Exception: " + tex.toString());
         } else {
             tex = new TException.GENERAL_EXCEPTION(ex);
         }
