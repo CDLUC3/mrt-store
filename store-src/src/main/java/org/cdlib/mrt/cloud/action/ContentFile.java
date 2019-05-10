@@ -181,6 +181,7 @@ public class ContentFile
     
     public File process ()
     {   
+        File tmpFile = null;
         try {
             ComponentContent content = map.getVersionContent(versionID);
             if (content == null) {
@@ -204,11 +205,15 @@ public class ContentFile
                     + " - fileID=" + fileID
                     + " - key=" + component.getLocalID()
                     , 10);
-            File tmpFile = FileUtil.getTempFile("tmpcld.", ".txt");
+            tmpFile = FileUtil.getTempFile("tmpcld.", ".txt");
             String key = component.getLocalID();
-            CloudResponse response = new CloudResponse(bucket, objectID, versionID, fileID);
-            InputStream in = s3service.getObject(bucket, key, response);
-            FileUtil.stream2File(in, tmpFile);
+            CloudResponse response = new CloudResponse(bucket, key);
+            s3service.getObject(bucket, key, tmpFile, response);
+            Exception ex = response.getException();
+            if (ex != null) {
+                System.out.println(MESSAGE + "Exception:" + ex);
+                throw ex;
+            }
             if (validateRead) {
                 component.setComponentFile(tmpFile);
                 validate(versionID, component);
@@ -216,6 +221,11 @@ public class ContentFile
             return tmpFile;
 
         } catch(Exception ex) {
+            if (tmpFile != null) {
+                try {
+                    tmpFile.delete();
+                } catch (Exception tex) { }
+            }
             setException(ex);
             return null;
             
