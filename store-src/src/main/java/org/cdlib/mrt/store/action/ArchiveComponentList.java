@@ -130,7 +130,7 @@ public class ArchiveComponentList
     {
         String key = inEntry.getKey();
         try {
-            String parts[] = key.split("\\|");
+            String parts[] = key.split("\\|",3);
             if (parts.length < 3) {
                 throw new TException.INVALID_OR_MISSING_PARM(MESSAGE + "bad key:" + key);
             }
