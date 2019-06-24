@@ -528,6 +528,7 @@ public abstract class AddVersionContentAbs
                 if (DEBUGLOW) System.out.println("***(" + System.nanoTime() + ") Fill:" + component.getIdentifier());
                 long componentBeforeTime = DateUtil.getEpochUTCDate();
                 fillComponent(component);
+                componentFile = component.getComponentFile();
                 
                 long componentAfterTime = DateUtil.getEpochUTCDate();
                 contentAccumTime += (componentAfterTime - componentBeforeTime);
@@ -591,8 +592,18 @@ public abstract class AddVersionContentAbs
                 try {
                     if (componentFile != null) {
                         componentFile.delete();
+                        if (componentFile.exists()) {
+                            System.out.println("***Component delete failure:" 
+                                    + componentFile.getAbsolutePath());
+                        } else {
+                            if (DEBUG) System.out.println("+++Component deleted:" 
+                                    + componentFile.getAbsolutePath());
+                        }
                     }
-                } catch (Exception ex) { }
+                } catch (Exception ex) { 
+                    System.out.println("***Component delete exception(" 
+                                    + componentFile.getAbsolutePath() + "):" + ex);
+                }
             }
         } 
     
