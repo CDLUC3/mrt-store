@@ -93,6 +93,7 @@ public class AsyncContainerObject
     protected TallyTable stats = new TallyTable();
     protected StorageEmail storageEmail = null;
     protected ArrayList<String> recipients = new ArrayList<String>();
+    protected ArrayList<String> recipientsBCC = new ArrayList<String>();
     protected String[] recipientsA= null;
     protected String from = null;
     protected String subject = null;
@@ -360,6 +361,7 @@ public class AsyncContainerObject
                     formatType = "html";
                 }
                 else if (elem.getName().equals("to")) recipients.add(elem.getText());
+                else if (elem.getName().equals("bcc")) recipientsBCC.add(elem.getText());
             }
             recipientsA = recipients.toArray(new String[0]);
             if (StringUtil.isEmpty(from)) {
@@ -452,6 +454,9 @@ public class AsyncContainerObject
     protected void sendEmail(String localBody, String localMsg)
     {
         try {
+            if (recipientsBCC.size() > 0) {
+            	storageEmail.setRecipientsBCC(recipientsBCC);
+            }
             if (StringUtil.isEmpty(localBody)) {
                 storageEmail.sendEmail(recipientsA, from, subject, localMsg);
             } else {
@@ -469,6 +474,8 @@ public class AsyncContainerObject
                 localMsg = errMsg;
             }
             subject = "Exception: " + subject;
+            //Add default BCC list to the error BCC list
+            errBCC.addAll(recipientsBCC);
             storageEmail.setRecipientsBCC(errBCC);
             if (StringUtil.isEmpty(localMsg)) {
                 storageEmail.sendEmail(recipientsA, from, subject, localMsg);

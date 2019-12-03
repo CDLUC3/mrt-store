@@ -135,7 +135,7 @@ public final class StorageEmail
                 {
                     addressBCC[i] = new InternetAddress(recipientsBCC.get(i));
                 }
-                message.setRecipients(Message.RecipientType.BCC, addressTo);
+                message.setRecipients(Message.RecipientType.BCC, addressBCC);
             }
             message.setSubject( subject );
             message.setSentDate(new Date());
