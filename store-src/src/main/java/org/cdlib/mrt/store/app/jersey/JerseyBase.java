@@ -30,7 +30,6 @@ OF THE POSSIBILITY OF SUCH DAMAGE.
 package org.cdlib.mrt.store.app.jersey;
 
 
-import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.glassfish.jersey.server.CloseableService;
 import org.cdlib.mrt.store.app.ValidateCmdParms;
 import org.cdlib.mrt.store.app.*;
@@ -41,17 +40,18 @@ import java.io.InputStream;
 import java.io.PrintStream;
 import java.io.OutputStream;
 import java.io.Serializable;
+import java.net.URI;
 import java.net.URL;
+import java.util.Date;
 import java.util.Properties;
-import javax.ws.rs.core.StreamingOutput;
-
-
 import javax.servlet.ServletConfig;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.PathParam;
+import javax.ws.rs.core.StreamingOutput;
+import javax.ws.rs.core.MediaType;
+
 import javax.ws.rs.core.Response;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
+import org.cdlib.mrt.cloud.utility.CloudUtil;
 
 
 import org.cdlib.mrt.formatter.FormatterAbs;
@@ -61,14 +61,18 @@ import org.cdlib.mrt.utility.PairtreeUtil;
 import org.cdlib.mrt.store.action.AsyncContainerObject;
 import org.cdlib.mrt.store.storage.StorageServiceInf;
 import org.cdlib.mrt.store.NodeState;
+import org.cdlib.mrt.store.PreSignedState;
+import org.cdlib.mrt.store.tools.JSONTools;
 import org.cdlib.mrt.core.Identifier;
 import org.cdlib.mrt.s3.service.CloudResponse;
 import org.cdlib.mrt.s3.service.CloudStoreInf;
 import org.cdlib.mrt.s3.service.NodeIO;
-import org.cdlib.mrt.store.StoreNode;
 import org.cdlib.mrt.utility.ArchiveBuilder;
+import org.cdlib.mrt.core.DateState;
+import org.cdlib.mrt.utility.DateUtil;
 import org.cdlib.mrt.utility.StateInf;
 import org.cdlib.mrt.utility.SerializeUtil;
+import org.cdlib.mrt.utility.StringUtil;
 import org.cdlib.mrt.utility.FileUtil;
 import org.cdlib.mrt.utility.FixityTests;
 import org.cdlib.mrt.utility.TException;
@@ -76,7 +80,6 @@ import org.cdlib.mrt.utility.TFileLogger;
 import org.cdlib.mrt.utility.LoggerInf;
 import org.cdlib.mrt.utility.PropertiesUtil;
 import org.cdlib.mrt.utility.StringUtil;
-
 /**
  * Base Jersey handling for both Storage and CAN services
  * The attempt is to keep the Jersey layer as thin as possible.
@@ -775,7 +778,7 @@ public class JerseyBase
             throw new TException.GENERAL_EXCEPTION(MESSAGE + "Exception:" + ex);
         }
     }
-    
+        
     /**
      * Get a specific file for a node-object-version
      * @param nodeID node identifier
@@ -785,8 +788,8 @@ public class JerseyBase
      * @param fileID file name
      * @param formatType user provided format type
      * @param sc ServletConfig used to get system configuration
-     * @return formatted version state information
-     * @throws TException processing exception
+     * @return content based on key
+     * @throws TException 
      */
     public Response getCloudStream(
             String key,
@@ -2751,6 +2754,65 @@ public class JerseyBase
         }
 
     }
+    
+    protected Response cloudPreSignFile(
+            String nodeIDS,
+            String key,
+            String expireMinutesS,
+            String formatType,
+            CloseableService cs,
+            ServletConfig sc
+    )
+        throws TException
+    {
+        LoggerInf logger = null;
+        try {
+            int nodeID = getNodeID(nodeIDS);
+            long expireMinutes = 0;
+            StorageServiceInit storageServiceInit = StorageServiceInit.getStorageServiceInit(sc);
+            StorageServiceInf storageService = storageServiceInit.getStorageService();
+            logger = getNodeLogger(nodeID, storageService);
+            Properties storeProperties = storageService.getStoreProperties();
+            String nodeIOName = storeProperties.getProperty("signedNodeName");
+            if (nodeIOName == null) {
+                throw new TException.INVALID_OR_MISSING_PARM(MESSAGE + "signedNodeName properties missing");
+            }
+            try {
+                expireMinutes = Long.parseLong(expireMinutesS);
+            } catch (Exception ex) {
+                throw new TException.INVALID_OR_MISSING_PARM(MESSAGE + "conversion minutes fails:" + expireMinutesS);
+            }
+            
+            Date date = DateUtil.getCurrentDatePlus(expireMinutes * 60 * 1000);
+            DateState expire = new DateState(date);
+            PreSignedState responseState = CloudUtil.getPreSignedURI(
+                nodeIOName,
+                nodeID,
+                key,
+                expireMinutes,
+                logger);
+            if (responseState.getExceptionEnum() == null) {
+                Properties responseProp = responseState.getProperties();
+                String json = JSONTools.simple(responseProp);
+                return Response 
+                    .ok(StringUtil.stringToStream(json, "utf8"), MediaType.APPLICATION_OCTET_STREAM)
+                    .build();
+                
+            } else {
+                Properties responseProp = responseState.getErrorProperties();
+                String json = JSONTools.simple(responseProp);
+                int status = responseState.getExceptionEnum().getHttpResponse();
+                return Response 
+                    .status(status).entity(json)
+                    .build();
+            }
+            //return getStateResponse(responseState, formatType, logger, cs, sc);
+
+        } catch (TException tex) {
+            return getExceptionResponse(cs, tex, "xml", logger);
+
+        } 
+    }
 
     /**
      * return integer if valid or exception if not
@@ -2899,6 +2961,7 @@ public class JerseyBase
     {
         if (valueS == null) return null;
         if (valueS.length() == 0) return null;
+        valueS = valueS.toLowerCase();
         if (valueS.equals("true")) return true;
         if (valueS.equals("t")) return true;
         if (valueS.equals("yes")) return true;

@@ -44,6 +44,7 @@ import org.cdlib.mrt.store.NodeState;
 import org.cdlib.mrt.store.ObjectFixityState;
 import org.cdlib.mrt.store.StorageServiceState;
 import org.cdlib.mrt.store.ObjectState;
+import org.cdlib.mrt.store.StoreNodeManager;
 import org.cdlib.mrt.store.VersionContent;
 import org.cdlib.mrt.store.VersionState;
 import org.cdlib.mrt.utility.LoggerInf;
@@ -526,5 +527,11 @@ public interface StorageServiceInf
      * @return Configuration Properties
      */
     public Properties getConfProp();
+
+    /**
+     * Storage properties from store-info.txt
+     * @return Storage Properties
+     */
+    public Properties getStoreProperties();
 }
 

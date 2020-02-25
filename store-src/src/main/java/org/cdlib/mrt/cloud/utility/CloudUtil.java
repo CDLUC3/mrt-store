@@ -30,11 +30,15 @@ OF THE POSSIBILITY OF SUCH DAMAGE.
 package org.cdlib.mrt.cloud.utility;
 
 import java.io.InputStream;
+import java.net.URI;
+import java.net.URL;
 import java.util.Properties;
+import javax.ws.rs.core.Response;
 
 import org.cdlib.mrt.store.cloud.CloudObjectService;
 
 import org.cdlib.mrt.cloud.ManInfo;
+import org.cdlib.mrt.core.Identifier;
 import org.cdlib.mrt.utility.StringUtil;
 import org.cdlib.mrt.utility.TException;
 import org.cdlib.mrt.utility.LoggerInf;
@@ -43,7 +47,11 @@ import org.cdlib.mrt.s3.aws.AWSS3Cloud;
 //import org.cdlib.mrt.s3.sdsc.SDSCCloud;
 import org.cdlib.mrt.s3.openstack.OpenstackCloud;
 import org.cdlib.mrt.s3.pairtree.PairtreeCloud;
+import org.cdlib.mrt.s3.service.CloudResponse;
 import org.cdlib.mrt.s3.service.NodeIO;
+import org.cdlib.mrt.store.PreSignedState;
+import org.cdlib.mrt.store.tools.StoreUtil;
+import org.cdlib.mrt.utility.URLEncoder;
 
     
 public class CloudUtil
@@ -241,6 +249,86 @@ public class CloudUtil
         } catch (Exception ex) {
             ex.printStackTrace();
             throw new TException.GENERAL_EXCEPTION(MESSAGE + "unable to build getSDSCService", ex);
+        }
+    }
+    
+    public static PreSignedState getPreSignedURI(
+            String nodeIOName,
+            int nodeID,
+            String key,
+            Long expireMinutes,
+            LoggerInf logger)
+        throws TException
+    {
+        PreSignedState state = PreSignedState.getPreSignedState();
+        if (expireMinutes == null) {
+            expireMinutes = 240L;
+        }
+        try {
+            System.out.println("getPreSigned entered:"
+                    + " - nodeIOName=" + nodeIOName
+                    + " - nodeId=" + nodeID
+                    + " - key=" + key
+                    + " - expireMinutes=" + expireMinutes
+                    );
+            
+    
+            if (nodeIOName == null) {
+                throw new TException.INVALID_OR_MISSING_PARM(MESSAGE + "signedNodeName properties missing");
+            };
+            
+            NodeIO nodeIO = new NodeIO(nodeIOName, logger);
+            long outNode = nodeID;
+            
+            NodeIO.AccessNode accessNode = nodeIO.getAccessNode(outNode);
+            if (accessNode == null) {
+                throw new TException.INVALID_OR_MISSING_PARM(MESSAGE + "NodeIO.AccessNode not found - outNode:" + outNode);
+            }
+            
+            CloudStoreInf service = accessNode.service;
+            String bucket = accessNode.container;
+            CloudResponse response = service.getPreSigned(expireMinutes, bucket, key);
+            Exception ex = response.getException();
+            if (ex != null) {
+                System.out.println("ex:" + ex);
+                
+                // unimplemented returns the storage link for redirect
+                if (ex instanceof TException.UNIMPLEMENTED_CODE) {
+                    state.setExceptionEnum(PreSignedState.ExceptionEnum.UNSUPPORTED_FUNCTION);
+                    return state;
+                
+                // error
+                } else if (ex instanceof TException.REQUESTED_ITEM_NOT_FOUND) {
+                    state.setExceptionEnum(PreSignedState.ExceptionEnum.REQUESTED_ITEM_NOT_FOUND);
+                    return state;
+                    
+                } else if (ex instanceof TException.REQUEST_ITEM_EXISTS) {
+                    state.setExceptionEnum(PreSignedState.ExceptionEnum.OFFLINE_STORAGE);
+                    return state;
+                    
+                } else {
+                    state.setExceptionEnum(PreSignedState.ExceptionEnum.SERVICE_EXCEPTION);
+                    state.setEx(ex);
+                    return state;
+                }
+                
+            // signed URL returned
+            } else {
+                URL signed = response.getReturnURL();
+                state.setUrl(signed);
+                state.setExpires(expireMinutes);
+            }
+            return state;
+            
+        } catch (TException tex) {
+            state.setExceptionEnum(PreSignedState.ExceptionEnum.SERVICE_EXCEPTION);
+            state.setEx(tex);
+            return state;
+
+        } catch (Exception ex) {
+            state.setExceptionEnum(PreSignedState.ExceptionEnum.SERVICE_EXCEPTION);
+            state.setEx(ex);
+            return state;
         }
     }
         
