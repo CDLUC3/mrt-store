@@ -59,25 +59,26 @@ public class PreSignedState
 
     protected URL url = null;
     protected DateState expires = null;
-    protected ExceptionEnum exceptionEnum = null;
+    protected StatusEnum statusEnum = null;
     protected Exception ex = null;
 
     // Presigned errors
-    public enum ExceptionEnum
+    public enum StatusEnum
     {
+        OK("Presigned URL created", 200),
+        
+        REQUESTED_ITEM_NOT_FOUND("File not found", 404),
 
-        REQUESTED_ITEM_NOT_FOUND("file not found", 404),
+        OFFLINE_STORAGE("File is in offline storage, request is not supported", 403),
 
-        OFFLINE_STORAGE("file is in offline storage, request is not supported", 403),
-
-        UNSUPPORTED_FUNCTION("this request not supported by this cloud service", 409),
+        UNSUPPORTED_FUNCTION("Signed URL not supported, redirect to download URL", 409),
 
         SERVICE_EXCEPTION("Requested format not supported", 500);
 
         protected final String description;
         protected final int httpResponse;
 
-        ExceptionEnum(String description, int httpResponse) {
+        StatusEnum(String description, int httpResponse) {
             this.description = description;
             this.httpResponse = httpResponse;
         }
@@ -218,16 +219,16 @@ public class PreSignedState
         this.expires = new DateState(date);
     }
 
-    public ExceptionEnum getExceptionEnum() {
-        return exceptionEnum;
+    public StatusEnum getStatusEnum() {
+        return statusEnum;
     }
 
     /**
-     * Set ExceptionEnum if an Exception occurs during Pre-Signed creation
+     * Set StatusEnum if an Exception occurs during Pre-Signed creation
      * @param exceptionEnum 
      */
-    public void setExceptionEnum(ExceptionEnum exceptionEnum) {
-        this.exceptionEnum = exceptionEnum;
+    public void setStatusEnum(StatusEnum exceptionEnum) {
+        this.statusEnum = exceptionEnum;
     }
 
     /**
@@ -258,13 +259,14 @@ public class PreSignedState
     public Properties getProperties()
     {
         Properties prop = new Properties();
-        prop.setProperty("status", "200");
+        prop.setProperty("status", "" + StatusEnum.OK.getHttpResponse());
         if (expires != null) {
             prop.setProperty("expires", getExpires());
         }
         if (url != null) {
             prop.setProperty("url", getUrl());
         }
+        prop.setProperty("message", StatusEnum.OK.getDescription());
         return prop;
     }
 
@@ -277,9 +279,9 @@ public class PreSignedState
         Properties prop = new Properties();
         int status = 0;
         String message = null;
-        if (exceptionEnum == null) return prop;
-        status = exceptionEnum.getHttpResponse();
-        message = exceptionEnum.getDescription();
+        if (statusEnum == null) return prop;
+        status = statusEnum.getHttpResponse();
+        message = statusEnum.getDescription();
         if ((status == 500) && (ex != null)) {
             message = ex.getMessage();
         }

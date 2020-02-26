@@ -304,26 +304,27 @@ public class CloudUtil
                 
                 // unimplemented returns the storage link for redirect
                 if (ex instanceof TException.UNIMPLEMENTED_CODE) {
-                    state.setExceptionEnum(PreSignedState.ExceptionEnum.UNSUPPORTED_FUNCTION);
+                    state.setStatusEnum(PreSignedState.StatusEnum.UNSUPPORTED_FUNCTION);
                     return state;
                 
                 // error
                 } else if (ex instanceof TException.REQUESTED_ITEM_NOT_FOUND) {
-                    state.setExceptionEnum(PreSignedState.ExceptionEnum.REQUESTED_ITEM_NOT_FOUND);
+                    state.setStatusEnum(PreSignedState.StatusEnum.REQUESTED_ITEM_NOT_FOUND);
                     return state;
                     
                 } else if (ex instanceof TException.REQUEST_ITEM_EXISTS) {
-                    state.setExceptionEnum(PreSignedState.ExceptionEnum.OFFLINE_STORAGE);
+                    state.setStatusEnum(PreSignedState.StatusEnum.OFFLINE_STORAGE);
                     return state;
                     
                 } else {
-                    state.setExceptionEnum(PreSignedState.ExceptionEnum.SERVICE_EXCEPTION);
+                    state.setStatusEnum(PreSignedState.StatusEnum.SERVICE_EXCEPTION);
                     state.setEx(ex);
                     return state;
                 }
                 
             // signed URL returned
             } else {
+                state.setStatusEnum(PreSignedState.StatusEnum.OK);
                 URL signed = response.getReturnURL();
                 state.setUrl(signed);
                 state.setExpires(expireMinutes);
@@ -331,12 +332,12 @@ public class CloudUtil
             return state;
             
         } catch (TException tex) {
-            state.setExceptionEnum(PreSignedState.ExceptionEnum.SERVICE_EXCEPTION);
+            state.setStatusEnum(PreSignedState.StatusEnum.SERVICE_EXCEPTION);
             state.setEx(tex);
             return state;
 
         } catch (Exception ex) {
-            state.setExceptionEnum(PreSignedState.ExceptionEnum.SERVICE_EXCEPTION);
+            state.setStatusEnum(PreSignedState.StatusEnum.SERVICE_EXCEPTION);
             state.setEx(ex);
             return state;
         }

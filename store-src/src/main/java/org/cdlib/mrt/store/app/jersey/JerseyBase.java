@@ -2801,7 +2801,7 @@ public class JerseyBase
                 key,
                 expireMinutes,
                 logger);
-            if (responseState.getExceptionEnum() == null) {
+            if (responseState.getStatusEnum() == PreSignedState.StatusEnum.OK) {
                 Properties responseProp = responseState.getProperties();
                 String json = JSONTools.simple(responseProp);
                 return Response 
@@ -2811,7 +2811,7 @@ public class JerseyBase
             } else {
                 Properties responseProp = responseState.getErrorProperties();
                 String json = JSONTools.simple(responseProp);
-                int status = responseState.getExceptionEnum().getHttpResponse();
+                int status = responseState.getStatusEnum().getHttpResponse();
                 return Response 
                     .status(status).entity(json)
                     .build();
