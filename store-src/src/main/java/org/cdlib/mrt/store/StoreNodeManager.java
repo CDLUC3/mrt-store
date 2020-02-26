@@ -694,5 +694,13 @@ public class StoreNodeManager
             throw new TException(ex);
         }
     }
+
+    public Properties getStoreProperties() {
+        return storeProperties;
+    }
+
+    public void setStoreProperties(Properties storeProperties) {
+        this.storeProperties = storeProperties;
+    }
 }
 
