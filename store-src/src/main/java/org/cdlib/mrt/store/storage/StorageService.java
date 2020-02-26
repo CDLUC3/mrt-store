@@ -50,6 +50,7 @@ import org.cdlib.mrt.store.StorageServiceState;
 import org.cdlib.mrt.store.NodeState;
 import org.cdlib.mrt.store.ObjectFixityState;
 import org.cdlib.mrt.store.ObjectState;
+import org.cdlib.mrt.store.StoreNodeManager;
 import org.cdlib.mrt.store.VersionContent;
 import org.cdlib.mrt.store.VersionState;
 import org.cdlib.mrt.utility.DateUtil;
@@ -658,6 +659,15 @@ public class StorageService
             long endTime = DateUtil.getEpochUTCDate();
             System.out.println("[TIMER-" + key + "]:" + (endTime - startTime));
         }
+    }
+
+    public StoreNodeManager getNodeManager() {
+        return nodeManager;
+    }
+
+    @Override
+    public Properties getStoreProperties() {
+        return nodeManager.getStoreProperties();
     }
 }
 

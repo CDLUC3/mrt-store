@@ -29,10 +29,12 @@ OF THE POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 package org.cdlib.mrt.store.app.jersey.store;
 
+import java.net.URI;
+import java.net.URL;
 import org.cdlib.mrt.store.app.jersey.*;
 import org.cdlib.mrt.store.app.*;
 
-
+import java.util.Properties;
 import javax.servlet.ServletConfig;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.glassfish.jersey.server.CloseableService;
@@ -51,6 +53,9 @@ import javax.ws.rs.QueryParam;
 import org.cdlib.mrt.core.Identifier;
 
 import org.cdlib.mrt.formatter.FormatterInf;
+import org.cdlib.mrt.cloud.utility.CloudUtil;
+import org.cdlib.mrt.store.StoreNodeManager;
+import org.cdlib.mrt.store.storage.StorageService;
 import org.cdlib.mrt.store.storage.StorageServiceInf;
 import org.cdlib.mrt.store.app.jersey.KeyNameHttpInf;
 import org.cdlib.mrt.utility.StateInf;
@@ -261,6 +266,33 @@ public class JerseyStorage
         throws TException
     {
         return getCloudStream(containerName, cs, sc);
+    }
+
+    @GET
+    @Path("presign-file/{nodeid}/{key}")
+    public Response callCloudPreSignFile(
+            @PathParam("nodeid") String nodeIDS,
+            @PathParam("key") String key,
+            @DefaultValue("240") @QueryParam("timeout") String expireMinutesS,
+            @DefaultValue("json") @QueryParam(KeyNameHttpInf.RESPONSEFORM) String formatType,
+            @Context CloseableService cs,
+            @Context ServletConfig sc)
+        throws TException
+    {
+        LoggerInf logger = null;
+        try {
+            
+            return cloudPreSignFile(
+                nodeIDS,
+                key,
+                expireMinutesS,
+                cs,
+                sc);
+
+        } catch (TException tex) {
+            return getExceptionResponse(cs, tex, "xml", logger);
+
+        } 
     }
     
     /**
