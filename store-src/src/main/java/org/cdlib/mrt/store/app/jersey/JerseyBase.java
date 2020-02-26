@@ -2755,11 +2755,21 @@ public class JerseyBase
 
     }
     
+    /**
+     * Generate a Jersey response using PreSignedState content
+     * @param nodeIDS String nodeID for processing
+     * @param key key value for nodeID cloud 
+     * @param expireMinutesS String minutes until PreSigned URL expires
+     * @param formatType
+     * @param cs
+     * @param sc
+     * @return
+     * @throws TException 
+     */
     protected Response cloudPreSignFile(
             String nodeIDS,
             String key,
             String expireMinutesS,
-            String formatType,
             CloseableService cs,
             ServletConfig sc
     )

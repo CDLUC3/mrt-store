@@ -286,7 +286,6 @@ public class JerseyStorage
                 nodeIDS,
                 key,
                 expireMinutesS,
-                formatType,
                 cs,
                 sc);
 

@@ -40,6 +40,11 @@ import java.util.Enumeration;
 public class JSONTools
 {
 
+    /**
+     * Return a simplified JSON based on key-value pairs in prop
+     * @param prop Properties used for generation of simplified JSON
+     * @return 
+     */
     public static String simple(Properties prop)
     {
         String out = new String();

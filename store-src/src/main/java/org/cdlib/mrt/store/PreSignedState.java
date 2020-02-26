@@ -48,6 +48,8 @@ import org.cdlib.mrt.utility.PropertiesUtil;
 /**
  *
  * @author dloy
+ * Provides both the Presigned URL also returns any error that may have occurred during processing
+ * 
  */
 public class PreSignedState
         implements StateInf, Serializable
@@ -57,10 +59,10 @@ public class PreSignedState
 
     protected URL url = null;
     protected DateState expires = null;
-    protected CloudResponse cloudResponse = null;
     protected ExceptionEnum exceptionEnum = null;
     protected Exception ex = null;
 
+    // Presigned errors
     public enum ExceptionEnum
     {
 
@@ -90,10 +92,8 @@ public class PreSignedState
     }
 
     /**
-     * Factory to get StorageService State
-     * @param storageProp store-info.txt properties
-     * @return StorageServiceState
-     * @throws TException process exception
+     * @return new PreSignedState without content
+     * @throws TException 
      */
     public static PreSignedState getPreSignedState()
         throws TException
@@ -103,10 +103,11 @@ public class PreSignedState
 
 
     /**
-     * Factory to get StorageService State
-     * @param storageProp store-info.txt properties
-     * @return StorageServiceState
-     * @throws TException process exception
+     * Return PreSignedState with url and expires content
+     * @param url presigned URL
+     * @param expires DateState for expiration
+     * @return
+     * @throws TException 
      */
     public static PreSignedState getPreSignedState(String url, DateState expires)
         throws TException
@@ -115,9 +116,7 @@ public class PreSignedState
     }
     
     /**
-     * Return State PreSigned command
-     * @param uri presigned URI
-     * @param expires expiration for presigned URI
+     * constructor empty state
      * @throws TException 
      */
     protected PreSignedState()
@@ -125,9 +124,9 @@ public class PreSignedState
     {  }
     
     /**
-     * Return State PreSigned command
-     * @param uri presigned URI
-     * @param expires expiration for presigned URI
+     * Construct with url and expires content
+     * @param url presigned URL
+     * @param expires DateState for expiration
      * @throws TException 
      */
     protected PreSignedState(String url, DateState expires)
@@ -141,6 +140,9 @@ public class PreSignedState
         );
     }
 
+    /**
+     * @return presigned URL as string
+     */
     public String getUrl() {
         if (url != null) {
             return url.toString();
@@ -148,10 +150,18 @@ public class PreSignedState
         return null;
     }
     
+    /**
+     * @return presigned URL as URL
+     */
     public URL retrieveUrl() {
         return url;
     }   
 
+    /**
+     * Set presigned URL from String
+     * @param urlS string URL
+     * @throws TException 
+     */
     public void setUrl(String urlS) 
             throws TException
     {
@@ -164,47 +174,66 @@ public class PreSignedState
         }
     }
 
+    /**
+     * Set presigned URL using URL
+     * @param url set URL
+     */
     public void setUrl(URL url) {
         this.url = url;
     }
 
+    /**
+     * Return DateState for expiration
+     * @return 
+     */
     public DateState retrieveExpires() {
         return expires;
     }
 
+    /**
+     * @return Display Expiration as standard ISO
+     */
     public String getExpires() {
         if (expires == null) {
             return null;
         }
-        return expires.getIsoZDate();
+        return expires.getIsoDate();
     }
 
+    /**
+     * Set expiration date as DateState
+     * @param expires  expiration date
+     */
     public void setExpires(DateState expires) {
         this.expires = expires;
     }
 
+    /**
+     * Set expiration date based on the duration for the expiration
+     * @param addExpireMinutes number of minutes before the presigned expires after generation
+     */
     public void setExpires(long addExpireMinutes) {
         long millSecs = addExpireMinutes * 60 * 1000;
         Date date =  DateUtil.getCurrentDatePlus(millSecs);
         this.expires = new DateState(date);
     }
 
-    public CloudResponse getCloudResponse() {
-        return cloudResponse;
-    }
-
-    public void setCloudResponse(CloudResponse cloudResponse) {
-        this.cloudResponse = cloudResponse;
-    }
-
     public ExceptionEnum getExceptionEnum() {
         return exceptionEnum;
     }
 
+    /**
+     * Set ExceptionEnum if an Exception occurs during Pre-Signed creation
+     * @param exceptionEnum 
+     */
     public void setExceptionEnum(ExceptionEnum exceptionEnum) {
         this.exceptionEnum = exceptionEnum;
     }
 
+    /**
+     * get Exception if not controlled by ExceptionEnum
+     * @return 
+     */
     public Exception getEx() {
         return ex;
     }
@@ -222,9 +251,14 @@ public class PreSignedState
                     ;
     }
 
+    /**
+     * Create a Java Properties based on successful completion
+     * @return 
+     */
     public Properties getProperties()
     {
         Properties prop = new Properties();
+        prop.setProperty("status", "200");
         if (expires != null) {
             prop.setProperty("expires", getExpires());
         }
@@ -234,6 +268,10 @@ public class PreSignedState
         return prop;
     }
 
+    /**
+     * Create Java Properties if failed completion
+     * @return 
+     */
     public Properties getErrorProperties()
     {
         Properties prop = new Properties();

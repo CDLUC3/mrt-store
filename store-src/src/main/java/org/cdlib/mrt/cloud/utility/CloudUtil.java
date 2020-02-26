@@ -252,6 +252,16 @@ public class CloudUtil
         }
     }
     
+    /**
+     * Return PreSignedState containing both presigned URL and any error conditions
+     * @param nodeIOName nodeIO Table Name containing cloud information for access
+     * @param nodeID node in nodeIO Table
+     * @param key key to be looked up
+     * @param expireMinutes expiration Minutes
+     * @param logger
+     * @return PreSigenedState
+     * @throws TException routine attempts to capture all errors
+     */
     public static PreSignedState getPreSignedURI(
             String nodeIOName,
             int nodeID,
