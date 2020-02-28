@@ -2819,8 +2819,16 @@ public class JerseyBase
             //return getStateResponse(responseState, formatType, logger, cs, sc);
 
         } catch (TException tex) {
-            return getExceptionResponse(cs, tex, "xml", logger);
-
+            tex.printStackTrace();
+            PreSignedState responseState = PreSignedState.getPreSignedState();
+            responseState.setStatusEnum(PreSignedState.StatusEnum.SERVICE_EXCEPTION);
+            responseState.setEx(tex);
+            Properties responseProp = responseState.getErrorProperties();
+            String json = JSONTools.simple(responseProp);
+            int status = responseState.getStatusEnum().getHttpResponse();
+                return Response 
+                    .status(status).entity(json)
+                    .build();
         } 
     }
 

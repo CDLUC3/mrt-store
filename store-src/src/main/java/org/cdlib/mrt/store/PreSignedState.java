@@ -73,7 +73,7 @@ public class PreSignedState
 
         UNSUPPORTED_FUNCTION("Signed URL not supported, redirect to download URL", 409),
 
-        SERVICE_EXCEPTION("Requested format not supported", 500);
+        SERVICE_EXCEPTION("Service exception", 500);
 
         protected final String description;
         protected final int httpResponse;
@@ -286,7 +286,7 @@ public class PreSignedState
             message = ex.getMessage();
         }
         prop.setProperty("status", "" + status);
-        prop.setProperty("message", message);
+        prop.setProperty("message", ex.toString());
         return prop;
     }
 }
