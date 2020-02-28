@@ -283,10 +283,10 @@ public class PreSignedState
         status = statusEnum.getHttpResponse();
         message = statusEnum.getDescription();
         if ((status == 500) && (ex != null)) {
-            message = ex.getMessage();
+            message = ex.toString();
         }
         prop.setProperty("status", "" + status);
-        prop.setProperty("message", ex.toString());
+        prop.setProperty("message", message);
         return prop;
     }
 }
