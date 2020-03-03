@@ -54,17 +54,17 @@ public class JSONTools
             String value = prop.getProperty(key);
             System.out.println(" - key=" + key + " - value=" + value);
             if (out.length() > 0) {
-                out += ",\n";
+                out += ",";
             }
             
             
             try {
                 Long.parseLong(value);
             } catch (Exception ex) { 
-                value = "'" + value + "'";
+                value = "\"" + value + "\"";
             }
-            out += "  " + key + ": " + value;
+            out += "\"" + key + "\":" + value;
         }
-        return "{\n" + out + "\n}";
+        return "{" + out + "}";
     }
 }
