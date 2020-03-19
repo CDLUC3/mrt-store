@@ -2770,6 +2770,7 @@ public class JerseyBase
             String nodeIDS,
             String key,
             String expireMinutesS,
+            String contentType,
             CloseableService cs,
             ServletConfig sc
     )
@@ -2792,7 +2793,9 @@ public class JerseyBase
             } catch (Exception ex) {
                 throw new TException.INVALID_OR_MISSING_PARM(MESSAGE + "conversion minutes fails:" + expireMinutesS);
             }
-            
+            if (StringUtil.isAllBlank(contentType)) {
+                contentType = null;
+            }
             Date date = DateUtil.getCurrentDatePlus(expireMinutes * 60 * 1000);
             DateState expire = new DateState(date);
             PreSignedState responseState = CloudUtil.getPreSignedURI(
@@ -2800,6 +2803,7 @@ public class JerseyBase
                 nodeID,
                 key,
                 expireMinutes,
+                contentType,
                 logger);
             if (responseState.getStatusEnum() == PreSignedState.StatusEnum.OK) {
                 Properties responseProp = responseState.getProperties();
