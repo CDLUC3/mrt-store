@@ -841,7 +841,7 @@ public class JerseyStorage
                     cs,
                     sc);
     }
-
+    
 
     @POST
     @Path("async/{nodeid}/{objectid}")
@@ -900,6 +900,82 @@ public class JerseyStorage
             email,
             archiveType,
             formatType,
+            cs,
+            sc);
+    }
+    
+       
+    
+    @POST
+    @Path("assemble-obj/{nodeid}/{objectid}")
+    public Response setAssembleObject(
+            @PathParam("nodeid") String nodeIDS,
+            @PathParam("objectid") String objectIDS,
+            @DefaultValue("zip") @QueryParam("format") String archiveTypeS,
+            @DefaultValue("false") @QueryParam("returnIfError") String returnOnErrorS,
+            @DefaultValue("false") @QueryParam("full-version") String returnFullVersionS,
+            @DefaultValue("") @QueryParam("assemble-node") String assembleNodeS,
+            @Context CloseableService cs,
+            @Context ServletConfig sc)
+        throws TException
+    {
+        System.out.println("setAssembleObject entered");
+        String archiveContentS = "full";
+        return setAssembleArchiveAsync(
+            nodeIDS,
+            objectIDS,
+            null,
+            archiveTypeS,
+            archiveContentS,
+            returnOnErrorS,
+            returnFullVersionS,
+            assembleNodeS,
+            cs,
+            sc);
+    }
+    
+    @POST
+    @Path("assemble-obj/{nodeid}/{objectid}/{versionid}")
+    public Response setAssembleVersion(
+            @PathParam("nodeid") String nodeIDS,
+            @PathParam("objectid") String objectIDS,
+            @PathParam("versionid") String versionIDS,
+            @DefaultValue("zip") @QueryParam("format") String archiveTypeS,
+            @DefaultValue("version") @QueryParam("content") String content,
+            @DefaultValue("false") @QueryParam("returnIfError") String returnOnErrorS,
+            @DefaultValue("false") @QueryParam("full-version") String returnFullVersionS,
+            @DefaultValue("") @QueryParam("assemble-node") String assembleNodeS,
+            @Context CloseableService cs,
+            @Context ServletConfig sc)
+        throws TException
+    {
+        return setAssembleArchiveAsync(
+            nodeIDS,
+            objectIDS,
+            versionIDS,
+            archiveTypeS,
+            content,
+            returnOnErrorS,
+            returnFullVersionS,
+            assembleNodeS,
+            cs,
+            sc);
+    }
+    
+    @GET
+    @Path("presign-obj-by-token/{asynchtoken}")
+    public Response getPresignAsynchObject(
+            @PathParam("asynchtoken") String asynchToken,
+            @DefaultValue("240") @QueryParam("timeout") String expireMinutesS,
+            @DefaultValue("") @QueryParam("assemble-node") String assembleNodeS,
+            @Context CloseableService cs,
+            @Context ServletConfig sc)
+        throws TException
+    {
+        return doPresignAsynchObject(
+            asynchToken,
+            expireMinutesS,
+            assembleNodeS,
             cs,
             sc);
     }
