@@ -941,7 +941,7 @@ public class JerseyStorage
             @PathParam("objectid") String objectIDS,
             @PathParam("versionid") String versionIDS,
             @DefaultValue("zip") @QueryParam("format") String archiveTypeS,
-            @DefaultValue("version") @QueryParam("content") String content,
+            @DefaultValue("full") @QueryParam("content") String content,
             @DefaultValue("false") @QueryParam("returnIfError") String returnOnErrorS,
             @DefaultValue("false") @QueryParam("full-version") String returnFullVersionS,
             @DefaultValue("") @QueryParam("assemble-node") String assembleNodeS,
