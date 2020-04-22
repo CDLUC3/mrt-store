@@ -136,7 +136,7 @@ public class TokenGetState
     {
         this.setEx(ex);
         runStatus = RunStatus.SERVICE_EXCEPTION;
-        if (ex.toString().contains("404")) {
+        if (ex.toString().contains("REQUESTED_ITEM_NOT_FOUND")) {
             runStatus = RunStatus.REQUESTED_ITEM_NOT_FOUND;
         }
     }
@@ -306,7 +306,7 @@ public class TokenGetState
             }
             JSONObject tokenJson = new JSONObject();
             tokenJson.put("status", runStatus.getHttpResponse());
-            tokenJson.put("message", ex.toString());
+            tokenJson.put("message", errMessage);
             return tokenJson.toString();
             
         } catch (Exception ex) {

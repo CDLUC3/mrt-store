@@ -120,10 +120,10 @@ public class TokenPostState
         throws TException
     {
         this.setEx(ex);
-        if (ex.toString().contains("404")) {
+        if (ex.toString().contains("REQUESTED_ITEM_NOT_FOUND")) {
             runStatus = RunStatus.REQUESTED_ITEM_NOT_FOUND;
             
-        } else if (ex instanceof TException.REQUEST_ITEM_EXISTS) {
+        } else if (ex.toString().contains("REQUEST_ITEM_EXISTS")) {
             runStatus = RunStatus.FORBIDDEN_OPERATION;
             
         } else {
