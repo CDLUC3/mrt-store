@@ -83,6 +83,7 @@ public class CloudActionAbs
     protected VersionMap map = null;
     protected LoggerInf logger = null;
     protected Exception exception = null;
+    protected Integer versionID = null;
     
 
     public CloudActionAbs(CloudStoreInf s3service, String bucket, Identifier objectID, LoggerInf logger)
@@ -91,6 +92,17 @@ public class CloudActionAbs
         this.bucket = bucket;
         this.logger = logger;
         this.objectID = objectID;
+    }
+    
+    
+
+    public CloudActionAbs(CloudStoreInf s3service, String bucket, Identifier objectID, Integer versionID, LoggerInf logger)
+    {
+        this.s3service = s3service;
+        this.bucket = bucket;
+        this.logger = logger;
+        this.objectID = objectID;
+        this.versionID = versionID;
     }
     
     protected void log(String msg, int lvl)

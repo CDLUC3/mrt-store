@@ -413,6 +413,7 @@ public interface StorageServiceInf
      * @return object-version state information
      * @throws TException Exception condition during storage service procssing
      */
+    
     public VersionState getVersionState (
             int nodeID,
             Identifier objectID,

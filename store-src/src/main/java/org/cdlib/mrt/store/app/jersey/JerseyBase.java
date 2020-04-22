@@ -42,6 +42,7 @@ import java.io.OutputStream;
 import java.io.Serializable;
 import java.net.URI;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Properties;
 import javax.servlet.ServletConfig;
@@ -62,6 +63,9 @@ import org.cdlib.mrt.store.action.AsyncContainerObject;
 import org.cdlib.mrt.store.storage.StorageServiceInf;
 import org.cdlib.mrt.store.NodeState;
 import org.cdlib.mrt.store.PreSignedState;
+import org.cdlib.mrt.store.TokenGetState;
+import org.cdlib.mrt.store.TokenPostState;
+import org.cdlib.mrt.store.TokenStatus;
 import org.cdlib.mrt.store.tools.JSONTools;
 import org.cdlib.mrt.core.Identifier;
 import org.cdlib.mrt.s3.service.CloudResponse;
@@ -69,6 +73,8 @@ import org.cdlib.mrt.s3.service.CloudStoreInf;
 import org.cdlib.mrt.s3.service.NodeIO;
 import org.cdlib.mrt.utility.ArchiveBuilder;
 import org.cdlib.mrt.core.DateState;
+import org.cdlib.mrt.store.action.AsyncCloudArchive;
+import org.cdlib.mrt.store.action.TokenManager;
 import org.cdlib.mrt.utility.DateUtil;
 import org.cdlib.mrt.utility.StateInf;
 import org.cdlib.mrt.utility.SerializeUtil;
@@ -1823,6 +1829,220 @@ public class JerseyBase
      * @param sc ServletConfig used to get system configuration
      * @throws TException processing exception
      */
+     public Response setAssembleArchiveAsync(
+            String nodeIDS,
+            String objectIDS,
+            String versionIDS,
+            String archiveTypeS,
+            String archiveContentS,
+            String returnOnErrorS,
+            String returnFullVersionS,
+            String assembleNodeS,
+            CloseableService cs,
+            ServletConfig sc)
+        throws TException
+    {
+        LoggerInf logger = null;
+        Integer versionID = getVersionIDCond(versionIDS);
+        Identifier objectID = getObjectID(objectIDS);
+        StorageServiceInf storageService = null;
+        try {
+            Boolean fullObject = setBoolean(returnFullVersionS);
+            Boolean returnOnError = setBoolean(returnOnErrorS);
+            int nodeID = getNodeID(nodeIDS);
+            Long assembleNode = getLongNull(assembleNodeS);
+            
+            StorageServiceInit storageServiceInit = StorageServiceInit.getStorageServiceInit(sc);
+            storageService = storageServiceInit.getStorageService();
+            
+            logger = getNodeLogger(nodeID, storageService);
+            Properties storeProperties = storageService.getStoreProperties();
+            String archiveNodeName = storeProperties.getProperty("archiveNodeName");
+            String archiveNodeS = storeProperties.getProperty("archiveNode");
+            Long archiveNode = getLongNull(archiveNodeS);
+            if (assembleNode != null) {
+                archiveNode = assembleNode;
+            }
+            ArrayList<String> producerFilter = new ArrayList();
+            if (storeProperties.getProperty("producerFilter.1") != null) {
+                for (int i=1; true; i++) {
+                    String fileName = storeProperties.getProperty("producerFilter." + i);
+                    if (fileName == null) break;
+                    producerFilter.add(fileName);
+                }
+            }
+            // if no list set to null
+            if (producerFilter.size() == 0) {
+                producerFilter = null;
+            }
+            
+            TokenPostState postState = null;
+            long nodeIDL = nodeID;
+            TokenManager tokenManager = null;
+            try {
+                tokenManager = TokenManager.getNewTokenManager(
+                    archiveNodeName,
+                    nodeIDL,
+                    archiveNode,
+                    objectID,
+                    versionID,
+                    archiveTypeS,
+                    fullObject,
+                    returnOnError,
+                    archiveContentS,
+                    producerFilter,
+                    logger);
+                String saveJSON = tokenManager.saveCloudToken();
+                System.out.println("saveJSON:" + saveJSON);
+                
+            } catch (TException tex) {
+                System.out.println("setAssembleArchiveAsync exception:" + tex);
+                tex.printStackTrace();
+                postState = TokenPostState.getTokenPostState(tex);
+                int status = postState.getHttpStatus();
+                String json = postState.getJsonError();
+                return Response 
+                    .status(status).entity(json)
+                    .build();
+            }
+            postState = TokenPostState.getTokenPostState(tokenManager.getTokenStatus());
+            buildTokenAsynch(tokenManager.getTokenStatus(), logger);
+            int status = postState.getHttpStatus();
+            String json = postState.getJsonOK();
+            return Response 
+                    .status(status).entity(json)
+                    .build();
+    
+
+        } catch (Exception ex) {
+            System.out.println("TRACE:" + StringUtil.stackTrace(ex));
+            throw new TException.GENERAL_EXCEPTION(MESSAGE + "Exception:" + ex);
+        }
+    }
+    
+    protected void buildTokenAsynch(TokenStatus tokenStatus, LoggerInf logger)
+        throws TException
+    {
+        try {
+            AsyncCloudArchive asyncCloudArchive = AsyncCloudArchive.getAsyncCloudArchive(
+                tokenStatus,
+                logger);
+            Thread asyncThread = new Thread(asyncCloudArchive);
+            asyncThread.start();
+            System.out.println(MESSAGE + "buildTokenAsynch - Start thread:" + tokenStatus.getToken());
+                    
+        } catch (TException tex) {
+            System.out.println("TRACE:" + StringUtil.stackTrace(tex));
+            throw tex;
+            
+        } catch (Exception ex) {
+            System.out.println("TRACE:" + StringUtil.stackTrace(ex));
+            throw new TException.GENERAL_EXCEPTION(MESSAGE + "Exception:" + ex);
+        }
+    }
+    
+    protected Response doPresignAsynchObject(
+            String asynchToken,
+            String expireMinutesS,
+            String assembleNodeS,
+            CloseableService cs,
+            ServletConfig sc)
+        throws TException
+    {
+        TokenStatus tokenStatus = null;
+        LoggerInf logger = defaultLogger;
+        StorageServiceInf storageService = null;
+        TokenGetState tokenGetState = null;
+        try {
+            StorageServiceInit storageServiceInit = StorageServiceInit.getStorageServiceInit(sc);
+            storageService = storageServiceInit.getStorageService();
+            
+            Properties storeProperties = storageService.getStoreProperties();
+            String archiveNodeName = storeProperties.getProperty("archiveNodeName");
+            String archiveNodeS = storeProperties.getProperty("archiveNode");
+            Long archiveNode = getLongNull(archiveNodeS);
+            Long assembleNode = getLongNull(archiveNodeS);
+            if (assembleNode != null) {
+                archiveNode = assembleNode;
+            }
+            
+            Long expireMinutes = getLongNull(expireMinutesS);
+     
+            String cloudToken = null;
+            try {
+                tokenStatus = TokenManager.getCloudToken(archiveNodeName, archiveNode, asynchToken, logger);
+            
+            } catch (TException tex) {
+                tokenGetState = TokenGetState.getTokenGetState(tex);
+                int status = tokenGetState.getHttpStatus();
+                String json = tokenGetState.getJsonError();
+                return Response 
+                    .status(status).entity(json)
+                    .build();
+            }
+            tokenGetState = TokenGetState.getTokenGetState(tokenStatus);
+            if (tokenGetState.getRunStatus() != TokenGetState.RunStatus.OK) {
+                int status = tokenGetState.getHttpStatus();
+                String json = tokenGetState.getJson();
+                return Response 
+                    .status(status).entity(json)
+                    .build();
+            }
+            
+            cloudToken = tokenStatus.getToken();
+            String key = cloudToken + "/data";
+            String contentType = tokenStatus.getArchiveTypeMime();
+            String nodeIOName = tokenStatus.getNodeIOName();
+            
+            long nodeID = tokenStatus.getDeliveryNode();
+            int nodeIDI = (int)nodeID;
+            PreSignedState presignState = CloudUtil.getPreSignedURI(
+                nodeIOName,
+                nodeIDI,
+                key,
+                expireMinutes,
+                contentType,
+                logger);
+            Exception ex = presignState.getEx();
+            if (presignState.getStatusEnum() != PreSignedState.StatusEnum.OK) {
+                tokenGetState.setRunStatus(TokenGetState.RunStatus.SERVICE_EXCEPTION);
+                tokenGetState.setEx(ex);
+                int status = tokenGetState.getHttpStatus();
+                String json = tokenGetState.getJsonError();
+                return Response 
+                    .status(status).entity(json)
+                    .build();
+            }
+            URL url = presignState.retrieveUrl();
+            tokenGetState.setUrl(url);
+            int status = tokenGetState.getHttpStatus();
+            String json200 = tokenGetState.getJson();
+            return Response 
+                    .status(status).entity(json200)
+                    .build();
+            
+        } catch (TException tex) {
+            tokenGetState = TokenGetState.getTokenGetState(tex);
+            int status = tokenGetState.getHttpStatus();
+            String json = tokenGetState.getJsonError();
+            return Response 
+                .status(status).entity(json)
+                .build();
+        }
+    }
+    /**
+     * 
+     * Get archive for file for this specific Object version
+     * @param nodeID node identifier for state information
+     * @param objectIDS object identifier for state information
+     * @param versionIDS version identifier
+     * "false"=return dflat as is
+     * @param returnIfErrorS "true"=no fixity test, "false"=fixity test
+     * @param archiveTypeS user provided format type for created container
+     * @param formatType user provided format type synchronized response
+     * @param sc ServletConfig used to get system configuration
+     * @throws TException processing exception
+     */
      public Response setProducerAsync(
             int nodeID,
             String objectIDS,
@@ -2655,6 +2875,21 @@ public class JerseyBase
     }
 
     /**
+     * Validate and return version identifier
+     * @param parm String containing versionID
+     * @return version identifier
+     * @throws TException invalid object identifier format
+     */
+    protected Integer getVersionIDCond(String parm)
+        throws TException
+    {
+        if (parm == null) {
+            return null;
+        }
+         return ValidateCmdParms.validateVersionID(parm);
+    }
+
+    /**
      * Validate and return node identifier
      * @param parm String containing nodeID
      * @return node identifier
@@ -2664,6 +2899,36 @@ public class JerseyBase
         throws TException
     {
         return ValidateCmdParms.validateNodeID(parm);
+    }
+    
+    protected Long getLongNull(String longS)
+        throws TException
+    {
+        try {
+            if (StringUtil.isAllBlank(longS)) {
+                return null;
+            }
+            long retLong = Long.parseLong(longS);
+            return retLong;
+            
+        } catch (Exception ex) {
+            return null;
+        }
+    }
+    
+    protected Integer getIntNull(String intS)
+        throws TException
+    {
+        try {
+            if (StringUtil.isAllBlank(intS)) {
+                return null;
+            }
+            int retLong = Integer.parseInt(intS);
+            return retLong;
+            
+        } catch (Exception ex) {
+            return null;
+        }
     }
 
     /**
