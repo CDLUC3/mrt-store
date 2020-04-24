@@ -275,6 +275,7 @@ public class JerseyStorage
             @PathParam("key") String key,
             @DefaultValue("240") @QueryParam("timeout") String expireMinutesS,
             @DefaultValue("") @QueryParam("contentType") String contentType,
+            @DefaultValue("") @QueryParam("contentDisposition") String contentDisp,
             @DefaultValue("json") @QueryParam(KeyNameHttpInf.RESPONSEFORM) String formatType,
             @Context CloseableService cs,
             @Context ServletConfig sc)
@@ -288,6 +289,7 @@ public class JerseyStorage
                 key,
                 expireMinutesS,
                 contentType,
+                contentDisp,
                 cs,
                 sc);
 
