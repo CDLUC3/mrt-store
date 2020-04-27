@@ -268,6 +268,7 @@ public class CloudUtil
             String key,
             Long expireMinutes,
             String contentType,
+            String contentDisp,
             LoggerInf logger)
         throws TException
     {
@@ -281,6 +282,8 @@ public class CloudUtil
                     + " - nodeId=" + nodeID
                     + " - key=" + key
                     + " - expireMinutes=" + expireMinutes
+                    + " - contentType=" + contentType
+                    + " - contentDisp=" + contentDisp
                     );
             
     
@@ -298,7 +301,7 @@ public class CloudUtil
             
             CloudStoreInf service = accessNode.service;
             String bucket = accessNode.container;
-            CloudResponse response = service.getPreSigned(expireMinutes, bucket, key, contentType);
+            CloudResponse response = service.getPreSigned(expireMinutes, bucket, key, contentType, contentDisp);
             Exception ex = response.getException();
             if (ex != null) {
                 System.out.println("ex:" + ex);

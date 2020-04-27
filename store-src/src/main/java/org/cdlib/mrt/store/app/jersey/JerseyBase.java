@@ -2002,6 +2002,7 @@ public class JerseyBase
                 key,
                 expireMinutes,
                 contentType,
+                null,
                 logger);
             Exception ex = presignState.getEx();
             if (presignState.getStatusEnum() != PreSignedState.StatusEnum.OK) {
@@ -3025,6 +3026,8 @@ public class JerseyBase
      * @param nodeIDS String nodeID for processing
      * @param key key value for nodeID cloud 
      * @param expireMinutesS String minutes until PreSigned URL expires
+     * @param contentType ContentType header this data
+     * @param contentDisp ContentDisp header this data
      * @param formatType
      * @param cs
      * @param sc
@@ -3036,6 +3039,7 @@ public class JerseyBase
             String key,
             String expireMinutesS,
             String contentType,
+            String contentDisp,
             CloseableService cs,
             ServletConfig sc
     )
@@ -3061,6 +3065,9 @@ public class JerseyBase
             if (StringUtil.isAllBlank(contentType)) {
                 contentType = null;
             }
+            if (StringUtil.isAllBlank(contentDisp)) {
+                contentDisp = null;
+            }
             Date date = DateUtil.getCurrentDatePlus(expireMinutes * 60 * 1000);
             DateState expire = new DateState(date);
             PreSignedState responseState = CloudUtil.getPreSignedURI(
@@ -3069,6 +3076,7 @@ public class JerseyBase
                 key,
                 expireMinutes,
                 contentType,
+                contentDisp,
                 logger);
             if (responseState.getStatusEnum() == PreSignedState.StatusEnum.OK) {
                 Properties responseProp = responseState.getProperties();
