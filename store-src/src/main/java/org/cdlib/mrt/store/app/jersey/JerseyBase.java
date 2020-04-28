@@ -1961,7 +1961,7 @@ public class JerseyBase
             String archiveNodeName = storeProperties.getProperty("archiveNodeName");
             String archiveNodeS = storeProperties.getProperty("archiveNode");
             Long archiveNode = getLongNull(archiveNodeS);
-            Long assembleNode = getLongNull(archiveNodeS);
+            Long assembleNode = getLongNull(assembleNodeS);
             if (assembleNode != null) {
                 archiveNode = assembleNode;
             }
