@@ -970,6 +970,7 @@ public class JerseyStorage
             @PathParam("asynchtoken") String asynchToken,
             @DefaultValue("240") @QueryParam("timeout") String expireMinutesS,
             @DefaultValue("") @QueryParam("assemble-node") String assembleNodeS,
+            @DefaultValue("") @QueryParam("contentDisposition") String contentDisposition,
             @Context CloseableService cs,
             @Context ServletConfig sc)
         throws TException
@@ -978,6 +979,7 @@ public class JerseyStorage
             asynchToken,
             expireMinutesS,
             assembleNodeS,
+            contentDisposition,
             cs,
             sc);
     }

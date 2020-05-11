@@ -1945,6 +1945,7 @@ public class JerseyBase
             String asynchToken,
             String expireMinutesS,
             String assembleNodeS,
+            String contentDisposition,
             CloseableService cs,
             ServletConfig sc)
         throws TException
@@ -1953,6 +1954,9 @@ public class JerseyBase
         LoggerInf logger = defaultLogger;
         StorageServiceInf storageService = null;
         TokenGetState tokenGetState = null;
+        if (StringUtil.isAllBlank(contentDisposition)) {
+            contentDisposition = null;
+        }
         try {
             StorageServiceInit storageServiceInit = StorageServiceInit.getStorageServiceInit(sc);
             storageService = storageServiceInit.getStorageService();
@@ -2002,7 +2006,7 @@ public class JerseyBase
                 key,
                 expireMinutes,
                 contentType,
-                null,
+                contentDisposition,
                 logger);
             Exception ex = presignState.getEx();
             if (presignState.getStatusEnum() != PreSignedState.StatusEnum.OK) {
