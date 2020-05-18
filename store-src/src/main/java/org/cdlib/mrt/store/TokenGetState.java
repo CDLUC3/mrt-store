@@ -75,6 +75,8 @@ public class TokenGetState
         NotReady("Object is not ready", 202),
         
         REQUESTED_ITEM_NOT_FOUND("Object not found", 404),
+        
+        DATA_EXPIRATION("Object expired", 410),
 
         ASYNC_EXCEPTION("Service exception during creation of archive", 500),
 

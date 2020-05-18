@@ -71,6 +71,8 @@ public class PreSignedState
 
         OFFLINE_STORAGE("File is in offline storage, request is not supported", 403),
 
+        DATA_EXPIRATION("File expired", 410),
+
         UNSUPPORTED_FUNCTION("Signed URL not supported, redirect to download URL", 409),
 
         SERVICE_EXCEPTION("Service exception", 500);
