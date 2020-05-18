@@ -737,6 +737,52 @@ public class TokenManager
         }
     }
     
+    public static Long getDataExpireRemain(
+            String nodeIOName,
+            Long deliveryNode,
+            String keyData,
+            LoggerInf logger)
+        throws TException
+    {
+        
+        try {
+            if (nodeIOName == null) {
+                throw new TException.INVALID_OR_MISSING_PARM(MESSAGE + "nodeIOName required and missing");
+            }
+            if (deliveryNode == null) {
+                throw new TException.INVALID_OR_MISSING_PARM(MESSAGE + "deliveryNode required and missing");
+            }
+            if (keyData == null) {
+                throw new TException.INVALID_OR_MISSING_PARM(MESSAGE + "key required and missing");
+            }
+            NodeIO.AccessNode deliveryAccessNode = NodeIO.getCloudNode(nodeIOName, deliveryNode, logger);
+            CloudStoreInf cloudService = deliveryAccessNode.service;
+            String bucket = deliveryAccessNode.container;
+            
+            Properties propData = cloudService.getObjectMeta(bucket, keyData);
+            if (propData == null) {
+                return null;
+            }
+            String expRemainS = propData.getProperty("expRemain");
+            if (expRemainS == null) return null;
+            Long expRemain = null;
+            try {
+                expRemain = Long.parseLong(expRemainS);
+            } catch (Exception ex) {
+                return null;
+            }
+            return expRemain;
+            
+        } catch (TException me) {
+            return null;
+            
+        } catch (Exception ex) {
+            return null;
+            
+        } finally {
+        }
+    }
+    
     public static List<String> setProducerFilterDefault()
         throws TException
     {

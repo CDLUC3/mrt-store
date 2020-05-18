@@ -2008,6 +2008,15 @@ public class JerseyBase
                 contentType,
                 contentDisposition,
                 logger);
+            
+            if (presignState.getStatusEnum() == PreSignedState.StatusEnum.DATA_EXPIRATION) {
+                tokenGetState.setRunStatus(TokenGetState.RunStatus.DATA_EXPIRATION);
+                int status = tokenGetState.getHttpStatus();
+                String json = tokenGetState.getJsonError();
+                return Response 
+                    .status(status).entity(json)
+                    .build();
+            }
             Exception ex = presignState.getEx();
             if (presignState.getStatusEnum() != PreSignedState.StatusEnum.OK) {
                 tokenGetState.setRunStatus(TokenGetState.RunStatus.SERVICE_EXCEPTION);

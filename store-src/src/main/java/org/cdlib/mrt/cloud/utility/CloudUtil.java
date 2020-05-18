@@ -50,6 +50,7 @@ import org.cdlib.mrt.s3.pairtree.PairtreeCloud;
 import org.cdlib.mrt.s3.service.CloudResponse;
 import org.cdlib.mrt.s3.service.NodeIO;
 import org.cdlib.mrt.store.PreSignedState;
+import org.cdlib.mrt.store.action.TokenManager;
 import org.cdlib.mrt.store.tools.StoreUtil;
 import org.cdlib.mrt.utility.URLEncoder;
 
@@ -257,7 +258,7 @@ public class CloudUtil
      * @param nodeIOName nodeIO Table Name containing cloud information for access
      * @param nodeID node in nodeIO Table
      * @param key key to be looked up
-     * @param expireMinutes expiration Minutes
+     * @param presignTimeoutMinutes expiration Minutes
      * @param logger
      * @return PreSigenedState
      * @throws TException routine attempts to capture all errors
@@ -266,22 +267,22 @@ public class CloudUtil
             String nodeIOName,
             int nodeID,
             String key,
-            Long expireMinutes,
+            Long presignTimeoutMinutes,
             String contentType,
             String contentDisp,
             LoggerInf logger)
         throws TException
     {
         PreSignedState state = PreSignedState.getPreSignedState();
-        if (expireMinutes == null) {
-            expireMinutes = 240L;
+        if (presignTimeoutMinutes == null) {
+            presignTimeoutMinutes = 240L;
         }
         try {
             System.out.println("getPreSigned entered:"
                     + " - nodeIOName=" + nodeIOName
                     + " - nodeId=" + nodeID
                     + " - key=" + key
-                    + " - expireMinutes=" + expireMinutes
+                    + " - expireMinutes=" + presignTimeoutMinutes
                     + " - contentType=" + contentType
                     + " - contentDisp=" + contentDisp
                     );
@@ -301,7 +302,7 @@ public class CloudUtil
             
             CloudStoreInf service = accessNode.service;
             String bucket = accessNode.container;
-            CloudResponse response = service.getPreSigned(expireMinutes, bucket, key, contentType, contentDisp);
+            CloudResponse response = service.getPreSigned(presignTimeoutMinutes, bucket, key, contentType, contentDisp);
             Exception ex = response.getException();
             if (ex != null) {
                 System.out.println("ex:" + ex);
@@ -327,12 +328,25 @@ public class CloudUtil
                 }
                 
             // signed URL returned
-            } else {
-                state.setStatusEnum(PreSignedState.StatusEnum.OK);
-                URL signed = response.getReturnURL();
-                state.setUrl(signed);
-                state.setExpires(expireMinutes);
+            } 
+            
+            Long dataRemainExpire = TokenManager.getDataExpireRemain(nodeIOName, outNode, key, logger);
+            if (dataRemainExpire != null) {
+                long expireMil = presignTimeoutMinutes * 60 * 1000;
+                System.out.println("+++Presign expiration -"
+                        + " - expireMil=" + expireMil
+                        + " - dataRemainExpire=" + dataRemainExpire
+                );
+                if (expireMil > dataRemainExpire) {
+                    state.setStatusEnum(PreSignedState.StatusEnum.DATA_EXPIRATION);
+                    return state;
+                }
             }
+            state.setStatusEnum(PreSignedState.StatusEnum.OK);
+            URL signed = response.getReturnURL();
+            state.setUrl(signed);
+            state.setExpires(presignTimeoutMinutes);
+           
             return state;
             
         } catch (TException tex) {
