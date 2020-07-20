@@ -305,6 +305,10 @@ public class AsyncCloudArchive
             logger.logError(msgx, 2);
 
         } finally {
+            // delete zip and base
+            try {
+                FileUtil.deleteDir(workBase);
+            } catch (Exception ex) { }
         }
 
     }
