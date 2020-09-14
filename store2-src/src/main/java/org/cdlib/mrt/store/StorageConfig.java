@@ -30,6 +30,7 @@ OF THE POSSIBILITY OF SUCH DAMAGE.
 package org.cdlib.mrt.store;
 
 import java.io.File;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,11 +39,9 @@ import java.util.Properties;
 
 import org.cdlib.mrt.utility.LoggerInf;
 import org.cdlib.mrt.s3.service.NodeIO;
-import static org.cdlib.mrt.store.StoreNodeManager.DEBUG;
-import static org.cdlib.mrt.store.StoreNodeManager.MESSAGE;
 import org.cdlib.mrt.utility.TException;
 import org.cdlib.mrt.tools.YamlParser;
-import org.cdlib.mrt.utility.FileUtil;
+import org.cdlib.mrt.utility.LoggerAbs;
 import org.cdlib.mrt.utility.PropertiesUtil;
 import org.cdlib.mrt.utility.StringUtil;
 import org.cdlib.mrt.utility.TFileLogger;
@@ -59,7 +58,6 @@ public class StorageConfig
     protected static final String MESSAGE = NAME + ": ";
     protected static final boolean DEBUG = false;
     
-    protected File confBase = null;
     protected String baseURI = null;
     protected String supportURI = null;
     protected Boolean verifyOnRead = null;
@@ -72,42 +70,31 @@ public class StorageConfig
     protected URL storeLink = null;
     protected Properties asyncArchivProp = null;
     //protected NodeIO.AccessNode archiveAccessNode = null;
+    private static class Test{ };
     
-    public static StorageConfig useYaml(String configEnv, LoggerInf logger)
+    public static StorageConfig useYaml()
         throws TException
     {
         try {
-            if (logger == null) {
-                throw new TException.INVALID_CONFIGURATION(MESSAGE + "logger required");
-            }
-           
-            if (StringUtil.isAllBlank(configEnv)) {
-                throw new TException.INVALID_CONFIGURATION(MESSAGE + "ENV name not supplied");
-            }
-            StorageConfig storageConfig = new StorageConfig(logger);
-            String confPathS = System.getenv(configEnv);
-            if (confPathS == null) {
-                throw new TException.INVALID_CONFIGURATION(MESSAGE + "ENV  not found:"  + configEnv);
-            }
-            File confBase = new File(confPathS);
-            if (!confBase.exists()) {
-                throw new TException.INVALID_CONFIGURATION(MESSAGE + "base directory not found:" + confPathS);
-            }
-            File confFile = new File(confBase, "store-info.yml");
-            if (!confFile.exists()) {
-                throw new TException.INVALID_CONFIGURATION(MESSAGE + "config file not found:" 
-                        + confFile.getAbsolutePath());
-            }
-            storageConfig.setConfBase(confBase);
-            String storeYaml = FileUtil.file2String(confFile);
-        
+            
+            String propName = "yaml/storeConfig.yml";
+            Test test=new Test();
+            InputStream propStream =  test.getClass().getClassLoader().
+                    getResourceAsStream(propName);
+            String storeYaml = StringUtil.streamToString(propStream, "utf8");
+            StorageConfig storageConfig = new StorageConfig();
+
             YamlParser yamlParser = new YamlParser();
             yamlParser.parseString(storeYaml);
             yamlParser.resolveValues();
             String jsonS = yamlParser.dumpJson();
             if (DEBUG) System.out.append("jsonS:" + jsonS);
             JSONObject jobj = new JSONObject(jsonS);
-            JSONObject jStoreInfo = jobj.getJSONObject("store-info");
+            String whichStoreInfo = jobj.getString("which-store-info");
+            JSONObject jStoreInfo = jobj.getJSONObject(whichStoreInfo);
+            JSONObject jStoreLogger = jStoreInfo.getJSONObject("fileLogger");
+            LoggerInf logger = storageConfig.setLogger(jStoreLogger);
+            storageConfig.setLogger(logger);
             storageConfig.setBaseURI(jStoreInfo.getString("baseURI"));
             storageConfig.setVerifyOnRead(jStoreInfo.getBoolean("verifyOnRead"));
             storageConfig.setVerifyOnWrite(jStoreInfo.getBoolean("verifyOnWrite"));
@@ -131,20 +118,18 @@ public class StorageConfig
             return storageConfig;
             
         } catch (TException tex) {
+            tex.printStackTrace();
             throw tex;
             
         } catch (Exception ex) {
+            ex.printStackTrace();
             throw new TException(ex);
         }
         
     }
-    public StorageConfig(LoggerInf logger) 
+    public StorageConfig() 
             throws TException
     { 
-        if (logger == null) {
-            throw new TException.INVALID_CONFIGURATION(MESSAGE + "logger required");
-        }
-        this.logger = logger;
     }
     
     public NodeIO setNodeIO(String nodeIOPath)
@@ -181,14 +166,6 @@ public class StorageConfig
         if (DEBUG) {
             System.out.println("!!!!storeLink:" + this.storeLink.toString());
         }
-    }
-    
-    public File getConfBase() {
-        return confBase;
-    }
-
-    public void setConfBase(File confBase) {
-        this.confBase = confBase;
     }
     
 
@@ -245,14 +222,6 @@ public class StorageConfig
     public void setNodePath(String nodePath) 
         throws TException
     {
-        if (DEBUG) System.out.println("%%%in  nodePath:" + nodePath);
-        if (nodePath.contains("./")) {
-            if (this.confBase == null) {
-                throw new TException.INVALID_OR_MISSING_PARM("confBase required for relative file path");
-            }
-            nodePath = nodePath.replace("./", confBase.getAbsolutePath() + "/");
-        }
-        if (DEBUG) System.out.println("%%%out nodePath:" + nodePath);
         this.nodePath = nodePath;
     }
 
@@ -285,7 +254,6 @@ public class StorageConfig
         try {
             this.asyncArchivProp = null;
             if (asyncArchivePropS == null) return;
-            asyncArchivePropS = asyncArchivePropS.replace("./", confBase.getAbsolutePath() + "/");
             File asyncArchivePropF = new File(asyncArchivePropS);
             if (!asyncArchivePropF.exists()) {
                 this.asyncArchivProp = null;
@@ -333,7 +301,6 @@ public class StorageConfig
         }
         
         String retString = header  + "\n"
-                + " - confBase=" + getConfBase() + "\n"
                 + " - baseURI=" + getBaseURI() + "\n"
                 + " - verifyOnRead=" + getVerifyOnRead() + "\n"
                 + " - verifyOnWrite=" + getVerifyOnWrite() + "\n"
@@ -347,15 +314,56 @@ public class StorageConfig
         
         return retString;
     }
+
+    public void setLogger(LoggerInf logger) {
+        this.logger = logger;
+    }
+    
+
+    /**
+     * set local logger to node/log/...
+     * @param path String path to node
+     * @return Node logger
+     * @throws Exception process exception
+     */
+    protected LoggerInf setLogger(JSONObject fileLogger)
+        throws Exception
+    {
+        String qualifier = fileLogger.getString("qualifier");
+        String path = fileLogger.getString("path");
+        Properties logprop = new Properties();
+        logprop.setProperty("fileLogger.message.maximumLevel", "" + fileLogger.getInt("messageMaximumLevel"));
+        logprop.setProperty("fileLogger.error.maximumLevel", "" + fileLogger.getInt("messageMaximumError"));
+        logprop.setProperty("fileLogger.name", fileLogger.getString("name"));
+        logprop.setProperty("fileLogger.trace", "" + fileLogger.getInt("trace"));
+        logprop.setProperty("fileLogger.qualifier", fileLogger.getString("qualifier"));
+        if (StringUtil.isEmpty(path)) {
+            throw new TException.INVALID_OR_MISSING_PARM(
+                    MESSAGE + "setCANLog: path not supplied");
+        }
+
+        File canFile = new File(path);
+        File log = new File(canFile, "logs");
+        if (!log.exists()) log.mkdir();
+        String logPath = log.getCanonicalPath() + '/';
+        
+        if (DEBUG) System.out.println(PropertiesUtil.dumpProperties("LOG", logprop)
+            + "\npath:" + path
+            + "\nlogpath:" + logPath
+        );
+        LoggerInf logger = LoggerAbs.getTFileLogger(qualifier, log.getCanonicalPath() + '/', logprop);
+        return logger;
+    }
     
     public static void main(String[] argv) {
     	
     	try {
             
             LoggerInf logger = new TFileLogger("test", 50, 50);
-            String configEnv = "MERRITT_INV_INFO";
-            StorageConfig storageConfig = StorageConfig.useYaml(configEnv, logger);
+            StorageConfig storageConfig = StorageConfig.useYaml();
             System.out.println(storageConfig.dump("test"));
+            NodeIO nodeIO = storageConfig.getNodeIO();
+            nodeIO.printNodes("StorageConfig");
         } catch (Exception ex) {
                 // TODO Auto-generated catch block
                 System.out.println("Exception:" + ex);

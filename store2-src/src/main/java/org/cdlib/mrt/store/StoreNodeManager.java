@@ -70,7 +70,7 @@ public class StoreNodeManager
 
     protected File storageDir = null;
     protected LoggerInf logger = null;
-    protected Properties conf = null;
+    //protected Properties conf = null;
     protected Integer defaultNode = null;
     protected URL storeLink = null;
     protected Hashtable<Integer, StoreNode> m_canTypes = new Hashtable<Integer, StoreNode>(200);
@@ -81,13 +81,13 @@ public class StoreNodeManager
     protected StorageConfig storageConfig = null;
     //protected NodeIO nodeIO = null;
     
-    protected StoreNodeManager(LoggerInf logger, Properties conf)
+    protected StoreNodeManager(LoggerInf logger, StorageConfig storageConfig)
         throws TException
     {
         this.logger = logger;
-        this.conf = conf;
-        System.out.println(PropertiesUtil.dumpProperties("***StorageNodeManager***", conf));
-        initEnv(conf);
+        this.storageConfig = storageConfig;
+        System.out.println(storageConfig.dump("***StorageNodeManager***"));
+        initEnv(storageConfig);
     }
 
     /**
@@ -99,11 +99,11 @@ public class StoreNodeManager
      * @return
      * @throws TException
      */
-    public static StoreNodeManager getStoreNodeManager(LoggerInf logger, Properties conf)
+    public static StoreNodeManager getStoreNodeManager(LoggerInf logger, StorageConfig storageConfig)
         throws TException
     {
         try {
-            StoreNodeManager nodeManager = new StoreNodeManager(logger, conf);
+            StoreNodeManager nodeManager = new StoreNodeManager(logger, storageConfig);
             return nodeManager;
 
         } catch (Exception ex) {
@@ -116,19 +116,16 @@ public class StoreNodeManager
     }
     
   
-    private void initEnv(Properties prop)
+    private void initEnv(StorageConfig storageConfig)
         throws TException
     {
         try {
             if (DEBUG) System.out.println("***init enetered");
-            if (prop == null) {
+            if (storageConfig == null) {
                 throw new TException.INVALID_OR_MISSING_PARM(
                     MESSAGE + "Exception TFrame properties not set");
             }
             
-            logger = setStoreLog();
-            String storageEnv = prop.getProperty("StorageEnv");
-            storageConfig = StorageConfig.useYaml(storageEnv, logger);
             List<NodeIO.AccessNode> accessNodes = storageConfig.getAccessNodes();
             setNodes(accessNodes);
             
@@ -375,35 +372,6 @@ public class StoreNodeManager
     public StoreNode getStoreNode(int nodeID)
     {
         return m_canTypes.get(nodeID);
-    }
-
-    /**
-     * set local logger to node/log/...
-     * @param path String path to node
-     * @return Node logger
-     * @throws Exception process exception
-     */
-    protected LoggerInf setCANLog(String path)
-        throws Exception
-    {
-        if (StringUtil.isEmpty(path)) {
-            throw new TException.INVALID_OR_MISSING_PARM(
-                    MESSAGE + "setCANLog: path not supplied");
-        }
-
-        File canFile = new File(path);
-        File log = new File(canFile, "log");
-        if (!log.exists()) log.mkdir();
-        LoggerInf logger = LoggerAbs.getTFileLogger("CAN", log.getCanonicalPath() + '/', conf);
-        return logger;
-    }
-    protected LoggerInf setStoreLog()
-        throws Exception
-    {
-        File log = new File(storageDir, "logs");
-        if (!log.exists()) log.mkdir();
-        LoggerInf logger = LoggerAbs.getTFileLogger("Store", log.getCanonicalPath() + '/', conf);
-        return logger;
     }
 
 

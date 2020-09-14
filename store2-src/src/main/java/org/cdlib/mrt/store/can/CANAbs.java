@@ -281,28 +281,6 @@ public abstract class CANAbs
             nodeForm.setObjectStoreType(protocol);
         }
     }
-
-    /**
-     * Get CAN properties
-     * @param nodeHome node home directory
-     * @return Resolved node properties
-     * @throws Exception
-     */
-    protected static Properties getNodeProperties(File nodeHome)
-        throws Exception
-    {
-        File canInfo = new File(nodeHome, "can-info.txt");
-        if (!canInfo.exists()) {
-            throw new TException.INVALID_ARCHITECTURE (
-                    MESSAGE + "setObjectStore - required directory can-info.txt does not exist:"
-                    + nodeHome.getAbsolutePath());
-        }
-        InputStream inStream = new FileInputStream(canInfo);
-        Properties canProp = new Properties();
-        canProp.load(inStream);
-        return canProp;
-    }
-
     
     protected VersionMap getVersionMap(File versionMapFile)
             throws TException

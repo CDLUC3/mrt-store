@@ -512,12 +512,6 @@ public interface StorageServiceInf
      * @return default nodeID
      */
     public Integer getDefaultNodeID();
-    
-    /**
-     * Configuration Properties
-     * @return Configuration Properties
-     */
-    public Properties getConfProp();
 
     /**
      * Storage properties from store-info.yaml

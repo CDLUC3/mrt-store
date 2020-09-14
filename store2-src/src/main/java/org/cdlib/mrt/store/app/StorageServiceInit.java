@@ -34,6 +34,8 @@ package org.cdlib.mrt.store.app;
 import org.cdlib.mrt.utility.TFrameInit;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
+import org.cdlib.mrt.store.StorageConfig;
+import org.cdlib.mrt.store.storage.StorageService;
 
 import org.cdlib.mrt.store.storage.StorageServiceInf;
 import org.cdlib.mrt.store.storage.StorageServiceAbs;
@@ -43,7 +45,7 @@ import org.cdlib.mrt.utility.TException;
  * @author dloy
  */
 public class StorageServiceInit
-        extends TFrameInit
+        // extends TFrameInit
 {
     private enum Type {
         Regular, Default
@@ -129,14 +131,9 @@ public class StorageServiceInit
     protected StorageServiceInit(Type type, ServletConfig servletConfig, String serviceName)
             throws TException
     {
-        super(servletConfig, serviceName);
-        if (type == Type.Regular) {
-            storageService = StorageServiceAbs.getStorageService(
-                    tFrame.getLogger(), tFrame.getProperties());
-        }
-        if (type == Type.Default) {
-            storageService = StorageServiceAbs.getStorageServiceDefault(
-                    tFrame.getLogger(), tFrame.getProperties());
-        }
+        
+        StorageConfig storageConfig = StorageConfig.useYaml();
+        StorageService.getStorageService(storageConfig);
+        storageService = StorageServiceAbs.getStorageService(storageConfig);
     }
 }

@@ -77,11 +77,10 @@ public class StorageService
 
 
     protected StorageService(
-            LoggerInf logger,
-            Properties confProp)
+            StorageConfig storageConfig)
         throws TException
     {
-        super(logger, confProp);
+        super(storageConfig);
     }
 
     @Override

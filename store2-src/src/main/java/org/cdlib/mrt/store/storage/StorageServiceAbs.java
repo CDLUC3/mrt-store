@@ -34,6 +34,7 @@ import java.io.File;
 import java.net.URL;
 import java.util.Properties;
 
+import org.cdlib.mrt.store.StorageConfig;
 import org.cdlib.mrt.store.StoreNodeManager;
 import org.cdlib.mrt.store.StoreNode;
 import org.cdlib.mrt.utility.LoggerInf;
@@ -49,8 +50,9 @@ public class StorageServiceAbs
     protected static final String NAME = "StorageServiceAbs";
     protected static final String MESSAGE = NAME + ": ";
     protected LoggerInf logger = null;
+    protected StorageConfig storageConfig = null;
     protected StoreNodeManager nodeManager = null;
-    protected Properties confProp = null;
+    //protected Properties confProp = null;
 
     /**
      * StorageService Factory
@@ -60,29 +62,10 @@ public class StorageServiceAbs
      * @throws org.cdlib.mrt.utility.MException
      */
     public static StorageService getStorageService(
-            LoggerInf logger,
-            Properties confProp)
+            StorageConfig storageConfig)
         throws TException
     {
-        StorageService storageService = new StorageService(logger, confProp);
-        return storageService;
-    }
-
-    /**
-     * StorageService Factory
-     * @param logger debug/status logging
-     * @param confProp system properties
-     * @return StorageService
-     * @throws org.cdlib.mrt.utility.MException
-     */
-    public static StorageService getStorageServiceDefault(
-            LoggerInf logger,
-            Properties confProp)
-        throws TException
-    {
-        StorageService storageService = new StorageService(logger, confProp);
-        storageService.setDefaultNodeID();
-
+        StorageService storageService = new StorageService(storageConfig);
         return storageService;
     }
 
@@ -93,18 +76,17 @@ public class StorageServiceAbs
      * @throws TException process exception
      */
     public StorageServiceAbs(
-            LoggerInf logger,
-            Properties confProp)
+            StorageConfig storageConfig)
         throws TException
     {
-        if (confProp == null) {
+        if (storageConfig == null) {
             throw new TException.INVALID_OR_MISSING_PARM(
                     MESSAGE + "Required confProp is missing");
         }
-        this.confProp = confProp;
-        this.logger = logger;
+        this.storageConfig = storageConfig;
+        this.logger = storageConfig.getLogger();
         //System.out.println(PropertiesUtil.dumpProperties("!!!!: StorageServiceAbs:", confProp));
-        this.nodeManager = StoreNodeManager.getStoreNodeManager(logger, confProp);
+        this.nodeManager = StoreNodeManager.getStoreNodeManager(logger, storageConfig);
         if (this.nodeManager.getNodeCount() == 0) {
             throw new TException.INVALID_OR_MISSING_PARM(
                     MESSAGE + "No Nodes found");
@@ -153,8 +135,8 @@ public class StorageServiceAbs
         return logger;
     }
 
-    public Properties getConfProp() {
-        return confProp;
+    public StorageConfig getStorageConfig() {
+        return storageConfig;
     }
 }
 

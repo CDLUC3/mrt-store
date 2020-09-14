@@ -811,29 +811,9 @@ public class JerseyBase
                     );
             StorageServiceInit storageServiceInit = StorageServiceInit.getStorageServiceInit(sc);
             StorageServiceInf storageService = storageServiceInit.getStorageService();
-            Properties storageProp = storageService.getConfProp();
-            
-            String storageServiceS = storageProp.getProperty("StorageService");
-            if (storageServiceS == null) {
-                throw new TException.INVALID_OR_MISSING_PARM(MESSAGE + "StorageService properties missing");
-            }
-            Properties prop = PropertiesUtil.loadPropertiesFileName(storageServiceS + "/store-info.txt");
-            if (DEBUG) System.out.println(PropertiesUtil.dumpProperties("getCloudStream", prop));
-            String nodePath = prop.getProperty("nodePath");
-            String archiveNode = prop.getProperty("archiveNode");
-            if ((nodePath == null) || (nodePath == null)) {
-                throw new TException.INVALID_OR_MISSING_PARM(MESSAGE + "Archive properties missing");
-            }
-            long outNode = 0;
-            try {
-                outNode = Long.parseLong(archiveNode);
-            } catch (Exception ex) {
-                throw new TException.INVALID_OR_MISSING_PARM(MESSAGE + "Non numeric archive node:" + archiveNode);
-            }
-            
-            //NodeIO nodeIO = new NodeIO(archiveNodeName, logger);
-            NodeIO nodeIO = NodeIO.getNodeIOConfig(nodePath, logger);
-            NodeIO.AccessNode accessNode = nodeIO.getAccessNode(outNode);
+            StorageConfig storageConfig = storageService.getStorageConfig();
+            Long outNode = storageConfig.getArchiveNode();
+            NodeIO.AccessNode accessNode = storageConfig.getAccessNode(outNode);
             if (accessNode == null) {
                 throw new TException.INVALID_OR_MISSING_PARM(MESSAGE + "NodeIO.AccessNode not found - outNode:" + outNode);
             }
@@ -2167,7 +2147,12 @@ public class JerseyBase
                     + " - name=" + name
                     + " - formatType=" + formatType
                     );
-            Properties storageProp = storageService.getConfProp();
+            StorageConfig storageConfig = storageService.getStorageConfig();
+            
+            Properties storageProp = storageConfig.getAsyncArchivProp();
+            if (storageProp == null) {
+                throw new TException.INVALID_OR_MISSING_PARM(MESSAGE + "setAsyncArchive storage property not found");
+            }
             String baseEmailDirS = storageProp.getProperty("baseEmailDir");
             if (StringUtil.isEmpty(baseEmailDirS)) {
                 throw new TException.INVALID_OR_MISSING_PARM(MESSAGE + "baseEmailDir property not found");
