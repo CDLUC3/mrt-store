@@ -98,17 +98,18 @@
           <version>1.0-SNAPSHOT</version>
       </dependency>
 
+	<!-- drop 
         <dependency>
             <groupId>org.cdlib.mrt</groupId>
             <artifactId>mrt-confs3</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
-	<!-- drop 
-    <dependency>
-      <groupId>javax.ws.rs</groupId>
-      <artifactId>jsr311-api</artifactId>
-      <version>1.1</version>
-    </dependency>
+              
+        <dependency>
+          <groupId>javax.ws.rs</groupId>
+          <artifactId>jsr311-api</artifactId>
+          <version>1.1</version>
+        </dependency>
 -->
     <dependency>
       <groupId>junit</groupId>
