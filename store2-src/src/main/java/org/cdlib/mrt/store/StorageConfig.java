@@ -57,7 +57,7 @@ public class StorageConfig
     protected static final String NAME = "StorageConfig";
     protected static final String MESSAGE = NAME + ": ";
     protected static final boolean DEBUG = false;
-    
+
     protected String baseURI = null;
     protected String supportURI = null;
     protected Boolean verifyOnRead = null;
@@ -71,12 +71,12 @@ public class StorageConfig
     protected Properties asyncArchivProp = null;
     //protected NodeIO.AccessNode archiveAccessNode = null;
     private static class Test{ };
-    
+
     public static StorageConfig useYaml()
         throws TException
     {
         try {
-            
+
             String propName = "yaml/storeConfig.yml";
             Test test=new Test();
             InputStream propStream =  test.getClass().getClassLoader().
@@ -86,11 +86,13 @@ public class StorageConfig
 
             YamlParser yamlParser = new YamlParser();
             yamlParser.parseString(storeYaml);
-            yamlParser.resolveValues();
+            yamlParser.partiallyResolveValues(storeYaml, "whichStoreInfo");
+            //yamlParser.resolveValues();
             String jsonS = yamlParser.dumpJson();
             if (DEBUG) System.out.append("jsonS:" + jsonS);
             JSONObject jobj = new JSONObject(jsonS);
             String whichStoreInfo = jobj.getString("which-store-info");
+            yamlParser.partiallyResolveValues(storeYaml, whichStoreInfo);
             JSONObject jStoreInfo = jobj.getJSONObject(whichStoreInfo);
             JSONObject jStoreLogger = jStoreInfo.getJSONObject("fileLogger");
             LoggerInf logger = storageConfig.setLogger(jStoreLogger);
@@ -103,35 +105,35 @@ public class StorageConfig
                 asyncArchivePropS = jStoreInfo.getString("asyncArchivProp");
                 storageConfig.setAsyncArchiveProp(asyncArchivePropS);
             } catch (Exception ex) { }
-            
+
             storageConfig.setAsyncArchiveProp(asyncArchivePropS);
             storageConfig.setNodePath(jStoreInfo.getString("nodePath"));
             storageConfig.setNodeIO(storageConfig.getNodePath());
             storageConfig.setArchiveNode(jStoreInfo.getLong("archiveNode"));
             storageConfig.setStoreLink();
-            
+
             JSONArray jarr = jStoreInfo.getJSONArray("producerFilter");
             for (int i=0; i < jarr.length(); i++) {
                 String producerFilter = jarr.getString(i);
                 storageConfig.addProducerFilter(producerFilter);
             }
             return storageConfig;
-            
+
         } catch (TException tex) {
             tex.printStackTrace();
             throw tex;
-            
+
         } catch (Exception ex) {
             ex.printStackTrace();
             throw new TException(ex);
         }
-        
+
     }
-    public StorageConfig() 
+    public StorageConfig()
             throws TException
-    { 
+    {
     }
-    
+
     public NodeIO setNodeIO(String nodeIOPath)
         throws TException
     {
@@ -139,15 +141,15 @@ public class StorageConfig
                 nodeIO = NodeIO.getNodeIOConfig(nodeIOPath, logger);
                 setNodeIO(nodeIO);
                 return nodeIO;
-            
+
         } catch (TException tex) {
             throw tex;
-            
+
         } catch (Exception ex) {
             throw new TException(ex);
         }
     }
-    
+
     protected void setStoreLink()
         throws TException
     {
@@ -167,7 +169,7 @@ public class StorageConfig
             System.out.println("!!!!storeLink:" + this.storeLink.toString());
         }
     }
-    
+
 
     public String getBaseURI() {
         return baseURI;
@@ -209,7 +211,7 @@ public class StorageConfig
         return archiveNode;
     }
 
-    public void setArchiveNode(Long archiveNode) 
+    public void setArchiveNode(Long archiveNode)
         throws TException
     {
         this.archiveNode = archiveNode;
@@ -219,7 +221,7 @@ public class StorageConfig
         return nodePath;
     }
 
-    public void setNodePath(String nodePath) 
+    public void setNodePath(String nodePath)
         throws TException
     {
         this.nodePath = nodePath;
@@ -260,7 +262,7 @@ public class StorageConfig
                 return;
             }
             this.asyncArchivProp = PropertiesUtil.loadFileProperties(asyncArchivePropF);
-            
+
         } catch (Exception ex) {
             this.asyncArchivProp = null;
         }
@@ -269,7 +271,7 @@ public class StorageConfig
     public Properties getAsyncArchivProp() {
         return asyncArchivProp;
     }
-    
+
     public LoggerInf getLogger() {
         return logger;
     }
@@ -278,7 +280,7 @@ public class StorageConfig
         return nodeIO.getAccessNodesList();
     }
 
-    public NodeIO.AccessNode getAccessNode(long node) 
+    public NodeIO.AccessNode getAccessNode(long node)
     {
         return nodeIO.getAccessNode(node);
     }
@@ -287,7 +289,7 @@ public class StorageConfig
         if (nodeIO == null) return null;
         return nodeIO.getNodeName();
     }
-    
+
     public String dump(String header)
     {
         StringBuffer buf = new StringBuffer("producerFilter\n");
@@ -299,7 +301,7 @@ public class StorageConfig
         } else {
             buf.append("\nAsyncArchiveProp: none");
         }
-        
+
         String retString = header  + "\n"
                 + " - baseURI=" + getBaseURI() + "\n"
                 + " - verifyOnRead=" + getVerifyOnRead() + "\n"
@@ -311,14 +313,14 @@ public class StorageConfig
                 + " - producerFilter:" + "\n"
                 + buf.toString() + "\n"
         ;
-        
+
         return retString;
     }
 
     public void setLogger(LoggerInf logger) {
         this.logger = logger;
     }
-    
+
 
     /**
      * set local logger to node/log/...
@@ -346,7 +348,7 @@ public class StorageConfig
         File log = new File(canFile, "logs");
         if (!log.exists()) log.mkdir();
         String logPath = log.getCanonicalPath() + '/';
-        
+
         if (DEBUG) System.out.println(PropertiesUtil.dumpProperties("LOG", logprop)
             + "\npath:" + path
             + "\nlogpath:" + logPath
@@ -354,11 +356,11 @@ public class StorageConfig
         LoggerInf logger = LoggerAbs.getTFileLogger(qualifier, log.getCanonicalPath() + '/', logprop);
         return logger;
     }
-    
+
     public static void main(String[] argv) {
-    	
+
     	try {
-            
+
             LoggerInf logger = new TFileLogger("test", 50, 50);
             StorageConfig storageConfig = StorageConfig.useYaml();
             System.out.println(storageConfig.dump("test"));
@@ -371,4 +373,3 @@ public class StorageConfig
         }
     }
 }
-
