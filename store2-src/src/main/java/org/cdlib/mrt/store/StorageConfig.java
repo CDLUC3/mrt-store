@@ -86,14 +86,10 @@ public class StorageConfig
 
             YamlParser yamlParser = new YamlParser();
             yamlParser.parseString(storeYaml);
-            yamlParser.partiallyResolveValues(storeYaml, "whichStoreInfo");
-            //yamlParser.resolveValues();
-            String jsonS = yamlParser.dumpJson();
-            if (DEBUG) System.out.append("jsonS:" + jsonS);
-            JSONObject jobj = new JSONObject(jsonS);
-            String whichStoreInfo = jobj.getString("which-store-info");
-            yamlParser.partiallyResolveValues(storeYaml, whichStoreInfo);
-            JSONObject jStoreInfo = jobj.getJSONObject(whichStoreInfo);
+            yamlParser.partiallyResolveValues("which-store-info");
+            String whichStoreInfo = yamlParser.getResolvedValues().get("which-store-info").toString();
+            yamlParser.partiallyResolveValues(whichStoreInfo);
+            JSONObject jStoreInfo = yamlParser.getJsonForKey(whichStoreInfo);
             JSONObject jStoreLogger = jStoreInfo.getJSONObject("fileLogger");
             LoggerInf logger = storageConfig.setLogger(jStoreLogger);
             storageConfig.setLogger(logger);
