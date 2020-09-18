@@ -43,7 +43,7 @@ store-info-docker:
     - mrt-embargo.txt
     - mrt-oaidc.xml
     - stash-wrapper.xml
-  archiveNode: 7001
+  archiveNode: 7777
   nodePath: "yaml:"
   fileLogger:
     messageMaximumLevel: 5
