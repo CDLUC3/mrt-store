@@ -190,12 +190,8 @@ public class NodeState
             if (accessNode.accessMode != null) {
                 prop.setProperty(CACCESSMODE, accessNode.accessMode);
             }
-            String accessProtocol = accessNode.serviceType;
-            if (accessNode.serviceType.matches("aws|minio|wasabi")) {
-                accessProtocol = "s3";
-            }
             
-            prop.setProperty(CACCESSPROTOCOL, accessProtocol);
+            prop.setProperty(CACCESSPROTOCOL, "s3");
             prop.setProperty(CMEDIACONNECTIVITY, "cloud");
             prop.setProperty(CNODEFORM, "physical");
             prop.setProperty(CNODEPROTOCOL, "http");
