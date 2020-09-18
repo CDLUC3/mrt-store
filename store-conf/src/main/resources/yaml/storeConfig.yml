@@ -28,7 +28,7 @@ store-info:
 
 
 store-info-docker:
-  baseURI: http://store:8080/
+  baseURI: "http://{!ENV: MRT_DOCKER_HOST !DEFAULT: localhost}:8081/store/"
   supportURI: mailto:merritt-support@ucop.edu
   verifyOnRead: true
   verifyOnWrite: true
