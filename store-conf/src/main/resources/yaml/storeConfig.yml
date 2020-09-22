@@ -1,7 +1,7 @@
 ---
 which-store-info: "{!ENV: MERRITT_STORE_INFO !DEFAULT: store-info}"
 store-info:
-  baseURI: "{!SSM: store/config/baseURI !DEFAULT: http://store-stage.cdlib.org:35121/}"
+  baseURI: "{!SSM: store/config/baseURI !DEFAULT: http://store-stage.cdlib.org:35121}"
   supportURI: mailto:merritt-support@ucop.edu
   verifyOnRead: "{!SSM: store/config/verifyOnRead !DEFAULT: true}"
   verifyOnWrite: "{!SSM: store/config/verifyOnWrite !DEFAULT: true}"
