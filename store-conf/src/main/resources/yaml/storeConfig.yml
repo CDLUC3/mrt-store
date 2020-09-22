@@ -1,0 +1,54 @@
+---
+which-store-info: "{!ENV: MERRITT_STORE_INFO !DEFAULT: store-info}"
+store-info:
+  baseURI: "{!SSM: store/config/baseURI !DEFAULT: http://store-stage.cdlib.org:35121}"
+  supportURI: mailto:merritt-support@ucop.edu
+  verifyOnRead: "{!SSM: store/config/verifyOnRead !DEFAULT: true}"
+  verifyOnWrite: "{!SSM: store/config/verifyOnWrite !DEFAULT: true}"
+  producerFilter:
+    - mrt-erc.txt
+    - mrt-eml.txt
+    - mrt-dc.xml
+    - mrt-delete.txt
+    - mrt-dua.txt
+    - mrt-dataone-manifest.txt
+    - mrt-datacite.xml
+    - mrt-embargo.txt
+    - mrt-oaidc.xml
+    - stash-wrapper.xml
+  archiveNode: 7001
+  nodePath: "{!SSM: store/config/nodePath  !DEFAULT: yaml:}"
+  fileLogger:
+    messageMaximumLevel: "{!SSM: store/config/log/messageMaximumLevel !DEFAULT: 5}"
+    messageMaximumError: "{!SSM: store/config/log/messageMaximumError !DEFAULT: 10}"
+    path: "{!SSM: store/config/log/path !DEFAULT: /apps/replic/tst/config/storage/mrtHomes/store2/}"
+    name: store
+    qualifier: yyMMdd
+    trace: 5
+
+
+store-info-docker:
+  baseURI: "http://{!ENV: MRT_DOCKER_HOST !DEFAULT: localhost}:8081/store"
+  supportURI: mailto:merritt-support@ucop.edu
+  verifyOnRead: true
+  verifyOnWrite: true
+  producerFilter:
+    - mrt-erc.txt
+    - mrt-eml.txt
+    - mrt-dc.xml
+    - mrt-delete.txt
+    - mrt-dua.txt
+    - mrt-dataone-manifest.txt
+    - mrt-datacite.xml
+    - mrt-embargo.txt
+    - mrt-oaidc.xml
+    - stash-wrapper.xml
+  archiveNode: 7777
+  nodePath: "yaml:"
+  fileLogger:
+    messageMaximumLevel: 5
+    messageMaximumError: 10
+    path: /dpr2store/mrtHomes/
+    name: store
+    qualifier: yyMMdd
+    trace: 5

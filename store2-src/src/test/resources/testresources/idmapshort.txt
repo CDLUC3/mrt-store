@@ -1,0 +1,10 @@
+ark:/13030/j2c821zz | doi:10.5060/D2X63JTX | ark:/b5060/d2x63jtx
+ark:/13030/j2c821zz | doi:10.5060/D2SF2T3M | ark:/b5060/d2sf2t3m
+ark:/13030/j2c821zz | doi:10.5060/D2NP22C8 | ark:/b5060/d2np22c8
+ark:/13030/j2c821zz | doi:10.5060/D2J1012K | ark:/b5060/d2j1012k
+ark:/13030/j2c821zz | doi:10.5060/D2D798B9 | ark:/b5060/d2d798b9
+ark:/13030/j2rn30xp | ark:/13030/j2qj73j5 | ark:/99999/fk45144j0
+ark:/13030/j2qj73j5 | ark:/13030/m5np22cp | ark:/99999/fk4rv0v2z
+ark:/13030/j2rf56vz | Lam_1240 | ark:/13030/m5zp441k
+ark:/13030/j2rf56vz | Murphy_1162 | ark:/13030/m5tx3c9v
+ark:/13030/j2rf56vz | Hampton_5748 | ark:/13030/m5q81b05

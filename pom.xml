@@ -17,8 +17,8 @@
             <artifactId>maven-compiler-plugin</artifactId>
             <version>3.0</version>
             <configuration>
-              <source>1.7</source>
-              <target>1.7</target>
+              <source>1.8</source>
+              <target>1.8</target>
             </configuration>
           </plugin>
       </plugins>
@@ -31,7 +31,9 @@
                 <activeByDefault>true</activeByDefault>
             </activation>   
             <modules>
+                <module>store-conf</module>
                 <module>store-src</module>
+                <module>store2-src</module>
                 <module>store-war</module>
             </modules>
         </profile>
