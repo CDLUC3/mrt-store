@@ -256,7 +256,7 @@ public class CANCloudService
             VersionMap map = deleteObject.getVersionMap();
             int current = map.getCurrent();
             if (current == 0) {
-                throw new TException.REQUESTED_ITEM_NOT_FOUND("Object not found:" + objectID.getValue());
+                throw new TException.REQUESTED_ITEM_NOT_FOUND("DELETE Object not found:" + objectID.getValue());
             }
             ObjectState state = (ObjectState)deleteObject.callEx();
             
