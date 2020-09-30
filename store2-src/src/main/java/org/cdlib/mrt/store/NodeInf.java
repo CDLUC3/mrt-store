@@ -318,7 +318,23 @@ public interface NodeInf
             String linkBaseURL,
             Boolean presign)
         throws TException;
-
+      
+    /**
+     * Get the Ingest  manifest for a  specific object-version
+     * @param nodeID node identifier for manifest to be retrieved
+     * @param objectID object identifier for manifest to be retrieved
+     * @param versionID version identifier for manifest to be retrieved
+     * @return addVersion manifest in file
+     * @throws TException Exception condition during storage service procssing
+     */
+    public FileContent getIngestLink(
+        Identifier objectID,
+        int versionID,
+        String linkBaseURL,
+        Boolean presign,
+        Boolean update)
+    throws TException;
+    
     /**
      * Get a sigle archive file containing the contents for a specific
      * object

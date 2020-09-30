@@ -380,6 +380,23 @@ public interface StorageServiceInf
         throws TException;
 
     /**
+     * Get the ingest manifest for a  specific object-version
+     * @param nodeID node identifier for manifest to be retrieved
+     * @param objectID object identifier for manifest to be retrieved
+     * @param versionID version identifier for manifest to be retrieved
+     * @return addVersion manifest in file
+     * @throws TException Exception condition during storage service procssing
+     */
+    public FileContent getIngestLink(
+            int nodeID,
+            Identifier objectID,
+            int versionID,
+            Boolean presign,
+            Boolean update)
+        throws TException;
+
+
+    /**
      * Local service method that provides object-version content that may
      * be used for testing
      * @param nodeID node identifier for object
