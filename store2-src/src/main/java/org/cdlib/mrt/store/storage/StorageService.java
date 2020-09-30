@@ -572,6 +572,44 @@ public class StorageService
         bump("getVersionLink", startTime);
         return content;
     }
+    
+    @Override
+    public FileContent getIngestLink(
+            int nodeID,
+            Identifier objectID,
+            int versionID,
+            Boolean presign,
+            Boolean update)
+        throws TException
+    {
+        long startTime = DateUtil.getEpochUTCDate();
+        StoreNode node = nodeManager.getStoreNode(nodeID);
+        URL nodeLink = node.getNodeLink();
+        if (nodeLink == null) {
+            nodeLink = nodeManager.getStoreLink();
+            if (DEBUG) {
+                System.out.println(NAME + ".getVersionLink "
+                        + " - nodeLink null - getStoreLink()=" + nodeLink);
+            }
+        } else {
+            if (DEBUG) {
+                System.out.println(NAME + ".getVersionLink "
+                        + " - nodeLink=" + nodeLink);
+            }
+        }
+        if (nodeLink == null) {
+            throw new TException.INVALID_OR_MISSING_PARM(
+                    MESSAGE + "- getVersionLink - nodeLink missing");
+        }
+        Integer nodeIDD =  getAccessNodeID(nodeID);
+        String nodeIDS = "";
+        if (nodeIDD != null) nodeIDS = "/" + nodeIDD;
+        String linkBaseURL = nodeLink.toString() + "/content" + nodeIDS;
+        NodeInf can = node.getCan();
+        FileContent content = can.getIngestLink(objectID, versionID, linkBaseURL, presign, update);
+        bump("getVersionLink", startTime);
+        return content;
+    }
 
 
     @Override

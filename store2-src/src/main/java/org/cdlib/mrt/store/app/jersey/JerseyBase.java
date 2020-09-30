@@ -2544,6 +2544,48 @@ public class JerseyBase
             throw new TException.GENERAL_EXCEPTION(MESSAGE + "Exception:" + ex);
         }
     }
+    public Response getIngestLink(
+            int nodeID,
+            String objectIDS,
+            String versionIDS,
+            String presignS,
+            String updateS,
+            CloseableService cs,
+            ServletConfig sc)
+        throws TException
+    {
+       LoggerInf logger = defaultLogger;
+       try {
+            int versionID = getVersionID(versionIDS);
+            Boolean presign = setBoolean(presignS);
+            Boolean update = setBoolean(updateS);
+            Identifier objectID = getObjectID(objectIDS);
+            String formatType = "txt";
+            log("getVersionLink entered:"
+                    + " - formatType=" + formatType
+                    + " - nodeId=" + nodeID
+                    + " - objectID=" + objectID
+                    );
+            StorageServiceInit storageServiceInit = StorageServiceInit.getStorageServiceInit(sc);
+            StorageServiceInf storageService = storageServiceInit.getStorageService();
+            logger = getNodeLogger(nodeID, storageService);
+            FileContent content = storageService.getIngestLink(nodeID, objectID, versionID, presign, update);
+            String fileResponseName = objectIDS + "_" + versionIDS + "_manifest.txt";
+            return getFileResponse(content, formatType, fileResponseName, cs, logger);
+
+       } catch (TException tex) {
+            try {
+                return getExceptionResponse(cs, tex, "xml", logger);
+
+            } catch (Exception ex2) {
+                throw new TException.GENERAL_EXCEPTION(ex2);
+            }
+
+        } catch (Exception ex) {
+            System.out.println("TRACE:" + StringUtil.stackTrace(ex));
+            throw new TException.GENERAL_EXCEPTION(MESSAGE + "Exception:" + ex);
+        }
+    }
 
     /**
      * Get Response to a formatted State object

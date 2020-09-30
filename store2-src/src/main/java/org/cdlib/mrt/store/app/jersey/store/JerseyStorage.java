@@ -708,6 +708,29 @@ public class JerseyStorage
     }
 
     @GET
+    @Path("ingestlink/{nodeid}/{objectid}/{versionid}")
+    public Response getIngestLink(
+            @PathParam("nodeid") String nodeIDS,
+            @PathParam("objectid") String objectIDS,
+            @PathParam("versionid") String versionIDS,
+            @DefaultValue("false") @QueryParam("presign") String presignS,
+            @DefaultValue("false") @QueryParam("update") String updateS,
+            @Context CloseableService cs,
+            @Context ServletConfig sc)
+        throws TException
+    {
+        int nodeID = getNodeID(nodeIDS);
+        return getIngestLink(
+                    nodeID,
+                    objectIDS,
+                    versionIDS,
+                    presignS,
+                    updateS,
+                    cs,
+                    sc);
+    }
+
+    @GET
     @Path("stream/{nodeid}/{objectid}/{versionid}")
     public Response getVersionStream(
             @PathParam("nodeid") String nodeIDS,

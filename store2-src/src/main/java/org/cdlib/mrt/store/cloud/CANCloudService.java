@@ -50,6 +50,7 @@ import org.cdlib.mrt.cloud.action.ContentCloudManifestStream;
 import org.cdlib.mrt.cloud.action.ContentFile;
 import org.cdlib.mrt.cloud.action.ContentFileStream;
 import org.cdlib.mrt.cloud.action.ComponentFile;
+import org.cdlib.mrt.cloud.action.ContentIngestLink;
 import org.cdlib.mrt.cloud.action.ContentVersionLink;
 import org.cdlib.mrt.cloud.action.CopyObject;
 import org.cdlib.mrt.cloud.action.DeleteCurrentVersion;
@@ -676,6 +677,35 @@ public class CANCloudService
             ContentVersionLink versionLink = ContentVersionLink.getContentVersionLink(s3service, bucket, 
                     objectID, versionID, linkBaseURL, presign, logger);
             return versionLink.callEx();
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            throw makeTException(ex);
+            
+        }
+     }
+        
+    public FileContent getIngestLink(
+            //File objectStoreBase,
+            Identifier objectID,
+            int versionID,
+            String linkBaseURL,
+            Boolean presign,
+            Boolean update)
+        throws TException
+    {
+        try {
+            log(MESSAGE + "getVersionLink entered"
+                    + " - objectID=" + objectID
+                    + " - versionID=" + versionID
+                    + " - linkBaseURL=" + linkBaseURL
+                    , 10);
+            if (logger == null) {
+                System.out.println("***null logger");
+            }
+            ContentIngestLink ingestLink = ContentIngestLink.getContentIngestLink(s3service, bucket, 
+                    objectID, versionID, linkBaseURL, presign, update, logger);
+            return ingestLink.callEx();
 
         } catch (Exception ex) {
             ex.printStackTrace();

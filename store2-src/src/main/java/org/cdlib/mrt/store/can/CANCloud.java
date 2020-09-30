@@ -323,6 +323,40 @@ public class CANCloud
     }
 
     @Override
+    public FileContent getIngestLink(
+            Identifier objectID,
+            int versionID,
+            String linkBaseURL,
+            Boolean presign,
+            Boolean update)
+        throws TException
+    {
+        FileContent manifestFile = null;
+        try {
+            if (objectID == null) {
+                throw new TException.INVALID_OR_MISSING_PARM(
+                        MESSAGE + "getVersionLink - objectID required");
+            }
+            if (StringUtil.isEmpty(linkBaseURL)) {
+                throw new TException.INVALID_OR_MISSING_PARM(
+                        MESSAGE + "getVersionLink - linkBaseURL not supplied");
+            }
+
+            manifestFile = objectCloudStore.getIngestLink(objectID, versionID, linkBaseURL, presign, update);
+
+            log(MESSAGE + "getVersionLink entered"
+                + " - objectID=" + objectID
+                + " - versionID=" + versionID
+                + " - baseURL=" + linkBaseURL
+                , 10);
+            return manifestFile;
+
+        } catch (Exception ex) {
+            throw makeGeneralTException("getVersionLink", ex);
+        }
+    }
+
+    @Override
     public VersionState getVersionState (
                 Identifier objectID,
                 int versionID)
