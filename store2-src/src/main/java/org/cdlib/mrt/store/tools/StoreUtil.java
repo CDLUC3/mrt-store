@@ -83,4 +83,40 @@ public class StoreUtil
             return null;
         }
     }
+    
+    /**
+     * Build manifest URL
+     * @param manURLin form http.../manifest/<node>
+     * @param objectID
+     * @return 
+     */
+    public static URL buildManifestURL(
+            URL manURL,
+            Identifier objectID
+            )
+    {
+        try {
+            if (manURL == null) return null;
+            StringBuffer buf = new StringBuffer();
+            if (debug) {
+                System.out.println("!!!!StoreUtil.buildContentURL:" 
+                        + " - manURL=" + manURL
+                        + " - objectID=" + objectID
+                        );
+            }
+            buf.append(manURL.toString());
+            buf.append("/" + URLEncoder.encode(objectID.getValue(), "utf-8"));
+            URL retURL = new URL(buf.toString());
+
+            if (debug)
+                System.out.println("!!!!StoreUtil.buildContentURL:"
+                        + " - return=" + retURL
+                        );
+            return retURL;
+
+        } catch (Exception ex) {
+            System.out.println("StoreUtil.buildContentURL Exception:" + ex);
+            return null;
+        }
+    }
 }

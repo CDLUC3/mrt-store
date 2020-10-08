@@ -33,9 +33,9 @@ import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 import java.util.concurrent.Callable;
 import org.cdlib.mrt.s3.service.CloudResponse;
-import org.cdlib.mrt.cloud.utility.CloudUtil;
 import org.cdlib.mrt.core.FileContent;
 import org.cdlib.mrt.core.FileComponent;
 import org.cdlib.mrt.core.Identifier;
@@ -46,7 +46,6 @@ import org.cdlib.mrt.core.ManifestRowIngest;
 import org.cdlib.mrt.utility.TException;
 import org.cdlib.mrt.utility.LoggerInf;
 import org.cdlib.mrt.s3.service.CloudStoreInf;
-import org.cdlib.mrt.store.PreSignedState;
 import org.cdlib.mrt.store.tools.StoreUtil;
 import org.cdlib.mrt.utility.FileUtil;
 //import org.cdlib.mrt.utility.FileUtil;
@@ -238,6 +237,11 @@ public class ContentIngestLink
                 manRowOut.setFileComponent(saveComponent);
                 manOut.write(manRowOut);
             }
+            FileComponent manifestComponent = setManifest();
+            if (manifestComponent != null) {
+                manRowOut.setFileComponent(manifestComponent);
+                manOut.write(manRowOut);
+            }
             manOut.writeEOF();
             manOut.closeOutput();
             
@@ -270,6 +274,40 @@ public class ContentIngestLink
             }
             saveComponent.setIdentifier(newFilePath);
             return saveComponent;
+            
+        } catch (Exception ex) {
+            String msg = MESSAGE + "buildCloudComponent - Exception:" + ex;
+            logger.logError(msg, 2);
+            logger.logError(StringUtil.stackTrace(ex), 10);
+            throw new TException.GENERAL_EXCEPTION(msg);
+            
+        }
+    }
+    
+    public FileComponent setManifest()
+        throws TException
+    {
+        try {
+            FileComponent manifestComponent = new FileComponent();
+            String manKey = objectID.getValue() + "|manifest";
+            Properties prop = s3service.getObjectMeta(bucket, manKey);
+            String sha256 = prop.getProperty("sha256");
+            String sizeS = prop.getProperty("size");
+            manifestComponent.setSize(sizeS);
+            if (sha256 != null) {
+                manifestComponent.addMessageDigest(sha256,"sha256");
+            }
+            manifestComponent.setMimeType("application/xml");
+            manifestComponent.setIdentifier("mrt-provenance.xml");
+            manifestComponent.setCreated();
+            
+            String manURLS = baseManifestURL.replace("content", "manifest");
+            URL manURL = new URL(manURLS);
+            URL manifestURL = StoreUtil.buildManifestURL(manURL, objectID);
+            manifestComponent.setURL(manifestURL);
+            String key = objectID.getValue() + "|manifest";
+            manifestComponent.setLocalID(key);
+            return manifestComponent;
             
         } catch (Exception ex) {
             String msg = MESSAGE + "buildCloudComponent - Exception:" + ex;
