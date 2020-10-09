@@ -1027,6 +1027,7 @@ public class TokenManager
                 "mrt-datacite.xml",
                 "mrt-embargo.txt",
                 "mrt-oaidc.xml",
+                "mrt-provenance.xml",
                 "stash-wrapper.xml"
             };
         ArrayList<String> producerFilter = new ArrayList<>();

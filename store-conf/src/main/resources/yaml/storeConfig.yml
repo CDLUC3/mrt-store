@@ -15,6 +15,7 @@ store-info:
     - mrt-datacite.xml
     - mrt-embargo.txt
     - mrt-oaidc.xml
+    - mrt-provenance.xml
     - stash-wrapper.xml
   archiveNode: 7001
   nodePath: "{!SSM: store/config/nodePath  !DEFAULT: yaml:}"
@@ -42,6 +43,7 @@ store-info-docker:
     - mrt-datacite.xml
     - mrt-embargo.txt
     - mrt-oaidc.xml
+    - mrt-provenance.xml
     - stash-wrapper.xml
   archiveNode: 7777
   nodePath: "yaml:"
