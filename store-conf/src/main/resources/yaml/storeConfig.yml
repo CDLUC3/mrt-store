@@ -28,7 +28,7 @@ store-info:
     trace: 5
 
 
-store-info-docker:
+store-info-docker: &docker
   baseURI: "http://{!ENV: MRT_DOCKER_HOST !DEFAULT: localhost}:8081/store"
   supportURI: mailto:merritt-support@ucop.edu
   verifyOnRead: true
@@ -54,3 +54,8 @@ store-info-docker:
     name: store
     qualifier: yyMMdd
     trace: 5
+
+
+store-info-dev-docker: 
+  <<: *docker
+  archiveNode: 5003
