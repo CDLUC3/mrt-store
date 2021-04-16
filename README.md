@@ -12,13 +12,13 @@ and the retrieval of content from the Merritt Preservation System.
 ## Component Diagram
 
 ### Merritt Store - Ingest Content
-![Flowchart](https://github.com/CDLUC3/mrt-doc/raw/master/diagrams/store-ing.mmd.svg)
+![Flowchart](https://github.com/CDLUC3/mrt-doc/raw/master/diagrams/store-ing.mmd.svg?sanitize=1)
 
 ### Merritt Access - File Retrieval
-![Flowchart](https://github.com/CDLUC3/mrt-doc/raw/master/diagrams/store-file.mmd.svg)
+![Flowchart](https://github.com/CDLUC3/mrt-doc/raw/master/diagrams/store-file.mmd.svg?sanitize=1)
 
 ### Merritt Access - Object Retrieval
-![Flowchart](https://github.com/CDLUC3/mrt-doc/raw/master/diagrams/store-obj.mmd.svg)
+![Flowchart](https://github.com/CDLUC3/mrt-doc/raw/master/diagrams/store-obj.mmd.svg?sanitize=1)
 
 ## Dependencies
 
