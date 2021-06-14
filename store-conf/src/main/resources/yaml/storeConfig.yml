@@ -22,7 +22,7 @@ store-info:
   fileLogger:
     messageMaximumLevel: "{!SSM: store/config/log/messageMaximumLevel !DEFAULT: 5}"
     messageMaximumError: "{!SSM: store/config/log/messageMaximumError !DEFAULT: 10}"
-    path: "{!SSM: store/config/log/path !DEFAULT: /apps/dpr2store/mrtHomes/store2/}"
+    path: "{!ENV: LOG_STORE}"
     name: store
     qualifier: yyMMdd
     trace: 5
