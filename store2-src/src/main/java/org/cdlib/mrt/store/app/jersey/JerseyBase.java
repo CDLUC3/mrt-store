@@ -76,6 +76,7 @@ import org.cdlib.mrt.utility.ArchiveBuilder;
 import org.cdlib.mrt.core.DateState;
 import org.cdlib.mrt.store.action.AsyncCloudArchive;
 import org.cdlib.mrt.store.action.TokenManager;
+import org.cdlib.mrt.store.tools.FileFromUrl;
 import org.cdlib.mrt.utility.DateUtil;
 import org.cdlib.mrt.utility.StateInf;
 import org.cdlib.mrt.utility.SerializeUtil;
@@ -1009,6 +1010,7 @@ public class JerseyBase
         throws TException
     {
         LoggerInf logger = defaultLogger;
+        File manifest = null;
         try {
             log("addVersion entered:"
                     + " - formatType=" + formatType
@@ -1036,9 +1038,9 @@ public class JerseyBase
             StorageServiceInit storageServiceInit = StorageServiceInit.getStorageServiceInit(sc);
             StorageServiceInf storageService = storageServiceInit.getStorageService();
             logger = getNodeLogger(nodeID, storageService);
-            File manifest = getManifest(manifestRequest, url, logger);
+            manifest = getManifest(manifestRequest, url, logger);
             validateManifest(manifest, sizeS, digestType, digestValue);
-            jerseyCleanup.addTempFile(manifest);
+            //jerseyCleanup.addTempFile(manifest);
             StateInf responseState = addVersion(nodeID, objectID, localContext, localID, manifest, storageService, logger);
             return getStateResponse(responseState, formatType, logger, cs, sc);
 
@@ -1048,6 +1050,9 @@ public class JerseyBase
         } catch (Exception ex) {
             System.out.println("TRACE:" + StringUtil.stackTrace(ex));
             throw new TException.GENERAL_EXCEPTION(MESSAGE + "Exception:" + ex);
+            
+        } finally {
+            FileFromUrl.delete(manifest);
         }
     }
     
@@ -1157,6 +1162,7 @@ public class JerseyBase
         throws TException
     {
         LoggerInf logger = defaultLogger;
+        File manifest = null;
         try {
             log("updateVersion entered:"
                     + " - formatType=" + formatType
@@ -1185,11 +1191,10 @@ public class JerseyBase
             StorageServiceInf storageService = storageServiceInit.getStorageService();
             logger = getNodeLogger(nodeID, storageService);
             
-            File manifest = null;
             if ((manifestRequest != null) || (url != null)) {
                 manifest = getManifest(manifestRequest, url, logger);
                 validateManifest(manifest, sizeS, digestType, digestValue);
-                jerseyCleanup.addTempFile(manifest);
+                //jerseyCleanup.addTempFile(manifest);
             }
             String [] deleteList = null;
             if (StringUtil.isEmpty(delete)) deleteList = null;
@@ -1206,6 +1211,9 @@ public class JerseyBase
         } catch (Exception ex) {
             System.out.println("TRACE:" + StringUtil.stackTrace(ex));
             throw new TException.GENERAL_EXCEPTION(MESSAGE + "Exception:" + ex);
+            
+        } finally {
+            FileFromUrl.delete(manifest);
         }
     }
 
@@ -2979,23 +2987,23 @@ public class JerseyBase
     {
 
         try {
-        File tempFile = FileUtil.getTempFile("manifest", ".txt");
-        URL remoteManifest = null;
-        if (StringUtil.isNotEmpty(manifestRequest) && !manifestRequest.equals("none")) {
-            InputStream manifest = StringUtil.stringToStream(manifestRequest, "utf-8");
-            FileUtil.stream2File(manifest, tempFile);
-            return tempFile;
-        }
-        if (StringUtil.isNotEmpty(url) && !url.equals("none")) {
-            try {
-                    remoteManifest = new URL(url);
-                } catch (Exception ex) {
-                    throw new TException.REQUEST_INVALID(
-                        "Manifest URL is invalid:" + url);
-                }
-                FileUtil.url2File(logger, remoteManifest, tempFile);
+            URL remoteManifest = null;
+            if (StringUtil.isNotEmpty(manifestRequest) && !manifestRequest.equals("none")) {
+                File tempFile = FileUtil.getTempFile("manifest", ".txt");
+                InputStream manifest = StringUtil.stringToStream(manifestRequest, "utf-8");
+                FileUtil.stream2File(manifest, tempFile);
                 return tempFile;
-        }
+            }
+            if (StringUtil.isNotEmpty(url) && !url.equals("none")) {
+                try {
+                        remoteManifest = new URL(url);
+                    } catch (Exception ex) {
+                        throw new TException.REQUEST_INVALID(
+                            "Manifest URL is invalid:" + url);
+                    }
+                    File tempFile = FileFromUrl.getFile(remoteManifest, logger);
+                    return tempFile;
+            }
         throw new TException.REQUEST_INVALID(
                  "Neither manifest.txt nor url provided");
 

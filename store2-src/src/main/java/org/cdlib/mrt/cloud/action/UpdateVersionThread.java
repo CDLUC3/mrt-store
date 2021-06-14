@@ -53,6 +53,7 @@ import org.cdlib.mrt.utility.FileUtil;
 import org.cdlib.mrt.utility.TException;
 import org.cdlib.mrt.utility.LoggerInf;
 import org.cdlib.mrt.s3.service.CloudStoreInf;
+import org.cdlib.mrt.store.tools.FileFromUrl;
 import org.cdlib.mrt.utility.StringUtil;
 /**
  * Run fixity
@@ -63,7 +64,7 @@ public class UpdateVersionThread
         implements Callable, Runnable
 {
 
-    protected static final String NAME = "AddVersionThread";
+    protected static final String NAME = "UpdateVersionThread";
     protected static final String MESSAGE = NAME + ": ";
     protected static final boolean DEBUG = true;
     protected static final boolean DEBUGLOW = false;
@@ -224,8 +225,7 @@ public class UpdateVersionThread
             if (url == null) {
                 throw new TException.INVALID_OR_MISSING_PARM(MESSAGE + "fillComponent - component URL missing");
             }
-            File tmpFile = FileUtil.getTempFile("tmp", ".txt");
-            FileUtil.url2File(logger, url, tmpFile);
+            File tmpFile = FileFromUrl.getFile(url, logger);
             manifestComponent.setComponentFile(tmpFile);
 
 

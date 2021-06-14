@@ -31,6 +31,7 @@ package org.cdlib.mrt.cloud.action;
 
 import java.io.File;
 import java.io.InputStream;
+import java.net.URI;
 import java.net.URL;
 import java.util.concurrent.Callable;
 
@@ -42,6 +43,7 @@ import org.cdlib.mrt.core.ManifestRowAbs;
 import org.cdlib.mrt.core.ComponentContent;
 import org.cdlib.mrt.core.FileComponent;
 import org.cdlib.mrt.core.Identifier;
+import org.cdlib.mrt.store.tools.FileFromUrl;
 
 
 import org.cdlib.mrt.store.VersionState;
@@ -218,7 +220,7 @@ public class AddVersionThread
         }
     } 
     
-    public void setFile(FileComponent manifestComponent)
+    public void setFileOriginal(FileComponent manifestComponent)
         throws TException
     {
         try {
@@ -230,6 +232,32 @@ public class AddVersionThread
             File tmpFile = FileUtil.getTempFile("tmp", ".txt");
             FileUtil.url2File(logger, url, tmpFile);
             manifestComponent.setComponentFile(tmpFile);
+
+
+        } catch (TException tex) {
+            throw tex;
+
+        } catch (Exception ex) {
+            String msg = MESSAGE + "buildCloudComponent - Exception:" + ex;
+            logger.logError(msg, 2);
+            logger.logError(StringUtil.stackTrace(ex), 10);
+            throw new TException.GENERAL_EXCEPTION(msg);
+        }
+
+    }
+    
+    public void setFile(FileComponent manifestComponent)
+        throws TException
+    {
+        try {
+            if (manifestComponent.getComponentFile() != null) return;
+            
+            URL url = manifestComponent.getURL();
+            if (url == null) {
+                throw new TException.INVALID_OR_MISSING_PARM(MESSAGE + "fillComponent - component URL missing");
+            }
+            File returnFile = FileFromUrl.getFile(url, logger);
+            manifestComponent.setComponentFile(returnFile);
 
 
         } catch (TException tex) {
