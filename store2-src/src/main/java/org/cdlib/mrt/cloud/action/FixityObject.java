@@ -41,12 +41,14 @@ import org.cdlib.mrt.core.FileComponent;
 
 import org.cdlib.mrt.core.FileContent;
 import org.cdlib.mrt.core.Identifier;
+import org.cdlib.mrt.core.MessageDigest;
 import org.cdlib.mrt.s3.service.CloudResponse;
 
 
 import org.cdlib.mrt.utility.TException;
 import org.cdlib.mrt.utility.LoggerInf;
 import org.cdlib.mrt.s3.service.CloudStoreInf;
+import org.cdlib.mrt.s3.tools.CloudChecksum;
 import org.cdlib.mrt.store.FileFixityState;
 import org.cdlib.mrt.store.ObjectFixityState;
 import org.cdlib.mrt.store.action.ArchiveComponent;
@@ -198,7 +200,7 @@ public class FixityObject
         }
     }   
     
-    protected FileFixityState getFileFixity (int versionID, FileComponent component)
+    protected FileFixityState getFileFixityOriginal(int versionID, FileComponent component)
     {   
         File tmpFile = null;
         FileFixityState state = new FileFixityState();
@@ -275,6 +277,73 @@ public class FixityObject
                     tmpFile.delete();
                 } catch (Exception ex) { }
             }
+        }
+    }   
+    
+    protected FileFixityState getFileFixity (int versionID, FileComponent component)
+    {  
+        FileFixityState state = new FileFixityState();
+        try {
+            if (component == null) {
+                throw new TException.REQUESTED_ITEM_NOT_FOUND(MESSAGE + "component not found in this version "
+                        + " - bucket=" + bucket
+                        + " - objectID=" + objectID.getValue()
+                        );
+            }
+            String fileID = component.getIdentifier();
+            state.setObjectID(objectID);
+            state.setVersionID(versionID);
+            state.setFileName(fileID);
+            state.setFileDigest(component.getMessageDigest());
+            state.setFileSize(component.getSize());
+            state.setFixityDate(new DateState());
+            state.setKey(component.getLocalID());
+            String checksumTypeManifest = component.getMessageDigest().getJavaAlgorithm();
+            String checksumManifest = component.getMessageDigest().getValue();
+            log(MESSAGE + " entered"
+                    + " - objectID=" + objectID
+                    + " - versionID=" + versionID
+                    + " - fileID=" + fileID
+                    + " - key=" + component.getLocalID()
+                    , 10);
+            //tmpFile = FileUtil.getTempFile("tmp", ".txt");
+            String key = component.getLocalID();
+            
+            MessageDigest digest = component.getMessageDigest();
+            String checksumType = digest.getJavaAlgorithm();
+            String checksum = digest.getValue();
+            long fileSize = component.getSize();
+            
+            String [] types = new String[1];
+            types[0] = checksumType;
+
+            CloudChecksum cc = CloudChecksum.getChecksums(types, s3service, bucket, key, sizeChecksumBuffer);
+
+            cc.process();
+            CloudChecksum.CloudChecksumResult fixityResult
+                    = cc.validateSizeChecksum(checksum, checksumType, fileSize, logger);
+            String returnChecksum = cc.getChecksum(checksumType);
+            
+            state.setSizeMatches(fixityResult.fileSizeMatch);
+            state.setDigestMatches(fixityResult.checksumMatch);
+           
+                log("Validation match "
+                        + " - objectID=" + objectID.getValue()
+                        + " - versionID=" + versionID
+                        + " - fileID=" + fileID
+                        + " - checksumTypeManifest=" + checksumTypeManifest
+                        + " - saveChecksum=" + checksumManifest
+                        + " - foundChecksum=" + returnChecksum
+                        );
+                    
+            
+            return state;
+
+        } catch(Exception ex) {
+            state.setEx(ex);
+            ex.printStackTrace();
+            return state;
+            
         }
     } 
     

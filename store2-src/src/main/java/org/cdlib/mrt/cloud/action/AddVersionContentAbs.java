@@ -56,6 +56,7 @@ import org.cdlib.mrt.utility.TException;
 import org.cdlib.mrt.utility.LoggerInf;
 import org.cdlib.mrt.s3.service.CloudResponse;
 import org.cdlib.mrt.s3.service.CloudStoreInf;
+import org.cdlib.mrt.store.tools.FileFromUrl;
 import org.cdlib.mrt.utility.StringUtil;
 /**
  * Run fixity
@@ -589,21 +590,7 @@ public abstract class AddVersionContentAbs
                 setThreadFail(component, tex);
                 
             } finally {
-                try {
-                    if (componentFile != null) {
-                        componentFile.delete();
-                        if (componentFile.exists()) {
-                            System.out.println("***Component delete failure:" 
-                                    + componentFile.getAbsolutePath());
-                        } else {
-                            if (DEBUG) System.out.println("+++Component deleted:" 
-                                    + componentFile.getAbsolutePath());
-                        }
-                    }
-                } catch (Exception ex) { 
-                    System.out.println("***Component delete exception(" 
-                                    + componentFile.getAbsolutePath() + "):" + ex);
-                }
+                FileFromUrl.delete(componentFile);
             }
         } 
     

@@ -50,6 +50,7 @@ import org.cdlib.mrt.cloud.ManifestSAX;
 import org.cdlib.mrt.cloud.VersionMap;
 import org.cdlib.mrt.core.ComponentContent;
 import org.cdlib.mrt.core.FileComponent;
+import org.cdlib.mrt.core.FixityStatusType;
 import org.cdlib.mrt.core.Identifier;
 import org.cdlib.mrt.core.MessageDigest;
 import org.cdlib.mrt.s3.service.CloudResponse;
@@ -59,6 +60,8 @@ import org.cdlib.mrt.s3.service.CloudUtil;
 
 import org.cdlib.mrt.formatter.FormatterAbs;
 import org.cdlib.mrt.formatter.FormatterInf;
+import org.cdlib.mrt.s3.service.NodeIO;
+import org.cdlib.mrt.s3.tools.CloudChecksum;
 import org.cdlib.mrt.utility.FileUtil;
 import org.cdlib.mrt.utility.LoggerInf;
 import org.cdlib.mrt.utility.StateInf;
@@ -84,6 +87,7 @@ public class CloudActionAbs
     protected LoggerInf logger = null;
     protected Exception exception = null;
     protected Integer versionID = null;
+    protected Integer sizeChecksumBuffer = 16000000;
     
 
     public CloudActionAbs(CloudStoreInf s3service, String bucket, Identifier objectID, LoggerInf logger)
@@ -494,7 +498,7 @@ public class CloudActionAbs
             return cnt;
     }
     
-    protected void validateComponent(int versionID, FileComponent file)
+    protected void validateComponentOriginal(int versionID, FileComponent file)
         throws TException
     {
         try {
@@ -548,5 +552,61 @@ public class CloudActionAbs
         }
     }
     
+    protected void validateComponent(int versionID, FileComponent file)
+        throws TException
+    {
+        try {
+            String key = file.getLocalID();
+            if (DEBUG) System.out.println("***validateComponent entered"
+                    + " - key=" + key
+                    );
+            MessageDigest digest = file.getMessageDigest();
+            String checksumType = digest.getJavaAlgorithm();
+            String checksum = digest.getValue();
+            long fileSize = file.getSize();
+            
+            String [] types = new String[1];
+            types[0] = checksumType;
+
+            CloudChecksum cc = CloudChecksum.getChecksums(types, s3service, bucket, key, sizeChecksumBuffer);
+
+            cc.process();
+            CloudChecksum.CloudChecksumResult fixityResult
+                    = cc.validateSizeChecksum(checksum, checksumType, fileSize, logger);
+            String returnChecksum = cc.getChecksum(checksumType);
+           
+            String msg = ""
+                        + " - objectID=" + objectID.getValue()
+                        + " - versionID=" + versionID
+                        + " - fileID=" + file.getIdentifier()
+                        + " - key=" + key
+                        + " - checksumType=" + checksumType
+                        + " - manifestChecksum=" + checksum
+                        + " - manifestSize=" + file.getSize()
+                        + " - returnChecksum=" + returnChecksum
+                        + " - returnSize=" + cc.getInputSize()
+                        + " - " + fixityResult.dump("ValidateComponent");
+            if (!fixityResult.fileSizeMatch || !fixityResult.checksumMatch) {
+                logger.logMessage("Component fixity FAILS:" + msg, 0, true);
+                throw new TException.FIXITY_CHECK_FAILS("Component fixity FAILS " + msg);
+                
+            } else {
+                    msg = ""
+                        + " - objectID=" + objectID.getValue()
+                        + " - versionID=" + versionID
+                        + " - fileID=" + file.getIdentifier()
+                        + " - key=" + key;
+                logger.logMessage("Component fixity OK:" + msg, 0, true);
+                if (DEBUG) System.out.println("validateComponent OK:" + msg);
+            }
+            
+        } catch (TException tex) {
+            throw tex;
+
+        } catch(Exception ex) {
+            throw new TException(ex);
+            
+        }
+    }
 }
 
