@@ -331,12 +331,12 @@ public class StorageConfig
     {
         String qualifier = fileLogger.getString("qualifier");
         String path = fileLogger.getString("path");
+        String name = fileLogger.getString("name");
         Properties logprop = new Properties();
         logprop.setProperty("fileLogger.message.maximumLevel", "" + fileLogger.getInt("messageMaximumLevel"));
         logprop.setProperty("fileLogger.error.maximumLevel", "" + fileLogger.getInt("messageMaximumError"));
-        logprop.setProperty("fileLogger.name", fileLogger.getString("name"));
-        logprop.setProperty("fileLogger.trace", "" + fileLogger.getInt("trace"));
-        logprop.setProperty("fileLogger.qualifier", fileLogger.getString("qualifier"));
+        logprop.setProperty("fileLogger.name", name);
+        logprop.setProperty("fileLogger.qualifier", qualifier);
         if (StringUtil.isEmpty(path)) {
             throw new TException.INVALID_OR_MISSING_PARM(
                     MESSAGE + "setCANLog: path not supplied");
@@ -351,7 +351,7 @@ public class StorageConfig
             + "\npath:" + path
             + "\nlogpath:" + logPath
         );
-        LoggerInf logger = LoggerAbs.getTFileLogger(qualifier, log.getCanonicalPath() + '/', logprop);
+        LoggerInf logger = LoggerAbs.getTFileLogger(name, log.getCanonicalPath() + '/', logprop);
         return logger;
     }
     
