@@ -436,6 +436,7 @@ public class ContentVersionLink
                 file.put("mimeType", component.getMimeType());
             }
     
+            jobj.put("objectID", objectID.getValue());
             jobj.put("currentVersion", currentVersion);
             jobj.put("localVersion", localVersion);
             jobj.put("versionFileCnt", versionFileCnt);
