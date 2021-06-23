@@ -354,7 +354,10 @@ public interface ObjectStoreInf
             Identifier objectID,
             int versionID,
             String linkBaseURL,
-            Boolean presign)
+            Boolean presign,
+            Boolean update,
+            String filter,
+            String format)
         throws TException;
 
     /**

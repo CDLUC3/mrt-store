@@ -619,7 +619,10 @@ public class CloudObjectService
             Identifier objectID,
             int versionID,
             String linkBaseURL,
-            Boolean presign)
+            Boolean presign,
+            Boolean update,
+            String filter,
+            String format)
         throws TException
      {
         try {
@@ -631,7 +634,8 @@ public class CloudObjectService
             if (logger == null) {
                 System.out.println("***null logger");
             }
-            ContentVersionLink versionLink = ContentVersionLink.getContentVersionLink(s3service, bucket, objectID, versionID, linkBaseURL, presign, logger);
+            ContentVersionLink versionLink 
+                    = ContentVersionLink.getContentVersionLink(s3service, bucket, objectID, versionID, linkBaseURL, presign, update, filter, format, logger);
             return versionLink.callEx();
 
         } catch (Exception ex) {

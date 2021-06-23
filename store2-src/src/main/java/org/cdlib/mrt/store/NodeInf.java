@@ -36,6 +36,7 @@ import java.io.File;
 import java.io.OutputStream;
 import java.net.URL;
 import java.util.List;
+import org.cdlib.mrt.cloud.action.ContentVersionLink;
 
 import org.cdlib.mrt.store.VersionState;
 
@@ -312,11 +313,7 @@ public interface NodeInf
      * @return addVersion manifest in file
      * @throws TException Exception condition during storage service procssing
      */
-      public FileContent getVersionLink(
-            Identifier objectID,
-            int versionID,
-            String linkBaseURL,
-            Boolean presign)
+      public FileContent getVersionLink(ContentVersionLink.Request cvlRequest)
         throws TException;
       
     /**
@@ -334,7 +331,7 @@ public interface NodeInf
         Boolean presign,
         Boolean update)
     throws TException;
-    
+      
     /**
      * Get a sigle archive file containing the contents for a specific
      * object

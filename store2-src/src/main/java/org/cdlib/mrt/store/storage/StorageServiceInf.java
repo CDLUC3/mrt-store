@@ -34,6 +34,7 @@ import java.io.File;
 import java.io.OutputStream;
 import java.net.URL;
 import java.util.Properties;
+import org.cdlib.mrt.cloud.action.ContentVersionLink;
 
 import org.cdlib.mrt.core.Identifier;
 import org.cdlib.mrt.core.FileContent;
@@ -365,21 +366,6 @@ public interface StorageServiceInf
         throws TException;
 
     /**
-     * Get the addVersion manifest for a  specific object-version
-     * @param nodeID node identifier for manifest to be retrieved
-     * @param objectID object identifier for manifest to be retrieved
-     * @param versionID version identifier for manifest to be retrieved
-     * @return addVersion manifest in file
-     * @throws TException Exception condition during storage service procssing
-     */
-    public FileContent getVersionLink(
-            int nodeID,
-            Identifier objectID,
-            int versionID,
-            Boolean presign)
-        throws TException;
-
-    /**
      * Get the ingest manifest for a  specific object-version
      * @param nodeID node identifier for manifest to be retrieved
      * @param objectID object identifier for manifest to be retrieved
@@ -393,6 +379,20 @@ public interface StorageServiceInf
             int versionID,
             Boolean presign,
             Boolean update)
+        throws TException;
+
+    /**
+     * Get the ingest manifest for a  specific object-version
+     * @param nodeID node identifier for manifest to be retrieved
+     * @param objectID object identifier for manifest to be retrieved
+     * @param versionID version identifier for manifest to be retrieved
+     * @param presign use presign instead of storage link
+     * @param update return only update files
+     * @param json return json format
+     * @return addVersion manifest in file
+     * @throws TException Exception condition during storage service procssing
+     */
+    public FileContent getVersionLink(ContentVersionLink.Request cvlRequest)
         throws TException;
 
 
