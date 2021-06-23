@@ -85,7 +85,7 @@ import org.cdlib.mrt.utility.StringUtil;
 public class CANCloudService
         extends ObjectStoreAbs
 {
-    protected static final String NAME = "CloudObjectService";
+    protected static final String NAME = "CANCloudService";
     protected static final String MESSAGE = NAME + ": ";
     protected static final boolean DEBUG = false;
 
@@ -657,25 +657,21 @@ public class CANCloudService
     }
 
     
-    public FileContent getVersionLink(
-            //File objectStoreBase,
-            Identifier objectID,
-            int versionID,
-            String linkBaseURL,
-            Boolean presign)
+    public FileContent getVersionLink(ContentVersionLink.Request cvlRequest)
         throws TException
      {
         try {
             log(MESSAGE + "getVersionLink entered"
-                    + " - objectID=" + objectID
-                    + " - versionID=" + versionID
-                    + " - linkBaseURL=" + linkBaseURL
+                    + " - objectID=" + cvlRequest.objectID
+                    + " - versionID=" + cvlRequest.versionID
+                    + " - linkBaseURL=" + cvlRequest.linkBaseURL
                     , 10);
             if (logger == null) {
                 System.out.println("***null logger");
             }
-            ContentVersionLink versionLink = ContentVersionLink.getContentVersionLink(s3service, bucket, 
-                    objectID, versionID, linkBaseURL, presign, logger);
+            cvlRequest.setS3Service(s3service)
+                    . setBucket(bucket);
+            ContentVersionLink versionLink = ContentVersionLink.getContentVersionLink(cvlRequest, logger);
             return versionLink.callEx();
 
         } catch (Exception ex) {
@@ -684,7 +680,7 @@ public class CANCloudService
             
         }
      }
-        
+
     public FileContent getIngestLink(
             //File objectStoreBase,
             Identifier objectID,

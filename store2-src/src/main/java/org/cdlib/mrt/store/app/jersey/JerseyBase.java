@@ -54,7 +54,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import org.cdlib.mrt.cloud.utility.CloudUtil;
 
-
+import org.cdlib.mrt.cloud.action.ContentVersionLink;
 import org.cdlib.mrt.formatter.FormatterAbs;
 import org.cdlib.mrt.formatter.FormatterInf;
 import org.cdlib.mrt.core.FileContent;
@@ -219,7 +219,7 @@ public class JerseyBase
             return null;
         }
     }
-
+     
     /**
      * Format file from input State file
      *  - identify format type
@@ -2517,14 +2517,19 @@ public class JerseyBase
             String objectIDS,
             String versionIDS,
             String presignS,
+            String updateS,
+            String filterS,
+            String formatS,
             CloseableService cs,
             ServletConfig sc)
         throws TException
     {
        LoggerInf logger = defaultLogger;
        try {
+                   
             int versionID = getVersionID(versionIDS);
             Boolean presign = setBoolean(presignS);
+            Boolean update = setBoolean(updateS);
             Identifier objectID = getObjectID(objectIDS);
             String formatType = "txt";
             log("getVersionLink entered:"
@@ -2535,9 +2540,20 @@ public class JerseyBase
             StorageServiceInit storageServiceInit = StorageServiceInit.getStorageServiceInit(sc);
             StorageServiceInf storageService = storageServiceInit.getStorageService();
             logger = getNodeLogger(nodeID, storageService);
-            FileContent content = storageService.getVersionLink(nodeID, objectID, versionID, presign);
+            
+            ContentVersionLink.Request cvlRequest = new ContentVersionLink.Request()
+                    .setNodeID(nodeID)
+                    .setObjectID(objectIDS)
+                    .setVersionID(versionIDS)
+                    .setPresign(presignS)
+                    .setUpdate(updateS)
+                    .setFilter(filterS)
+                    .setOutputFormat(formatS);
+            System.out.println(cvlRequest.dump(NAME + " - getVersionLink"));
+            
+            FileContent fileContent = storageService.getVersionLink(cvlRequest);
             String fileResponseName = objectIDS + "_" + versionIDS + "_manifest.txt";
-            return getFileResponse(content, formatType, fileResponseName, cs, logger);
+            return getFileResponse(fileContent, formatType, fileResponseName, cs, logger);
 
        } catch (TException tex) {
             try {
@@ -2594,7 +2610,7 @@ public class JerseyBase
             throw new TException.GENERAL_EXCEPTION(MESSAGE + "Exception:" + ex);
         }
     }
-
+    
     /**
      * Get Response to a formatted State object
      * @param responseState State object to format

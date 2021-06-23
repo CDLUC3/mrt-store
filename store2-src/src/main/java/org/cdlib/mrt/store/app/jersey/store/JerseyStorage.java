@@ -685,28 +685,6 @@ public class JerseyStorage
                 cs,
                 sc);
     }
-
-    @GET
-    @Path("link/{nodeid}/{objectid}/{versionid}")
-    public Response getVersionLink(
-            @PathParam("nodeid") String nodeIDS,
-            @PathParam("objectid") String objectIDS,
-            @PathParam("versionid") String versionIDS,
-            @DefaultValue("false") @QueryParam("presign") String presignS,
-            @Context CloseableService cs,
-            @Context ServletConfig sc)
-        throws TException
-    {
-        int nodeID = getNodeID(nodeIDS);
-        return getVersionLink(
-                    nodeID,
-                    objectIDS,
-                    versionIDS,
-                    presignS,
-                    cs,
-                    sc);
-    }
-
     @GET
     @Path("ingestlink/{nodeid}/{objectid}/{versionid}")
     public Response getIngestLink(
@@ -726,6 +704,33 @@ public class JerseyStorage
                     versionIDS,
                     presignS,
                     updateS,
+                    cs,
+                    sc);
+    }
+
+    @GET
+    @Path("versionlink/{nodeid}/{objectid}/{versionid}")
+    public Response getVersionLink(
+            @PathParam("nodeid") String nodeIDS,
+            @PathParam("objectid") String objectIDS,
+            @PathParam("versionid") String versionIDS,
+            @DefaultValue("false") @QueryParam("presign") String presignS,
+            @DefaultValue("false") @QueryParam("update") String updateS,
+            @DefaultValue("none") @QueryParam("filter") String filterS,
+            @DefaultValue("json") @QueryParam("format") String formatS,
+            @Context CloseableService cs,
+            @Context ServletConfig sc)
+        throws TException
+    {
+        int nodeID = getNodeID(nodeIDS);
+        return getVersionLink(
+                    nodeID,
+                    objectIDS,
+                    versionIDS,
+                    presignS,
+                    updateS,
+                    filterS,
+                    formatS,
                     cs,
                     sc);
     }

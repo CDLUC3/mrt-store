@@ -38,6 +38,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import org.cdlib.mrt.cloud.action.ContentVersionLink;
 
 import org.cdlib.mrt.core.Identifier;
 import org.cdlib.mrt.core.FileContent;
@@ -537,15 +538,12 @@ public class StorageService
     }
     
     @Override
-    public FileContent getVersionLink(
-            int nodeID,
-            Identifier objectID,
-            int versionID,
-            Boolean presign)
+    public FileContent getVersionLink(ContentVersionLink.Request cvlRequest)
         throws TException
     {
         long startTime = DateUtil.getEpochUTCDate();
-        StoreNode node = nodeManager.getStoreNode(nodeID);
+        int nodeID = cvlRequest.nodeID;
+        StoreNode node = nodeManager.getStoreNode(cvlRequest.nodeID);
         URL nodeLink = node.getNodeLink();
         if (nodeLink == null) {
             nodeLink = nodeManager.getStoreLink();
@@ -567,8 +565,9 @@ public class StorageService
         String nodeIDS = "";
         if (nodeIDD != null) nodeIDS = "/" + nodeIDD;
         String linkBaseURL = nodeLink.toString() + "/content" + nodeIDS;
+        cvlRequest.setLinkBaseURL(linkBaseURL);
         NodeInf can = node.getCan();
-        FileContent content = can.getVersionLink(objectID, versionID, linkBaseURL, presign);
+        FileContent content = can.getVersionLink(cvlRequest);
         bump("getVersionLink", startTime);
         return content;
     }
@@ -610,7 +609,7 @@ public class StorageService
         bump("getVersionLink", startTime);
         return content;
     }
-
+    
 
     @Override
     public FileContent getObjectArchive(

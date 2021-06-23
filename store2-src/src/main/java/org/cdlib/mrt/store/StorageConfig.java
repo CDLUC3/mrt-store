@@ -62,7 +62,7 @@ public class StorageConfig
     protected String supportURI = null;
     protected Boolean verifyOnRead = null;
     protected Boolean verifyOnWrite = null;
-    protected ArrayList <String> producerFilter = new ArrayList();
+    protected static ArrayList <String> producerFilter = new ArrayList();
     protected Long archiveNode = null;
     protected String nodePath = null;
     protected NodeIO nodeIO = null;
@@ -193,7 +193,7 @@ public class StorageConfig
         this.verifyOnWrite = verifyOnWrite;
     }
 
-    public ArrayList<String> getProducerFilter() {
+    public static ArrayList<String> getProducerFilter() {
         return producerFilter;
     }
 

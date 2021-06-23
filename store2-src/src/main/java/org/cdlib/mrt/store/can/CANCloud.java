@@ -59,6 +59,7 @@ import org.cdlib.mrt.core.FileComponent;
 import org.cdlib.mrt.cloud.action.FixityObject;
 import org.cdlib.mrt.store.action.ProducerComponentList;
 import org.cdlib.mrt.cloud.CloudList;
+import org.cdlib.mrt.cloud.action.ContentVersionLink;
 import org.cdlib.mrt.cloud.utility.CloudUtil;
 import org.cdlib.mrt.core.DateState;
 import org.cdlib.mrt.s3.service.CloudStoreInf;
@@ -290,30 +291,14 @@ public class CANCloud
     }
 
     @Override
-    public FileContent getVersionLink(
-            Identifier objectID,
-            int versionID,
-            String linkBaseURL,
-            Boolean presign)
+    public FileContent getVersionLink(ContentVersionLink.Request cvlRequest)
         throws TException
     {
         FileContent manifestFile = null;
         try {
-            if (objectID == null) {
-                throw new TException.INVALID_OR_MISSING_PARM(
-                        MESSAGE + "getVersionLink - objectID required");
-            }
-            if (StringUtil.isEmpty(linkBaseURL)) {
-                throw new TException.INVALID_OR_MISSING_PARM(
-                        MESSAGE + "getVersionLink - linkBaseURL not supplied");
-            }
+            manifestFile = objectCloudStore.getVersionLink(cvlRequest);
 
-            manifestFile = objectCloudStore.getVersionLink(objectID, versionID, linkBaseURL, presign);
-
-            log(MESSAGE + "getVersionLink entered"
-                + " - objectID=" + objectID
-                + " - versionID=" + versionID
-                + " - baseURL=" + linkBaseURL
+            log(cvlRequest.dump(NAME)
                 , 10);
             return manifestFile;
 
