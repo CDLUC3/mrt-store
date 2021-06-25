@@ -9,6 +9,9 @@ This microservice provides an API for other Merritt microservices to interact wi
 This microservice supports the ingest of new objects into the Merritt Preservation System 
 and the retrieval of content from the Merritt Preservation System.
 
+## Original System Specifications
+- [Merritt Storage Service](https://github.com/CDLUC3/mrt-doc/blob/main/doc/Merritt-storage-service-latest.pdf)
+
 ## Component Diagram
 
 ### Merritt Store - Ingest Content
