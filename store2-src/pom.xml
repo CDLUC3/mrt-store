@@ -8,21 +8,6 @@
   <name>UC3-mrtStore2Pub-src</name>
   <url>http://uc3.cdlib.org</url>
 
-  <repositories>
-    <repository>
-      <id>cdl-releases</id>
-      <url>http://mvn.cdlib.org/content/repositories/cdl-releases</url>
-    </repository>
-    <repository>
-      <id>cdl-snapshots</id>
-      <url>http://mvn.cdlib.org/content/repositories/cdl-snapshots</url>
-    </repository>
-    <repository>
-      <id>thirdparty</id>
-      <url>http://mvn.cdlib.org/content/repositories/thirdparty</url>
-    </repository>
-  </repositories>
-
   <!-- force UTF-8 -->
   <properties>
       <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -98,19 +83,6 @@
           <version>1.0-SNAPSHOT</version>
       </dependency>
 
-	<!-- drop 
-        <dependency>
-            <groupId>org.cdlib.mrt</groupId>
-            <artifactId>mrt-confs3</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
-              
-        <dependency>
-          <groupId>javax.ws.rs</groupId>
-          <artifactId>jsr311-api</artifactId>
-          <version>1.1</version>
-        </dependency>
--->
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
@@ -119,35 +91,11 @@
     </dependency>
 
     <dependency>
-        <groupId>net.sf</groupId>
-        <artifactId>jargs</artifactId>
-        <version>1.0</version>
-    </dependency>
-
-    <dependency>
         <groupId>javax.servlet</groupId>
         <artifactId>servlet-api</artifactId>
         <version>2.5</version>
     </dependency>
     
-        <!--
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpcore</artifactId>
-            <version>4.3.3</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpmime</artifactId>
-            <version>4.3.6</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-            <version>4.3.6</version>
-        </dependency>
-        -->
-
 
         <dependency>
             <groupId>jaxen</groupId>
