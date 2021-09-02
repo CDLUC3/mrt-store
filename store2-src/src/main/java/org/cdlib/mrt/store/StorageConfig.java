@@ -69,6 +69,11 @@ public class StorageConfig
     protected LoggerInf logger = null;
     protected URL storeLink = null;
     protected Properties asyncArchivProp = null;
+    protected String queueService = null;
+    protected String queueName = null;
+    protected String queueHoldFile = null;
+    protected String queuePollingInterval = null;
+    protected String queueNumThreads = null;
     //protected NodeIO.AccessNode archiveAccessNode = null;
     private static class Test{ };
     
@@ -93,11 +98,17 @@ public class StorageConfig
             String whichStoreInfo = jobj.getString("which-store-info");
             JSONObject jStoreInfo = jobj.getJSONObject(whichStoreInfo);
             JSONObject jStoreLogger = jStoreInfo.getJSONObject("fileLogger");
+            JSONObject jStoreQueue = jStoreInfo.getJSONObject("queueInfo");
             LoggerInf logger = storageConfig.setLogger(jStoreLogger);
             storageConfig.setLogger(logger);
             storageConfig.setBaseURI(jStoreInfo.getString("baseURI"));
             storageConfig.setVerifyOnRead(jStoreInfo.getBoolean("verifyOnRead"));
             storageConfig.setVerifyOnWrite(jStoreInfo.getBoolean("verifyOnWrite"));
+            storageConfig.setQueueService(jStoreQueue.getString("QueueService"));
+            storageConfig.setQueueName(jStoreQueue.getString("QueueName"));
+            storageConfig.setQueueHoldFile(jStoreQueue.getString("QueueHoldFile"));
+            storageConfig.setQueuePollingInterval(jStoreQueue.getString("PollingInterval"));
+            storageConfig.setQueueNumThreads(jStoreQueue.getString("NumThreads"));
             String asyncArchivePropS = null;
             try {
                 asyncArchivePropS = jStoreInfo.getString("asyncArchivProp");
@@ -244,6 +255,46 @@ public class StorageConfig
 
     public String getSupportURI() {
         return supportURI;
+    }
+
+    public void setQueueHoldFile(String queueHoldFile) {
+        this.queueHoldFile = queueHoldFile;
+    }
+
+    public void setQueuePollingInterval(String queuePollingInterval) {
+        this.queuePollingInterval = queuePollingInterval;
+    }
+
+    public void setQueueNumThreads(String queueNumThreads) {
+        this.queueNumThreads = queueNumThreads;
+    }
+
+    public void setQueueService(String queueService) {
+        this.queueService = queueService;
+    }
+
+    public void setQueueName(String queueName) {
+        this.queueName = queueName;
+    }
+
+    public String getQueueHoldFile() {
+        return queueHoldFile;
+    }
+
+    public String getQueuePollingInterval() {
+        return queuePollingInterval;
+    }
+
+    public String getQueueNumThreads() {
+        return queueNumThreads;
+    }
+
+    public String getQueueService() {
+        return queueService;
+    }
+
+    public String getQueueName() {
+        return queueName;
     }
 
     public void setSupportURI(String supportURI) {

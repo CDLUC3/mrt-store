@@ -26,6 +26,12 @@ store-info:
     name: store
     qualifier: yyMMdd
     trace: 5
+  queueInfo:
+    QueueService: "{!SSM: inventory/zoo/queueService !DEFAULT: localhost:2181}"
+    QueueName: "{!SSM: store/zoo/AccessQName !DEFAULT: /access}"
+    QueueHoldFile: "{!SSM: store/config/QueueHoldFile !DEFAULT: /apps/dpr2store/mrtHomes/AccessHold}"
+    PollingInterval: "{!SSM: store/config/PollingInterval !DEFAULT: 15}"
+    NumThreads: "{!SSM: store/config/numThreads !DEFAULT: 5}"
 
 
 store-info-docker: &docker
@@ -54,6 +60,12 @@ store-info-docker: &docker
     name: store
     qualifier: yyMMdd
     trace: 5
+  queueInfo:
+    QueueService: "zoo:2181"
+    QueueName: "/access"
+    QueueHoldFile: "/dpr2store/mrtHomes/AccessHold"
+    PollingInterval: "15"
+    NumThreads: "5"
 
 
 store-info-dev-docker: 
