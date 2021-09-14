@@ -72,6 +72,8 @@ public class TokenStatus
     {
         OK("Container complete", 200),
         
+        Queued("Queued for processing", 201),
+        
         NotReady("Object is not ready", 202),
 
         SERVICE_EXCEPTION("Service exception", 500);
