@@ -72,6 +72,8 @@ public class TokenGetState
     {
         OK("Payload contains token info", 200),
         
+        Queued("Assembley request queued", 201),
+        
         NotReady("Object is not ready", 202),
         
         REQUESTED_ITEM_NOT_FOUND("Object not found", 404),
@@ -110,12 +112,22 @@ public class TokenGetState
         return getState;
     }
     
+    public static TokenGetState getEmptyTokenGetState()
+        throws TException
+    {
+        TokenGetState getState =  new TokenGetState();
+        return getState;
+    }
+    
     protected TokenGetState(TokenStatus tokenStatus)
         throws TException
     {
         this.tokenStatus = tokenStatus;
         if (tokenStatus.getTokenStatusEnum() == TokenStatus.TokenStatusEnum.NotReady) {
             setRunStatus(TokenGetState.RunStatus.NotReady);
+            
+        } else if (tokenStatus.getTokenStatusEnum() == TokenStatus.TokenStatusEnum.Queued) {
+            setRunStatus(TokenGetState.RunStatus.Queued);
             
         } else if (tokenStatus.getTokenStatusEnum() == TokenStatus.TokenStatusEnum.SERVICE_EXCEPTION) {
             setRunStatus(TokenGetState.RunStatus.ASYNC_EXCEPTION);
@@ -125,6 +137,12 @@ public class TokenGetState
         } else if (tokenStatus.getTokenStatusEnum() == TokenStatus.TokenStatusEnum.OK) {
             setRunStatus(TokenGetState.RunStatus.OK);
         }
+    }
+    
+    protected TokenGetState()
+        throws TException
+    {
+        this.tokenStatus = tokenStatus;
     }
     
     public static TokenGetState getTokenGetState(Exception ex)
@@ -248,9 +266,14 @@ public class TokenGetState
     public String getJson()
     {
         String response = null;
+        System.out.println("runStatus:" + runStatus);
         switch (runStatus) {
             case OK:
                 response = getJsonStandard();
+                break;
+                
+            case Queued:
+                response = getJsonQueued();
                 break;
                 
             case NotReady:
@@ -286,6 +309,26 @@ public class TokenGetState
             tokenJson.put("cloud-content-byte", getCloudContentBytes());
             tokenJson.put("url", getUrl());
             tokenJson.put("message", runStatus.getDescription());
+            return tokenJson.toString();
+            
+        } catch (Exception ex) {
+            System.out.println("TokenStatus Exception:" + ex);
+            return null;
+        }
+    }
+    /**
+     * Return the Json value of this TplemStatus
+     * @return JSON for TokenStatus
+     */
+    public String getJsonQueued()
+    {
+        //JsonObject tokenJson = new JsonObject();
+        try {
+            JSONObject tokenJson = new JSONObject();
+            tokenJson.put("status", runStatus.getHttpResponse());
+            tokenJson.put("token", getToken());
+            tokenJson.put("cloud-content-byte", getCloudContentBytes());
+            //tokenJson.put("message", runStatus.getDescription());
             return tokenJson.toString();
             
         } catch (Exception ex) {

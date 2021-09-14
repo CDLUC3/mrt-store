@@ -327,7 +327,7 @@ public class TokenManager
         setAnticipatedDate();
     }
     
-    public TokenManager getExistingTokenManager(
+    public static TokenManager getExistingTokenManager(
             String nodeIOName,
             Long deliveryNode,
             String token,
@@ -336,6 +336,20 @@ public class TokenManager
     {
         return new TokenManager(
             nodeIOName,
+            deliveryNode,
+            token,
+            logger);
+    }
+    
+    public static TokenManager getExistingTokenManager(
+            NodeIO nodeIO,
+            Long deliveryNode,
+            String token,
+            LoggerInf logger)
+        throws TException
+    {
+        return new TokenManager(
+            nodeIO,
             deliveryNode,
             token,
             logger);
@@ -359,6 +373,33 @@ public class TokenManager
                 throw new TException.INVALID_OR_MISSING_PARM(MESSAGE + "deliveryNode required and missing");
             }
             deliveryAccessNode = NodeIO.getCloudNode(nodeIOName, deliveryNode, logger);
+        } catch (TException me) {
+            throw me;
+            
+        } catch (Exception ex) {
+            throw makeGeneralTException(logger, "getVersionMap", ex);
+        }
+    }
+    
+    private TokenManager(
+            NodeIO nodeIO,
+            Long deliveryNode,
+            String token,
+            LoggerInf logger)
+        throws TException
+    {
+        try {
+            if (nodeIO == null) {
+                throw new TException.INVALID_OR_MISSING_PARM(MESSAGE + "nodeIO required and missing");
+            }
+            if (deliveryNode == null) {
+                throw new TException.INVALID_OR_MISSING_PARM(MESSAGE + "deliveryNode required and missing");
+            }
+            if (token == null) {
+                throw new TException.INVALID_OR_MISSING_PARM(MESSAGE + "deliveryNode required and missing");
+            }
+            deliveryAccessNode = nodeIO.getAccessNode(deliveryNode);
+            
         } catch (TException me) {
             throw me;
             
@@ -584,6 +625,12 @@ public class TokenManager
         throws TException
     {
         return saveCloudToken(token.getNodeIOName(), token.getDeliveryNode(), getTokenStatus(), logger);
+    }
+    
+    public static String saveCloudToken(TokenStatus tokenStatus, LoggerInf logger)
+        throws TException
+    {
+        return saveCloudToken(tokenStatus.getNodeIOName(), tokenStatus.getDeliveryNode(), tokenStatus, logger);
     }
     
     public static String saveCloudToken(
