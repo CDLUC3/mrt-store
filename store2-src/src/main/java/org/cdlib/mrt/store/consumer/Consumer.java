@@ -48,6 +48,8 @@ import org.cdlib.mrt.queue.DistributedQueue;
 import org.cdlib.mrt.queue.Item;
 import org.cdlib.mrt.utility.StateInf;
 import org.cdlib.mrt.utility.StringUtil;
+import org.cdlib.mrt.store.consumer.utility.QueueUtil;
+import org.json.JSONObject;
 
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
@@ -69,6 +71,8 @@ import java.net.URI;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Properties;
+import java.net.InetAddress;  
+import java.net.UnknownHostException;  
 
 /**
  * Consume queue data and submit to store service
@@ -83,10 +87,13 @@ public class Consumer extends HttpServlet
     private volatile Thread consumerThread = null;
     private volatile Thread cleanupThread = null;
 
-    private String queueConnectionString = "localhost:2181";	// default single server connection
-    private String queueNode = "/server.1";	// default queue
+    public static String queueConnectionString = "localhost:2181";	// default single server connection
+    public static final String queueNodeSmall = "/accessSmall.1";
+    public static final String queueNodeLarge = "/accessLarge.1";
+    private String queueNode = null;	// Consumer will process this node
     private int numThreads = 5;		// default size
     private int pollingInterval = 2;	// default interval (minutes)
+    public static long queueSizeLimit = 500000000;	// default size for large/small worker (bytes)
 
     public void init(ServletConfig servletConfig)
             throws ServletException {
@@ -95,6 +102,7 @@ public class Consumer extends HttpServlet
 	String queueConnectionString = null;
 	String numThreads = null;
 	String pollingInterval = null;
+	String queueSizeLimit = null;
         StorageServiceInit storageServiceInit = null;
         StorageServiceInf storageService = null;
 
@@ -117,21 +125,35 @@ public class Consumer extends HttpServlet
 	}
 
 	try {
-	    queueNode = storageService.getStorageConfig().getQueueName();
-	    if (StringUtil.isNotEmpty(queueNode)) {
-	    	System.out.println("[info] " + MESSAGE + "Setting queue node: " + queueNode);
-		this.queueNode = queueNode;
+	    queueSizeLimit = storageService.getStorageConfig().getQueueSizeLimit();
+	    if (StringUtil.isNotEmpty(queueSizeLimit)) {
+	    	System.out.println("[info] " + MESSAGE + "Setting queue size limit: " + queueSizeLimit);
+                this.queueSizeLimit = new Integer(queueSizeLimit).intValue();
 	    }
 	} catch (Exception e) {
-	    System.err.println("[warn] " + MESSAGE + "Could not set queue node: " + queueNode +
-		 "  - using default: " + this.queueNode);
+	    System.err.println("[warn] " + MESSAGE + "Could not set queue size limit: " + queueNode +
+		 "  - using default: " + this.queueSizeLimit);
 	}
 
 	try {
-	    numThreads = storageService.getStorageConfig().getQueueNumThreads();
+	    String hostname = getHostname();
+	    String largeWorkerDef = storageService.getStorageConfig().getQueueLargeWorker();
+	    boolean largeWorker = largeWorkerDef.contains(hostname);
+	    numThreads = storageService.getStorageConfig().getQueueNumThreadsSmall();
+	    queueNode = queueNodeSmall;
+	    if (largeWorker) {
+		numThreads = storageService.getStorageConfig().getQueueNumThreadsLarge(); 
+	        queueNode = queueNodeLarge;
+	    	System.out.println("[info] " + MESSAGE + "Large worker detected: " + hostname);
+	    } else {
+	    	System.out.println("[info] " + MESSAGE + "Small worker detected: " + hostname);
+	    }
 	    if (StringUtil.isNotEmpty(numThreads)) {
 	    	System.out.println("[info] " + MESSAGE + "Setting thread pool size: " + numThreads);
 		this.numThreads = new Integer(numThreads).intValue();
+	    }
+	    if (StringUtil.isNotEmpty(queueNode)) {
+	    	System.out.println("[info] " + MESSAGE + "Setting consumer queue to: " + queueNode);
 	    }
 	} catch (Exception e) {
 	    System.err.println("[warn] " + MESSAGE + "Could not set thread pool size: " + numThreads + "  - using default: " + this.numThreads);
@@ -217,6 +239,12 @@ public class Consumer extends HttpServlet
 
 	    System.out.println("[info] " + MESSAGE + "cleanup daemon started");
 
+	    // Test data
+	    System.out.println("[info] " + MESSAGE + "------> Sample small queue request");
+	    QueueUtil.queueAccessRequest("{'status':201,'token':'bf6ef133-9b05-4fd8-a4d1-845c40125315','cloud-content-byte':206290233,'delivery-node':7001}");
+	    System.out.println("[info] " + MESSAGE + "------> Sample large queue request");
+	    QueueUtil.queueAccessRequest("{'status':201,'token':'large-request-token','cloud-content-byte':29906290233,'delivery-node':7001}");
+
             return;
 
         } catch (Exception ex) {
@@ -226,6 +254,16 @@ public class Consumer extends HttpServlet
 
     public String getName() {
         return NAME;
+    }
+
+    public String getHostname() {
+        try {  
+           InetAddress id = InetAddress.getLocalHost();  
+	   return id.getHostName();
+        } catch (UnknownHostException e) {  
+	   System.err.println("[error] " + MESSAGE + "could not determine hostname.");
+	   return null;
+        }  
     }
 
     public void destroy() {
@@ -509,18 +547,18 @@ class ConsumeData implements Runnable
     {
         ObjectInputStream ois = null;
         try {
-            if (DEBUG) System.out.println("[info] START: consuming queue data:" + item.toString());
+	    String data = new String(item.getData());
+            if (DEBUG) System.out.println("[info] START: consuming queue data:" + data);
 
-            ois = new ObjectInputStream(new ByteArrayInputStream(item.getData()));
-            Properties p = (Properties) ois.readObject();
-	    // StorageRequest storageRequest = new StorageRequest(p.getProperty("submitter"));
+	    JSONObject jo = QueueUtil.string2json(data);
+	    String token = jo.getString("token");
 
-	    // storageService.submit(ingestRequest);
+	    System.out.println("[INFO] Stub for processing Access request token: " + token);
 
 	    // inform queue that we're done
 	    distributedQueue.complete(item.getId());
 
-            if (DEBUG) System.out.println("[item] END: completed queue data:" + item.toString());
+            if (DEBUG) System.out.println("[item] END: completed queue data:" + data);
         } catch (SessionExpiredException see) {
             see.printStackTrace(System.err);
             System.err.println("[warn] ConsumeData" + MESSAGE + "Session expired.  Attempting to recreate session.");
@@ -547,10 +585,6 @@ class ConsumeData implements Runnable
             e.printStackTrace(System.err);
             System.out.println("[error] Consuming queue data");
         } finally {
-	    try {
-	        ois.close();
-	    } catch (IOException ioe) {
-	    }
 	} 
     }
 

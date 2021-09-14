@@ -73,7 +73,10 @@ public class StorageConfig
     protected String queueName = null;
     protected String queueHoldFile = null;
     protected String queuePollingInterval = null;
-    protected String queueNumThreads = null;
+    protected String queueNumThreadsSmall = null;
+    protected String queueNumThreadsLarge = null;
+    protected String queueSizeLimit = null;
+    protected String queueLargeWorker = null;
     //protected NodeIO.AccessNode archiveAccessNode = null;
     private static class Test{ };
     
@@ -105,10 +108,12 @@ public class StorageConfig
             storageConfig.setVerifyOnRead(jStoreInfo.getBoolean("verifyOnRead"));
             storageConfig.setVerifyOnWrite(jStoreInfo.getBoolean("verifyOnWrite"));
             storageConfig.setQueueService(jStoreQueue.getString("QueueService"));
-            storageConfig.setQueueName(jStoreQueue.getString("QueueName"));
             storageConfig.setQueueHoldFile(jStoreQueue.getString("QueueHoldFile"));
             storageConfig.setQueuePollingInterval(jStoreQueue.getString("PollingInterval"));
-            storageConfig.setQueueNumThreads(jStoreQueue.getString("NumThreads"));
+            storageConfig.setQueueNumThreadsSmall(jStoreQueue.getString("NumThreadsSmall"));
+            storageConfig.setQueueNumThreadsLarge(jStoreQueue.getString("NumThreadsLarge"));
+            storageConfig.setQueueSizeLimit(jStoreQueue.getString("QueueSizeLimit"));
+            storageConfig.setQueueLargeWorker(jStoreQueue.getString("QueueLargeWorker"));
             String asyncArchivePropS = null;
             try {
                 asyncArchivePropS = jStoreInfo.getString("asyncArchivProp");
@@ -265,8 +270,20 @@ public class StorageConfig
         this.queuePollingInterval = queuePollingInterval;
     }
 
-    public void setQueueNumThreads(String queueNumThreads) {
-        this.queueNumThreads = queueNumThreads;
+    public void setQueueNumThreadsSmall(String queueNumThreadsSmall) {
+        this.queueNumThreadsSmall = queueNumThreadsSmall;
+    }
+
+    public void setQueueNumThreadsLarge(String queueNumThreadsLarge) {
+        this.queueNumThreadsLarge = queueNumThreadsLarge;
+    }
+
+    public void setQueueLargeWorker(String queueLargeWorker) {
+        this.queueLargeWorker = queueLargeWorker;
+    }
+
+    public void setQueueSizeLimit(String queueSizeLimit) {
+        this.queueSizeLimit = queueSizeLimit;
     }
 
     public void setQueueService(String queueService) {
@@ -285,8 +302,20 @@ public class StorageConfig
         return queuePollingInterval;
     }
 
-    public String getQueueNumThreads() {
-        return queueNumThreads;
+    public String getQueueNumThreadsSmall() {
+        return queueNumThreadsSmall;
+    }
+
+    public String getQueueNumThreadsLarge() {
+        return queueNumThreadsLarge;
+    }
+
+    public String getQueueLargeWorker() {
+        return queueLargeWorker;
+    }
+
+    public String getQueueSizeLimit() {
+        return queueSizeLimit;
     }
 
     public String getQueueService() {

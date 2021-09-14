@@ -47,7 +47,8 @@
             <param-name>localProperties</param-name>
             <param-value>resources/TStorageStoreLocal.properties</param-value>
         </init-param>
-        <load-on-startup>1</load-on-startup>
+        <!-- <load-on-startup>1</load-on-startup> -->
+        <load-on-startup>${AccessDaemon}</load-on-startup>
     </servlet>
 
 
