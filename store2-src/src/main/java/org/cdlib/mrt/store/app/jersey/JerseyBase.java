@@ -76,6 +76,7 @@ import org.cdlib.mrt.utility.ArchiveBuilder;
 import org.cdlib.mrt.core.DateState;
 import org.cdlib.mrt.store.action.AsyncCloudArchive;
 import org.cdlib.mrt.store.action.TokenManager;
+import org.cdlib.mrt.store.consumer.utility.QueueUtil;
 import org.cdlib.mrt.store.tools.FileFromUrl;
 import org.cdlib.mrt.utility.DateUtil;
 import org.cdlib.mrt.utility.StateInf;
@@ -1933,11 +1934,7 @@ public class JerseyBase
             TokenStatus tokenStatus = tokenManager.getTokenStatus();
             tokenStatus.setTokenStatusEnum("Queued");
             tokenManager.saveCloudToken();
-            /*
-            import org.cdlib.mrt.store.consumer.utility.QueueUtil
-    public static boolean queueAccessRequest(String request)
-            boolean worked = QueueUtil.queueAccessRequest(jsonQueue);)
-            */
+            boolean worked = QueueUtil.queueAccessRequest(jsonQueue);
                     
         } catch (TException tex) {
             System.out.println("TRACE:" + StringUtil.stackTrace(tex));

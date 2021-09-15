@@ -49,6 +49,7 @@ import org.cdlib.mrt.queue.Item;
 import org.cdlib.mrt.utility.StateInf;
 import org.cdlib.mrt.utility.StringUtil;
 import org.cdlib.mrt.store.consumer.utility.QueueUtil;
+import org.cdlib.mrt.store.action.TokenRun;
 import org.json.JSONObject;
 
 import java.util.concurrent.ArrayBlockingQueue;
@@ -238,12 +239,6 @@ public class Consumer extends HttpServlet
             cleanupThread.start();
 
 	    System.out.println("[info] " + MESSAGE + "cleanup daemon started");
-
-	    // Test data
-	    System.out.println("[info] " + MESSAGE + "------> Sample small queue request");
-	    QueueUtil.queueAccessRequest("{'status':201,'token':'bf6ef133-9b05-4fd8-a4d1-845c40125315','cloud-content-byte':206290233,'delivery-node':7001}");
-	    System.out.println("[info] " + MESSAGE + "------> Sample large queue request");
-	    QueueUtil.queueAccessRequest("{'status':201,'token':'large-request-token','cloud-content-byte':29906290233,'delivery-node':7001}");
 
             return;
 
@@ -555,7 +550,12 @@ class ConsumeData implements Runnable
 
 	    System.out.println("[INFO] Stub for processing Access request token: " + token);
 
-	    // inform queue that we're done
+	    TokenRun tokenRun = TokenRun.getTokenRun(data, storageService.getStorageConfig());
+	    tokenRun.run();
+	    if (tokenRun.getRunStatus() != TokenRun.TokenRunStatus.OK) {
+                System.out.println("TokenRun not OK:" + tokenRun.getRunStatus());
+            }
+
 	    distributedQueue.complete(item.getId());
 
             if (DEBUG) System.out.println("[item] END: completed queue data:" + data);
