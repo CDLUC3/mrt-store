@@ -548,17 +548,16 @@ class ConsumeData implements Runnable
 	    JSONObject jo = QueueUtil.string2json(data);
 	    String token = jo.getString("token");
 
-	    System.out.println("[INFO] Stub for processing Access request token: " + token);
-
 	    TokenRun tokenRun = TokenRun.getTokenRun(data, storageService.getStorageConfig());
 	    tokenRun.run();
 	    if (tokenRun.getRunStatus() != TokenRun.TokenRunStatus.OK) {
-                System.out.println("TokenRun not OK:" + tokenRun.getRunStatus());
-            }
-
-	    distributedQueue.complete(item.getId());
-
-            if (DEBUG) System.out.println("[item] END: completed queue data:" + data);
+                if (DEBUG) System.out.println("[error] TokenRun error:" + tokenRun.getRunStatus());
+	        distributedQueue.fail(item.getId());
+            } else {
+		// complete or delete??
+            	if (DEBUG) System.out.println("[item] END: completed queue data:" + data);
+	        distributedQueue.complete(item.getId());
+	    }
         } catch (SessionExpiredException see) {
             see.printStackTrace(System.err);
             System.err.println("[warn] ConsumeData" + MESSAGE + "Session expired.  Attempting to recreate session.");
