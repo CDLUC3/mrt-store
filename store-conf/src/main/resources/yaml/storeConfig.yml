@@ -64,7 +64,7 @@ store-info-docker: &docker
     trace: 5
   queueInfo:
     QueueService: "zoo:2181"
-    QueueLargeWorker: "large-worker"
+    QueueLargeWorker: "store"
     QueueSizeLimit: "600000000"
     QueueHoldFile: "/dpr2store/mrtHomes/AccessHold"
     PollingInterval: "15"

@@ -92,6 +92,7 @@ public class Consumer extends HttpServlet
     public static final String queueNodeSmall = "/accessSmall.1";
     public static final String queueNodeLarge = "/accessLarge.1";
     private String queueNode = null;	// Consumer will process this node
+    boolean largeWorker = true;
     private int numThreads = 5;		// default size
     private int pollingInterval = 2;	// default interval (minutes)
     public static long queueSizeLimit = 500000000;	// default size for large/small worker (bytes)
@@ -139,14 +140,14 @@ public class Consumer extends HttpServlet
 	try {
 	    String hostname = getHostname();
 	    String largeWorkerDef = storageService.getStorageConfig().getQueueLargeWorker();
-	    boolean largeWorker = largeWorkerDef.contains(hostname);
+	    largeWorker = largeWorkerDef.contains(hostname);
 	    numThreads = storageService.getStorageConfig().getQueueNumThreadsSmall();
-	    queueNode = queueNodeSmall;
 	    if (largeWorker) {
 		numThreads = storageService.getStorageConfig().getQueueNumThreadsLarge(); 
 	        queueNode = queueNodeLarge;
 	    	System.out.println("[info] " + MESSAGE + "Large worker detected: " + hostname);
 	    } else {
+	    	queueNode = queueNodeSmall;
 	    	System.out.println("[info] " + MESSAGE + "Small worker detected: " + hostname);
 	    }
 	    if (StringUtil.isNotEmpty(numThreads)) {
@@ -205,7 +206,7 @@ public class Consumer extends HttpServlet
             }
 
             ConsumerDaemon consumerDaemon = new ConsumerDaemon(queueConnectionString, queueNode,
-		servletConfig, pollingInterval, numThreads);
+		servletConfig, pollingInterval, numThreads, largeWorker, queueNodeSmall);
 
             consumerThread =  new Thread(consumerDaemon);
             consumerThread.setDaemon(true);                // Kill thread when servlet dies
@@ -237,6 +238,12 @@ public class Consumer extends HttpServlet
             cleanupThread =  new Thread(cleanupDaemon);
             cleanupThread.setDaemon(true);                // Kill thread when servlet dies
             cleanupThread.start();
+
+            // Test data
+            //System.out.println("[info] " + MESSAGE + "------> Sample small queue request");
+            //QueueUtil.queueAccessRequest("{'status':201,'token':'SMALL-request token','cloud-content-byte':206290233,'delivery-node':7001}");
+            //System.out.println("[info] " + MESSAGE + "------> Sample large queue request");
+            //QueueUtil.queueAccessRequest("{'status':201,'token':'LARGE-request-token','cloud-content-byte':29906290233,'delivery-node':7001}");
 
 	    System.out.println("[info] " + MESSAGE + "cleanup daemon started");
 
@@ -288,11 +295,16 @@ class ConsumerDaemon implements Runnable
 
     private String queueConnectionString = null;
     private String queueNode = null;
+    private String queueSmallNode = null;
     private Integer pollingInterval = null;
     private Integer poolSize = null;
+    private boolean largeWorker = false;
+    int smallQueueCounter = 0;
+    boolean smallQueueBool = false;
 
     private ZooKeeper zooKeeper = null;
     private DistributedQueue distributedQueue = null;
+    private DistributedQueue distributedSmallQueue = null;
 
     // session data
     private long sessionID;
@@ -301,12 +313,14 @@ class ConsumerDaemon implements Runnable
 
     // Constructor
     public ConsumerDaemon(String queueConnectionString, String queueNode, ServletConfig servletConfig, 
-		Integer pollingInterval, Integer poolSize)
+		Integer pollingInterval, Integer poolSize, boolean largeWorker, String queueNodeSmall)
     {
         this.queueConnectionString = queueConnectionString;
         this.queueNode = queueNode;
+        this.queueSmallNode = queueNodeSmall;
 	this.pollingInterval = pollingInterval;
 	this.poolSize = poolSize;
+	this.largeWorker = largeWorker;
 
 	try {
             storageServiceInit = StorageServiceInit.getStorageServiceInit(servletConfig);
@@ -315,6 +329,9 @@ class ConsumerDaemon implements Runnable
             zooKeeper = new ZooKeeper(queueConnectionString, DistributedQueue.sessionTimeout, new Ignorer());
 
             distributedQueue = new DistributedQueue(zooKeeper, queueNode, null);    // default priority
+	    if (largeWorker) {
+                distributedSmallQueue = new DistributedQueue(zooKeeper, queueNodeSmall, null);    // process if no work avail on large queue
+	    }
 	} catch (Exception e) {
 	    e.printStackTrace(System.err);
 	}
@@ -341,6 +358,7 @@ class ConsumerDaemon implements Runnable
                     System.out.println(MESSAGE + "Waiting for polling interval(seconds): " + pollingInterval);
                     Thread.yield();
                     Thread.currentThread().sleep(pollingInterval.longValue() * 1000);
+		    smallQueueCheck();
                 } else {
                     init = false;
                 }
@@ -371,6 +389,13 @@ class ConsumerDaemon implements Runnable
 		    // To prevent long shutdown, no more than poolsize tasks queued.
 		    while (true) {
 		        numActiveTasks = executorService.getActiveCount();
+			if (largeWorker && smallQueueBool && numActiveTasks == 0) {
+			    System.out.println(MESSAGE + "Checking for additional Access tasks on SMALL queue.  Current tasks: " + numActiveTasks + " - Max: " + poolSize);
+			    smallQueueBool = false;
+			    smallQueueCounter = 0;
+			    item = distributedSmallQueue.consume();
+                            executorService.execute(new ConsumeData(storageService, item, distributedSmallQueue, queueConnectionString, queueNode));
+			}
 			if (numActiveTasks < poolSize) {
 			    System.out.println(MESSAGE + "Checking for additional Access tasks.  Current tasks: " + numActiveTasks + " - Max: " + poolSize);
 			    item = distributedQueue.consume();
@@ -452,6 +477,13 @@ class ConsumerDaemon implements Runnable
 	    executorService.shutdown();
         } finally {
 	}
+    }
+
+    // simple modulo method
+    private void smallQueueCheck()
+    {
+	smallQueueCounter++;
+	if ((smallQueueCounter % 4) == 0) smallQueueBool = !smallQueueBool;
     }
 
     // to do: make this a service call
@@ -540,7 +572,6 @@ class ConsumeData implements Runnable
 
     public void run()
     {
-        ObjectInputStream ois = null;
         try {
 	    String data = new String(item.getData());
             if (DEBUG) System.out.println("[info] START: consuming queue data:" + data);
