@@ -76,6 +76,7 @@ import org.cdlib.mrt.utility.ArchiveBuilder;
 import org.cdlib.mrt.core.DateState;
 import org.cdlib.mrt.store.action.AsyncCloudArchive;
 import org.cdlib.mrt.store.action.TokenManager;
+import org.cdlib.mrt.store.consumer.utility.QueueUtil;
 import org.cdlib.mrt.store.tools.FileFromUrl;
 import org.cdlib.mrt.utility.DateUtil;
 import org.cdlib.mrt.utility.StateInf;
@@ -1887,9 +1888,13 @@ public class JerseyBase
                     .build();
             }
             postState = TokenPostState.getTokenPostState(tokenManager.getTokenStatus());
-            buildTokenAsynch(tokenManager.getTokenStatus(), logger);
+            String jsonQueue = postState.getJsonQueue();
+            System.out.println(">>>JsonQueue:" + jsonQueue);
+            //!!! buildTokenAsynch(tokenManager.getTokenStatus(), logger);
+            queueTokenAsynch(jsonQueue, tokenManager, logger);
             int status = postState.getHttpStatus();
             String json = postState.getJsonOK();
+            
             return Response 
                     .status(status).entity(json)
                     .build();
@@ -1920,6 +1925,31 @@ public class JerseyBase
             System.out.println("TRACE:" + StringUtil.stackTrace(ex));
             throw new TException.GENERAL_EXCEPTION(MESSAGE + "Exception:" + ex);
         }
+    }
+    
+    protected void queueTokenAsynch(String jsonQueue, TokenManager tokenManager, LoggerInf logger)
+        throws TException
+    {
+        try {
+            TokenStatus tokenStatus = tokenManager.getTokenStatus();
+            tokenStatus.setTokenStatusEnum("Queued");
+            tokenManager.saveCloudToken();
+            boolean worked = QueueUtil.queueAccessRequest(jsonQueue);
+                    
+        } catch (TException tex) {
+            System.out.println("TRACE:" + StringUtil.stackTrace(tex));
+            throw tex;
+            
+        } catch (Exception ex) {
+            System.out.println("TRACE:" + StringUtil.stackTrace(ex));
+            throw new TException.GENERAL_EXCEPTION(MESSAGE + "Exception:" + ex);
+        }
+    }
+    
+    protected void setTokenZookeeper(String jsonQueue)
+        throws TException
+    {
+        System.out.println("***setTokenZookeeper:" + jsonQueue);
     }
     
     protected Response doPresignAsynchObject(

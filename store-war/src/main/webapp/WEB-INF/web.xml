@@ -32,6 +32,25 @@
         </init-param>
     </servlet>
     
+    <servlet>
+        <servlet-name>Consumer Daemon</servlet-name>
+        <servlet-class>org.cdlib.mrt.store.consumer.Consumer</servlet-class>
+        <init-param>
+            <param-name>loggerProperties</param-name>
+            <param-value>resources/TStorageLogger.properties</param-value>
+        </init-param>
+        <init-param>
+            <param-name>serviceProperties</param-name>
+            <param-value>resources/TStorageStore.properties</param-value>
+        </init-param>
+        <init-param>
+            <param-name>localProperties</param-name>
+            <param-value>resources/TStorageStoreLocal.properties</param-value>
+        </init-param>
+        <!-- <load-on-startup>1</load-on-startup> -->
+        <load-on-startup>${AccessDaemon}</load-on-startup>
+    </servlet>
+
 
     <servlet-mapping>
         <servlet-name>Jersey Web Application</servlet-name>

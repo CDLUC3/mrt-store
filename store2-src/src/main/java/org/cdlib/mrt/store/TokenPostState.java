@@ -68,6 +68,8 @@ public class TokenPostState
     {
         OK("Request queued, use token to check status", 200),
         
+        Queued("Assembly request queued", 201),
+        
         NotReady("Object is not ready", 202),
         
         REQUESTED_ITEM_NOT_FOUND("Object content not found", 404),
@@ -204,6 +206,27 @@ public class TokenPostState
             tokenJson.put("cloud-content-byte", getCloudContentBytes());
             tokenJson.put("anticipated-availability-time", getAnticipatedAvailableDate().getIsoDate());
             tokenJson.put("message", RunStatus.OK.getDescription());
+            return tokenJson.toString();
+            
+        } catch (Exception ex) {
+            System.out.println("TokenStatus Exception:" + ex);
+            return null;
+        }
+    }
+    /**
+     * Return the Json value of this TplemStatus
+     * @return JSON for TokenStatus
+     */
+    public String getJsonQueue()
+    {
+        //JsonObject tokenJson = new JsonObject();
+        try {
+            JSONObject tokenJson = new JSONObject();
+            tokenJson.put("status", RunStatus.Queued.getHttpResponse());
+            tokenJson.put("token", getToken());
+            tokenJson.put("cloud-content-byte", getCloudContentBytes());
+            tokenJson.put("delivery-node", tokenStatus.getDeliveryNode());
+            //tokenJson.put("message", RunStatus.OK.getDescription());
             return tokenJson.toString();
             
         } catch (Exception ex) {

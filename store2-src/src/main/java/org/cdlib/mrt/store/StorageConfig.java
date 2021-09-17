@@ -69,6 +69,14 @@ public class StorageConfig
     protected LoggerInf logger = null;
     protected URL storeLink = null;
     protected Properties asyncArchivProp = null;
+    protected String queueService = null;
+    protected String queueName = null;
+    protected String queueHoldFile = null;
+    protected String queuePollingInterval = null;
+    protected String queueNumThreadsSmall = null;
+    protected String queueNumThreadsLarge = null;
+    protected String queueSizeLimit = null;
+    protected String queueLargeWorker = null;
     //protected NodeIO.AccessNode archiveAccessNode = null;
     private static class Test{ };
     
@@ -93,11 +101,19 @@ public class StorageConfig
             String whichStoreInfo = jobj.getString("which-store-info");
             JSONObject jStoreInfo = jobj.getJSONObject(whichStoreInfo);
             JSONObject jStoreLogger = jStoreInfo.getJSONObject("fileLogger");
+            JSONObject jStoreQueue = jStoreInfo.getJSONObject("queueInfo");
             LoggerInf logger = storageConfig.setLogger(jStoreLogger);
             storageConfig.setLogger(logger);
             storageConfig.setBaseURI(jStoreInfo.getString("baseURI"));
             storageConfig.setVerifyOnRead(jStoreInfo.getBoolean("verifyOnRead"));
             storageConfig.setVerifyOnWrite(jStoreInfo.getBoolean("verifyOnWrite"));
+            storageConfig.setQueueService(jStoreQueue.getString("QueueService"));
+            storageConfig.setQueueHoldFile(jStoreQueue.getString("QueueHoldFile"));
+            storageConfig.setQueuePollingInterval(jStoreQueue.getString("PollingInterval"));
+            storageConfig.setQueueNumThreadsSmall(jStoreQueue.getString("NumThreadsSmall"));
+            storageConfig.setQueueNumThreadsLarge(jStoreQueue.getString("NumThreadsLarge"));
+            storageConfig.setQueueSizeLimit(jStoreQueue.getString("QueueSizeLimit"));
+            storageConfig.setQueueLargeWorker(jStoreQueue.getString("QueueLargeWorker"));
             String asyncArchivePropS = null;
             try {
                 asyncArchivePropS = jStoreInfo.getString("asyncArchivProp");
@@ -244,6 +260,70 @@ public class StorageConfig
 
     public String getSupportURI() {
         return supportURI;
+    }
+
+    public void setQueueHoldFile(String queueHoldFile) {
+        this.queueHoldFile = queueHoldFile;
+    }
+
+    public void setQueuePollingInterval(String queuePollingInterval) {
+        this.queuePollingInterval = queuePollingInterval;
+    }
+
+    public void setQueueNumThreadsSmall(String queueNumThreadsSmall) {
+        this.queueNumThreadsSmall = queueNumThreadsSmall;
+    }
+
+    public void setQueueNumThreadsLarge(String queueNumThreadsLarge) {
+        this.queueNumThreadsLarge = queueNumThreadsLarge;
+    }
+
+    public void setQueueLargeWorker(String queueLargeWorker) {
+        this.queueLargeWorker = queueLargeWorker;
+    }
+
+    public void setQueueSizeLimit(String queueSizeLimit) {
+        this.queueSizeLimit = queueSizeLimit;
+    }
+
+    public void setQueueService(String queueService) {
+        this.queueService = queueService;
+    }
+
+    public void setQueueName(String queueName) {
+        this.queueName = queueName;
+    }
+
+    public String getQueueHoldFile() {
+        return queueHoldFile;
+    }
+
+    public String getQueuePollingInterval() {
+        return queuePollingInterval;
+    }
+
+    public String getQueueNumThreadsSmall() {
+        return queueNumThreadsSmall;
+    }
+
+    public String getQueueNumThreadsLarge() {
+        return queueNumThreadsLarge;
+    }
+
+    public String getQueueLargeWorker() {
+        return queueLargeWorker;
+    }
+
+    public String getQueueSizeLimit() {
+        return queueSizeLimit;
+    }
+
+    public String getQueueService() {
+        return queueService;
+    }
+
+    public String getQueueName() {
+        return queueName;
     }
 
     public void setSupportURI(String supportURI) {
