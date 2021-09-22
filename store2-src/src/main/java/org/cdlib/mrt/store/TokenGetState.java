@@ -72,7 +72,7 @@ public class TokenGetState
     {
         OK("Payload contains token info", 200),
         
-        Queued("Assembley request queued", 201),
+        Queued("Assembley request queued", 202),
         
         NotReady("Object is not ready", 202),
         
