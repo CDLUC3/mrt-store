@@ -130,9 +130,10 @@ public class Consumer extends HttpServlet
 	    queueSizeLimit = storageService.getStorageConfig().getQueueSizeLimit();
 	    if (StringUtil.isNotEmpty(queueSizeLimit)) {
 	    	System.out.println("[info] " + MESSAGE + "Setting queue size limit: " + queueSizeLimit);
-                this.queueSizeLimit = new Integer(queueSizeLimit).intValue();
+                this.queueSizeLimit = new Long(queueSizeLimit).longValue();
 	    }
 	} catch (Exception e) {
+	    e.printStackTrace(System.err);
 	    System.err.println("[warn] " + MESSAGE + "Could not set queue size limit: " + queueNode +
 		 "  - using default: " + this.queueSizeLimit);
 	}
