@@ -32,7 +32,7 @@
             </activation>   
             <modules>
                 <module>store-conf</module>
-                <module>store-src</module>
+                <!--module>store-src</module-->
                 <module>store2-src</module>
                 <module>store-war</module>
             </modules>
