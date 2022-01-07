@@ -105,11 +105,11 @@
       <scope>test</scope>
     </dependency>
 
-    <dependency>
+    <!--dependency>
         <groupId>net.sf</groupId>
         <artifactId>jargs</artifactId>
         <version>1.0</version>
-    </dependency>
+    </dependency-->
 
     <dependency>
         <groupId>javax.servlet</groupId>
