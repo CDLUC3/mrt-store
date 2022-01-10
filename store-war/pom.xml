@@ -9,6 +9,19 @@
 
     <url>http://uc3.cdlib.org</url>
 
+    <repositories>
+        <repository>
+          <id>central</id>
+          <url>https://repo1.maven.org/maven2/</url>
+          <releases>
+            <updatePolicy>never</updatePolicy>
+        </releases>
+        <snapshots>
+            <updatePolicy>never</updatePolicy>
+        </snapshots>
+        </repository>
+    </repositories>
+
     <!-- force UTF-8 -->
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
