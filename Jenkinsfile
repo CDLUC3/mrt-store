@@ -23,6 +23,8 @@ pipeline {
     stages {
         stage('Purge Local') {
             steps {
+                sh "env"
+                sh "which mvn"
                 sh "echo 'Building tag ${tagname}' > build.current.txt"
                 sh "date >> build.current.txt"
                 sh "echo '' >> build.current.txt"
