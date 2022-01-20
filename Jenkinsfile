@@ -39,7 +39,7 @@ pipeline {
                 dir('mrt-core2') {
                   git branch: "${env.BRANCH_CORE}", url: 'https://github.com/CDLUC3/mrt-core2.git'
                   sh "git remote get-url origin >> ../build.current.txt"
-                  sh "git branch >> ../build.current.txt"
+                  sh "git symbolic-ref -q --short HEAD >> ../build.current.txt || git describe --tags --exact-match >> ../build.current.txt"
                   sh "git log --pretty=full -n 1 >> ../build.current.txt"
                   sh "mvn -Dmaven.repo.local=${m2dir} -s ${MAVEN_HOME}/conf/settings.xml clean install -DskipTests"
                 }
@@ -50,7 +50,7 @@ pipeline {
                 dir('mrt-cloud') {
                   git branch: "${env.BRANCH_CLOUD}", url: 'https://github.com/CDLUC3/mrt-cloud.git'
                   sh "git remote get-url origin >> ../build.current.txt"
-                  sh "git branch >> ../build.current.txt"
+                  sh "git symbolic-ref -q --short HEAD >> ../build.current.txt || git describe --tags --exact-match >> ../build.current.txt"
                   sh "git log --pretty=full -n 1 >> ../build.current.txt"
                   sh "mvn -Dmaven.repo.local=${m2dir} -s ${MAVEN_HOME}/conf/settings.xml clean install -DskipTests"
                 }
@@ -61,7 +61,7 @@ pipeline {
                 dir('cdl-zk-queue') {
                   git branch: "${env.BRANCH_ZK}", url: 'https://github.com/CDLUC3/cdl-zk-queue.git'
                   sh "git remote get-url origin >> ../build.current.txt"
-                  sh "git branch >> ../build.current.txt"
+                  sh "git symbolic-ref -q --short HEAD >> ../build.current.txt || git describe --tags --exact-match >> ../build.current.txt"
                   sh "git log --pretty=full -n 1 >> ../build.current.txt"
                   sh "mvn -Dmaven.repo.local=${m2dir} -s ${MAVEN_HOME}/conf/settings.xml clean install -DskipTests"
                 }
