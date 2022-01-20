@@ -41,7 +41,7 @@ pipeline {
                   sh "git remote get-url origin >> ../build.current.txt"
                   sh "git branch >> ../build.current.txt"
                   sh "git log --pretty=full -n 1 >> ../build.current.txt"
-                  sh "mvn -Dmaven.repo.local=${m2dir} -s /dev/null clean install -DskipTests"
+                  sh "mvn -Dmaven.repo.local=${m2dir} -s ${maven.home}/conf/settings.xml clean install -DskipTests"
                 }
             }
         }
@@ -52,7 +52,7 @@ pipeline {
                   sh "git remote get-url origin >> ../build.current.txt"
                   sh "git branch >> ../build.current.txt"
                   sh "git log --pretty=full -n 1 >> ../build.current.txt"
-                  sh "mvn -Dmaven.repo.local=${m2dir} -s /dev/null clean install -DskipTests"
+                  sh "mvn -Dmaven.repo.local=${m2dir} -s ${maven.home}/conf/settings.xml clean install -DskipTests"
                 }
             }
         }
@@ -63,7 +63,7 @@ pipeline {
                   sh "git remote get-url origin >> ../build.current.txt"
                   sh "git branch >> ../build.current.txt"
                   sh "git log --pretty=full -n 1 >> ../build.current.txt"
-                  sh "mvn -Dmaven.repo.local=${m2dir} -s /dev/null clean install -DskipTests"
+                  sh "mvn -Dmaven.repo.local=${m2dir} -s ${maven.home}/conf/settings.xml clean install -DskipTests"
                 }
             }
         }
@@ -77,7 +77,7 @@ pipeline {
                   ])
                   sh "git remote get-url origin >> ../build.current.txt"
                   sh "git log --pretty=medium -n 1 >> ../build.current.txt"
-                  sh "mvn -Dmaven.repo.local=${m2dir} -s /dev/null clean install"
+                  sh "mvn -Dmaven.repo.local=${m2dir} -s ${maven.home}/conf/settings.xml clean install"
                 }
             }
         }
