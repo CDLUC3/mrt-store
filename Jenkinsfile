@@ -31,9 +31,6 @@ pipeline {
                     if (remove_local_m2.toBoolean()) {
                         sh "rm -rf ${m2dir}"
                     }
-                    sh "mkdir -p ${m2dir}"
-                    sh "find ${m2dir}"
-                    sh "find /devtools/builds -name settings.xml"
                 }
             }
         }
@@ -44,7 +41,7 @@ pipeline {
                   sh "git remote get-url origin >> ../build.current.txt"
                   sh "git branch >> ../build.current.txt"
                   sh "git log --pretty=full -n 1 >> ../build.current.txt"
-                  sh "mvn -Dmaven.repo.local=${m2dir} clean install -DskipTests"
+                  sh "mvn -Dmaven.repo.local=${m2dir} -s /dev/null clean install -DskipTests"
                 }
             }
         }
@@ -55,7 +52,7 @@ pipeline {
                   sh "git remote get-url origin >> ../build.current.txt"
                   sh "git branch >> ../build.current.txt"
                   sh "git log --pretty=full -n 1 >> ../build.current.txt"
-                  sh "mvn -Dmaven.repo.local=${m2dir} clean install -DskipTests"
+                  sh "mvn -Dmaven.repo.local=${m2dir} -s /dev/null clean install -DskipTests"
                 }
             }
         }
@@ -66,7 +63,7 @@ pipeline {
                   sh "git remote get-url origin >> ../build.current.txt"
                   sh "git branch >> ../build.current.txt"
                   sh "git log --pretty=full -n 1 >> ../build.current.txt"
-                  sh "mvn -Dmaven.repo.local=${m2dir} clean install -DskipTests"
+                  sh "mvn -Dmaven.repo.local=${m2dir} -s /dev/null clean install -DskipTests"
                 }
             }
         }
@@ -80,7 +77,7 @@ pipeline {
                   ])
                   sh "git remote get-url origin >> ../build.current.txt"
                   sh "git log --pretty=medium -n 1 >> ../build.current.txt"
-                  sh "mvn -Dmaven.repo.local=${m2dir} clean install"
+                  sh "mvn -Dmaven.repo.local=${m2dir} -s /dev/null clean install"
                 }
             }
         }
