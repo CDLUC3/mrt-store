@@ -47,7 +47,7 @@ pipeline {
         stage('Build Cloud') {
             steps {
                 dir('mrt-cloud') {
-                  git branch: "${env.BRANCH_CLOID}", url: 'https://github.com/CDLUC3/mrt-cloud.git'
+                  git branch: "${env.BRANCH_CLOUD}", url: 'https://github.com/CDLUC3/mrt-cloud.git'
                   sh "git remote get-url origin >> ../build.current.txt"
                   sh "git log --pretty=full -n 1 >> ../build.current.txt"
                   sh "mvn -Dmaven.repo.local=${m2dir} clean install -DskipTests"
