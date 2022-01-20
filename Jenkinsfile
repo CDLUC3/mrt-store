@@ -33,6 +33,7 @@ pipeline {
                     }
                     sh "mkdir -p ${m2dir}"
                     sh "find ${m2dir}"
+                    sh "find /devtools/builds -name settings.xml"
                 }
             }
         }
