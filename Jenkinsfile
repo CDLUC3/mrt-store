@@ -31,6 +31,8 @@ pipeline {
                     if (remove_local_m2.toBoolean()) {
                         sh "rm -rf ${m2dir}"
                     }
+                    sh "mkdir -p ${m2dir}"
+                    sh "find ${m2dir}"
                 }
             }
         }
