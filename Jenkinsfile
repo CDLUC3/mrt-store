@@ -23,8 +23,6 @@ pipeline {
     stages {
         stage('Purge Local') {
             steps {
-                sh "env"
-                sh "which mvn"
                 sh "echo 'Building tag ${tagname}' > build.current.txt"
                 sh "date >> build.current.txt"
                 sh "echo '' >> build.current.txt"
@@ -43,7 +41,7 @@ pipeline {
                   sh "git remote get-url origin >> ../build.current.txt"
                   sh "git branch >> ../build.current.txt"
                   sh "git log --pretty=full -n 1 >> ../build.current.txt"
-                  sh "mvn -Dmaven.repo.local=${m2dir} -s ${maven.home}/conf/settings.xml clean install -DskipTests"
+                  sh "mvn -Dmaven.repo.local=${m2dir} -s ${MAVEN_HOME}/conf/settings.xml clean install -DskipTests"
                 }
             }
         }
@@ -54,7 +52,7 @@ pipeline {
                   sh "git remote get-url origin >> ../build.current.txt"
                   sh "git branch >> ../build.current.txt"
                   sh "git log --pretty=full -n 1 >> ../build.current.txt"
-                  sh "mvn -Dmaven.repo.local=${m2dir} -s ${maven.home}/conf/settings.xml clean install -DskipTests"
+                  sh "mvn -Dmaven.repo.local=${m2dir} -s ${MAVEN_HOME}/conf/settings.xml clean install -DskipTests"
                 }
             }
         }
@@ -65,7 +63,7 @@ pipeline {
                   sh "git remote get-url origin >> ../build.current.txt"
                   sh "git branch >> ../build.current.txt"
                   sh "git log --pretty=full -n 1 >> ../build.current.txt"
-                  sh "mvn -Dmaven.repo.local=${m2dir} -s ${maven.home}/conf/settings.xml clean install -DskipTests"
+                  sh "mvn -Dmaven.repo.local=${m2dir} -s ${MAVEN_HOME}/conf/settings.xml clean install -DskipTests"
                 }
             }
         }
@@ -79,7 +77,7 @@ pipeline {
                   ])
                   sh "git remote get-url origin >> ../build.current.txt"
                   sh "git log --pretty=medium -n 1 >> ../build.current.txt"
-                  sh "mvn -Dmaven.repo.local=${m2dir} -s ${maven.home}/conf/settings.xml clean install"
+                  sh "mvn -Dmaven.repo.local=${m2dir} -s ${MAVEN_HOME}/conf/settings.xml clean install"
                 }
             }
         }
