@@ -77,6 +77,10 @@ import org.cdlib.mrt.utility.LoggerInf;
 import org.cdlib.mrt.s3.service.CloudStoreInf;
 import org.cdlib.mrt.store.NodeInf;
 import org.cdlib.mrt.store.action.CloudArchive;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * @author dloy
  */
@@ -87,6 +91,7 @@ public class CloudObjectService
     protected static final String NAME = "CloudObjectService";
     protected static final String MESSAGE = NAME + ": ";
     protected static final boolean DEBUG = false;
+    protected Logger ecslogger = LoggerFactory.getLogger("ecslogger.store.cloud.CloudObjectService");
 
     protected CloudStoreInf s3service = null;
     protected String bucket = null;
@@ -132,6 +137,7 @@ public class CloudObjectService
             log(MESSAGE + "addVersion entered"
                     + " - objectID=" + objectID
                     , 10);
+            ecslogger.debug("{}: addVersion entered - objectID={}", NAME, objectID);
             return versionState;
         
         } catch (Exception ex) {
@@ -164,9 +170,10 @@ public class CloudObjectService
                     logger);
             VersionState versionState = updateVersion.callEx();
             
-            log(MESSAGE + "addVersion entered"
+            log(MESSAGE + "updateVersion entered"
                     + " - objectID=" + objectID
                     , 10);
+            ecslogger.debug("{}: updateVersion entered - objectID={}", NAME, objectID);
             return versionState;
         
         } catch (Exception ex) {
@@ -189,6 +196,7 @@ public class CloudObjectService
             log(MESSAGE + "copyObject entered"
                     + " - objectID=" + objectID
                     , 10);
+            ecslogger.debug("{}: copyObject entered - objectID={}", NAME, objectID);
             return objectState;
             
         } catch (Exception ex) {
@@ -218,6 +226,7 @@ public class CloudObjectService
             log(MESSAGE + "deleteVersion entered"
                     + " - objectID=" + objectID
                     , 10);
+            ecslogger.debug("{}: deleteVersion entered - objectID={}", NAME, objectID);
             return state;
 
        } catch (Exception ex) {
@@ -244,6 +253,7 @@ public class CloudObjectService
             log(MESSAGE + "deleteObject entered"
                     + " - objectID=" + objectID
                     , 10);
+            ecslogger.debug("{}: deleteObject entered - objectID={}", NAME, objectID);
             return state;
 
        } catch (Exception ex) {
@@ -266,6 +276,7 @@ public class CloudObjectService
                     + " - objectID=" + objectID
                     + " - versionID=" + versionID
                     , 10);
+            ecslogger.debug("{}: getVersionContent entered - objectID={} - versionID={}", NAME, objectID, versionID);
             ComponentContent content = versionContent.callEx();
             return content;
 
@@ -288,6 +299,7 @@ public class CloudObjectService
             log(MESSAGE + "getObjectState entered"
                     + " - objectID=" + objectID
                     , 10);
+            ecslogger.debug("{}: getObjectState entered - objectID={}", NAME, objectID);
             return (ObjectState)stateObject.callEx();
 
        } catch (Exception ex) {
@@ -309,6 +321,7 @@ public class CloudObjectService
                     + " - objectID=" + objectID
                     + " - versionID=" + versionID
                     , 10);
+            ecslogger.debug("{}: getVersionState entered - objectID={} - versionID={}", NAME, objectID, versionID);
             return (VersionState)stateVersion.callEx();
 
         } catch (Exception ex) {
@@ -338,6 +351,7 @@ public class CloudObjectService
                     + " - fileName=" + fileID
                     + " - dump=" + fileState.dump("")
                     , 10);
+            ecslogger.debug("{}: getFileState entered - objectID={} - versionID={} - fileName={} - dump={}", NAME, objectID, versionID, fileID, fileState.dump(""));
             return fileState;
 
        } catch (Exception ex) {
@@ -360,6 +374,7 @@ public class CloudObjectService
                     + " - versionID=" + versionID
                     + " - fileName=" + fileName
                     , 10);
+            ecslogger.debug("{}: getFileFixityState entered - objectID={} - versionID={} - fileName={}", NAME, objectID, versionID, fileName);
             return (FileFixityState)fixityFile.callEx();
 
         } catch (Exception ex) {
@@ -378,6 +393,7 @@ public class CloudObjectService
             log(MESSAGE + "FileFixityState entered"
                     + " - objectID=" + objectID
                     , 10);
+            ecslogger.debug("{}: getObjectFixityState entered - objectID={}", NAME, objectID);
             return fixityObject.callEx();
 
         } catch (Exception ex) {
@@ -400,6 +416,7 @@ public class CloudObjectService
                     + " - versionID=" + versionID
                     + " - fileName=" + fileName
                     , 10);
+            ecslogger.debug("{}: getFile entered - objectID={} - versionID={} - fileName={}", NAME, objectID, versionID, fileName);
             ContentFile content = ContentFile.getContentFile(s3service, bucket, objectID, versionID, fileName, true, logger);
             return content.callEx();
 
@@ -423,6 +440,7 @@ public class CloudObjectService
                     + " - versionID=" + versionID
                     + " - fileName=" + fileName
                     , 10);
+            ecslogger.debug("{}: getFileStream entered - objectID={} - versionID={} - fileName={}", NAME, objectID, versionID, fileName);
             ContentFileStream content = ContentFileStream.getContentFileStream(
                     s3service, bucket, objectID, versionID, fileName, outputStream, logger);
             content.callEx();
@@ -449,6 +467,8 @@ public class CloudObjectService
                     + " - returnIfError=" + returnIfError
                     + " - archiveTypeS=" + archiveTypeS
                     , 10);
+            ecslogger.debug("{}: getObject entered - objectID={} - archiveTypeS={} - returnFullVersion={} - returnIfError={} - archiveTypeS={}",
+                    NAME, objectID, archiveTypeS, returnFullVersion, returnIfError, archiveTypeS);
             CloudArchive cloudArchive = new CloudArchive(s3service, bucket, objectID, objectStoreBase, archiveTypeS, logger);
             FileContent fileContent = cloudArchive.buildObject(archiveTypeS, returnFullVersion);
             return fileContent;
@@ -477,6 +497,8 @@ public class CloudObjectService
                     + " - returnIfError=" + returnIfError
                     + " - archiveTypeS=" + archiveTypeS
                     , 10);
+            ecslogger.debug("{}: getObjectStream entered - objectID={} - archiveTypeS={} - returnFullVersion={} - returnIfError={} - archiveTypeS={}",
+                    NAME, objectID, archiveTypeS, returnFullVersion, returnIfError, archiveTypeS);
             CloudArchive cloudArchive = new CloudArchive(s3service, bucket, objectID, objectStoreBase, archiveTypeS, logger);
             cloudArchive.buildObject(outputStream, returnFullVersion);
 
@@ -499,6 +521,7 @@ public class CloudObjectService
                     + " - objectID=" + objectID
                     + " - validate=" + validate
                     , 10);
+            ecslogger.debug("{}: getCloudManifest entered - objectID={} - validate={}", NAME, objectID, validate);
             ContentCloudManifest content = ContentCloudManifest.getContentCloudManifest(s3service, bucket, objectID, validate, logger);
             FileContent fileContent = content.callEx();
             return fileContent;
@@ -522,6 +545,7 @@ public class CloudObjectService
                     + " - objectID=" + objectID
                     + " - validate=" + validate
                     , 10);
+            ecslogger.debug("{}: getCloudManifestStream entered - objectID={} - validate={}", NAME, objectID, validate);
             ContentCloudManifestStream content = ContentCloudManifestStream.getContentCloudManifestStream(s3service, bucket, objectID, validate, outStream, logger);
             content.callEx();
 
@@ -548,6 +572,8 @@ public class CloudObjectService
                     + " - returnIfError=" + returnIfError
                     + " - archiveTypeS=" + archiveTypeS
                     , 10);
+            ecslogger.debug("{}: getVersionArchive entered - objectID={} - versionID={} - archiveTypeS={} - returnIfError={}",
+                    NAME, objectID, versionID, archiveTypeS, returnIfError);
             
             CloudArchive cloudArchive = new CloudArchive(s3service, bucket, objectID, objectStoreBase, archiveTypeS, logger);
             FileContent fileContent = cloudArchive.buildVersion(versionID, archiveTypeS);
@@ -602,6 +628,8 @@ public class CloudObjectService
                     + " - returnIfError=" + returnIfError
                     + " - archiveTypeS=" + archiveTypeS
                     , 10);
+            ecslogger.debug("{}: getVersionArchiveStream entered - objectID={} - versionID={} - archiveTypeS={} - returnIfError={}",
+                    NAME, objectID, versionID, archiveTypeS, returnIfError);
             
             CloudArchive cloudArchive = new CloudArchive(s3service, bucket, objectID, objectStoreBase, archiveTypeS, logger);
             cloudArchive.buildVersion(versionID, outputStream);
@@ -631,6 +659,7 @@ public class CloudObjectService
                     + " - versionID=" + versionID
                     + " - linkBaseURL=" + linkBaseURL
                     , 10);
+            ecslogger.debug("{}: getVersionArchiveStream entered - objectID={} - versionID={} - linkBaseURL={}", NAME, objectID, versionID, linkBaseURL);
             if (logger == null) {
                 System.out.println("***null logger");
             }
@@ -705,7 +734,9 @@ public class CloudObjectService
             tex = new TException.GENERAL_EXCEPTION(ex);
         }
         logger.logError(tex.toString(), 0);
+        ecslogger.error(tex.toString());
         logger.logError(tex.dump(MESSAGE), 20);
+        ecslogger.debug(tex.dump(MESSAGE));
         return tex;
     }
     
