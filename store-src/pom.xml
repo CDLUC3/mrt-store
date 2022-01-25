@@ -10,14 +10,16 @@
 
   <repositories>
     <repository>
-      <id>central</id>
-      <url>https://repo1.maven.org/maven2/</url>
-      <releases>
-        <updatePolicy>never</updatePolicy>
-    </releases>
-    <snapshots>
-        <updatePolicy>never</updatePolicy>
-    </snapshots>
+      <id>cdl-releases</id>
+      <url>http://mvn.cdlib.org/content/repositories/cdl-releases</url>
+    </repository>
+    <repository>
+      <id>cdl-snapshots</id>
+      <url>http://mvn.cdlib.org/content/repositories/cdl-snapshots</url>
+    </repository>
+    <repository>
+      <id>thirdparty</id>
+      <url>http://mvn.cdlib.org/content/repositories/thirdparty</url>
     </repository>
   </repositories>
 
@@ -145,26 +147,6 @@
         <artifactId>mail</artifactId>
         <version>1.4.1</version>
     </dependency>
-
-    <!-- for ECS encoding -->
-    <!-- see: https://www.elastic.co/guide/en/ecs-logging/java/current/setup.html -->
-    <!-- see: https://github.com/elastic/ecs-logging-java -->
-    <dependency>
-      <groupId>ch.qos.logback</groupId>
-      <artifactId>logback-classic</artifactId>
-      <version>1.3.0-alpha12</version>
-    </dependency>
-    <dependency>
-      <groupId>ch.qos.logback</groupId>
-      <artifactId>logback-access</artifactId>
-      <version>1.3.0-alpha12</version>
-    </dependency>
-    <dependency>
-        <groupId>co.elastic.logging</groupId>
-        <artifactId>logback-ecs-encoder</artifactId>
-       <version>1.2.0</version>
-    </dependency>
-
   </dependencies>
   
     <reporting>

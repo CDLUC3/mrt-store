@@ -276,7 +276,8 @@ public class CloudObjectService
                     + " - objectID=" + objectID
                     + " - versionID=" + versionID
                     , 10);
-            ecslogger.debug("{}: getVersionContent entered - objectID={} - versionID={}", NAME, objectID, versionID);
+            Object[] paramArray = {NAME, objectID, versionID};
+            ecslogger.debug("{}: getVersionContent entered - objectID={} - versionID={}", paramArray);
             ComponentContent content = versionContent.callEx();
             return content;
 
@@ -321,7 +322,8 @@ public class CloudObjectService
                     + " - objectID=" + objectID
                     + " - versionID=" + versionID
                     , 10);
-            ecslogger.debug("{}: getVersionState entered - objectID={} - versionID={}", NAME, objectID, versionID);
+            Object[] paramArray = {NAME, objectID, versionID};
+            ecslogger.debug("{}: getVersionState entered - objectID={} - versionID={}", paramArray);
             return (VersionState)stateVersion.callEx();
 
         } catch (Exception ex) {
@@ -351,7 +353,8 @@ public class CloudObjectService
                     + " - fileName=" + fileID
                     + " - dump=" + fileState.dump("")
                     , 10);
-            ecslogger.debug("{}: getFileState entered - objectID={} - versionID={} - fileName={} - dump={}", NAME, objectID, versionID, fileID, fileState.dump(""));
+            Object[] paramArray = {NAME, objectID, versionID, fileID, fileState.dump("")};
+            ecslogger.debug("{}: getFileState entered - objectID={} - versionID={} - fileName={} - dump={}", paramArray);
             return fileState;
 
        } catch (Exception ex) {
@@ -374,7 +377,8 @@ public class CloudObjectService
                     + " - versionID=" + versionID
                     + " - fileName=" + fileName
                     , 10);
-            ecslogger.debug("{}: getFileFixityState entered - objectID={} - versionID={} - fileName={}", NAME, objectID, versionID, fileName);
+            Object[] paramArray = {NAME, objectID, versionID, fileName};
+            ecslogger.debug("{}: getFileFixityState entered - objectID={} - versionID={} - fileName={}", paramArray);
             return (FileFixityState)fixityFile.callEx();
 
         } catch (Exception ex) {
@@ -416,7 +420,8 @@ public class CloudObjectService
                     + " - versionID=" + versionID
                     + " - fileName=" + fileName
                     , 10);
-            ecslogger.debug("{}: getFile entered - objectID={} - versionID={} - fileName={}", NAME, objectID, versionID, fileName);
+            Object[] paramArray = {NAME, objectID, versionID, fileName};
+            ecslogger.debug("{}: getFile entered - objectID={} - versionID={} - fileName={}", paramArray);
             ContentFile content = ContentFile.getContentFile(s3service, bucket, objectID, versionID, fileName, true, logger);
             return content.callEx();
 
@@ -440,7 +445,8 @@ public class CloudObjectService
                     + " - versionID=" + versionID
                     + " - fileName=" + fileName
                     , 10);
-            ecslogger.debug("{}: getFileStream entered - objectID={} - versionID={} - fileName={}", NAME, objectID, versionID, fileName);
+            Object[] paramArray = {NAME, objectID, versionID, fileName};
+            ecslogger.debug("{}: getFileStream entered - objectID={} - versionID={} - fileName={}", paramArray);
             ContentFileStream content = ContentFileStream.getContentFileStream(
                     s3service, bucket, objectID, versionID, fileName, outputStream, logger);
             content.callEx();
@@ -467,8 +473,8 @@ public class CloudObjectService
                     + " - returnIfError=" + returnIfError
                     + " - archiveTypeS=" + archiveTypeS
                     , 10);
-            ecslogger.debug("{}: getObject entered - objectID={} - archiveTypeS={} - returnFullVersion={} - returnIfError={} - archiveTypeS={}",
-                    NAME, objectID, archiveTypeS, returnFullVersion, returnIfError, archiveTypeS);
+            Object[] paramArray = {NAME, objectID, archiveTypeS, returnFullVersion, returnIfError};
+            ecslogger.debug("{}: getObject entered - objectID={} - archiveTypeS={} - returnFullVersion={} - returnIfError={}", paramArray);
             CloudArchive cloudArchive = new CloudArchive(s3service, bucket, objectID, objectStoreBase, archiveTypeS, logger);
             FileContent fileContent = cloudArchive.buildObject(archiveTypeS, returnFullVersion);
             return fileContent;
@@ -497,8 +503,8 @@ public class CloudObjectService
                     + " - returnIfError=" + returnIfError
                     + " - archiveTypeS=" + archiveTypeS
                     , 10);
-            ecslogger.debug("{}: getObjectStream entered - objectID={} - archiveTypeS={} - returnFullVersion={} - returnIfError={} - archiveTypeS={}",
-                    NAME, objectID, archiveTypeS, returnFullVersion, returnIfError, archiveTypeS);
+            Object[] paramArray = {NAME, objectID, archiveTypeS, returnFullVersion, returnIfError};
+            ecslogger.debug("{}: getObject entered - objectID={} - archiveTypeS={} - returnFullVersion={} - returnIfError={}", paramArray);
             CloudArchive cloudArchive = new CloudArchive(s3service, bucket, objectID, objectStoreBase, archiveTypeS, logger);
             cloudArchive.buildObject(outputStream, returnFullVersion);
 
@@ -521,7 +527,8 @@ public class CloudObjectService
                     + " - objectID=" + objectID
                     + " - validate=" + validate
                     , 10);
-            ecslogger.debug("{}: getCloudManifest entered - objectID={} - validate={}", NAME, objectID, validate);
+            Object[] paramArray = {NAME, objectID, validate};
+            ecslogger.debug("{}: getCloudManifest entered - objectID={} - validate={}", paramArray);
             ContentCloudManifest content = ContentCloudManifest.getContentCloudManifest(s3service, bucket, objectID, validate, logger);
             FileContent fileContent = content.callEx();
             return fileContent;
@@ -545,7 +552,8 @@ public class CloudObjectService
                     + " - objectID=" + objectID
                     + " - validate=" + validate
                     , 10);
-            ecslogger.debug("{}: getCloudManifestStream entered - objectID={} - validate={}", NAME, objectID, validate);
+            Object[] paramArray = {NAME, objectID, validate};
+            ecslogger.debug("{}: getCloudManifestStream entered - objectID={} - validate={}", paramArray);
             ContentCloudManifestStream content = ContentCloudManifestStream.getContentCloudManifestStream(s3service, bucket, objectID, validate, outStream, logger);
             content.callEx();
 
@@ -572,9 +580,8 @@ public class CloudObjectService
                     + " - returnIfError=" + returnIfError
                     + " - archiveTypeS=" + archiveTypeS
                     , 10);
-            ecslogger.debug("{}: getVersionArchive entered - objectID={} - versionID={} - archiveTypeS={} - returnIfError={}",
-                    NAME, objectID, versionID, archiveTypeS, returnIfError);
-            
+            Object[] paramArray = {NAME, objectID, archiveTypeS, returnFullVersion, returnIfError};
+            ecslogger.debug("{}: getVersionArchive entered - objectID={} - archiveTypeS={} - returnFullVersion={} - returnIfError={}", paramArray);
             CloudArchive cloudArchive = new CloudArchive(s3service, bucket, objectID, objectStoreBase, archiveTypeS, logger);
             FileContent fileContent = cloudArchive.buildVersion(versionID, archiveTypeS);
             return fileContent;
@@ -628,8 +635,8 @@ public class CloudObjectService
                     + " - returnIfError=" + returnIfError
                     + " - archiveTypeS=" + archiveTypeS
                     , 10);
-            ecslogger.debug("{}: getVersionArchiveStream entered - objectID={} - versionID={} - archiveTypeS={} - returnIfError={}",
-                    NAME, objectID, versionID, archiveTypeS, returnIfError);
+            Object[] getVersionArchiveStream = {NAME, objectID, archiveTypeS, returnFullVersion, returnIfError};
+            ecslogger.debug("{}: getVersionArchive entered - objectID={} - archiveTypeS={} - returnFullVersion={} - returnIfError={}", paramArray);
             
             CloudArchive cloudArchive = new CloudArchive(s3service, bucket, objectID, objectStoreBase, archiveTypeS, logger);
             cloudArchive.buildVersion(versionID, outputStream);
@@ -659,7 +666,8 @@ public class CloudObjectService
                     + " - versionID=" + versionID
                     + " - linkBaseURL=" + linkBaseURL
                     , 10);
-            ecslogger.debug("{}: getVersionArchiveStream entered - objectID={} - versionID={} - linkBaseURL={}", NAME, objectID, versionID, linkBaseURL);
+            Object[] getVersionArchiveStream = {NAME, objectID, versionID, linkBaseURL};
+            ecslogger.debug("{}: getVersionLink entered - objectID={} - versionID={} - linkBaseURL={}", paramArray);
             if (logger == null) {
                 System.out.println("***null logger");
             }
@@ -734,9 +742,9 @@ public class CloudObjectService
             tex = new TException.GENERAL_EXCEPTION(ex);
         }
         logger.logError(tex.toString(), 0);
-        ecslogger.error(tex.toString());
+        //ecslogger.error(tex.toString());
         logger.logError(tex.dump(MESSAGE), 20);
-        ecslogger.debug(tex.dump(MESSAGE));
+        //ecslogger.debug(tex.dump(MESSAGE));
         return tex;
     }
     
