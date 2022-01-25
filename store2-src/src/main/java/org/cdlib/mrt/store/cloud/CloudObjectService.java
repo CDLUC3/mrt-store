@@ -92,6 +92,7 @@ public class CloudObjectService
     protected static final String MESSAGE = NAME + ": ";
     protected static final boolean DEBUG = false;
     protected Logger ecslogger = LoggerFactory.getLogger("ecslogger.store.cloud.CloudObjectService");
+    private Object[] paramArray = {};
 
     protected CloudStoreInf s3service = null;
     protected String bucket = null;
@@ -580,8 +581,8 @@ public class CloudObjectService
                     + " - returnIfError=" + returnIfError
                     + " - archiveTypeS=" + archiveTypeS
                     , 10);
-            Object[] paramArray = {NAME, objectID, archiveTypeS, returnFullVersion, returnIfError};
-            ecslogger.debug("{}: getVersionArchive entered - objectID={} - archiveTypeS={} - returnFullVersion={} - returnIfError={}", paramArray);
+            Object[] paramArray = {NAME, objectID, versionID, archiveTypeS, returnIfError};
+            ecslogger.debug("{}: getVersionArchive entered - objectID={} versionID = {} - archiveTypeS={} - returnIfError={}", paramArray);
             CloudArchive cloudArchive = new CloudArchive(s3service, bucket, objectID, objectStoreBase, archiveTypeS, logger);
             FileContent fileContent = cloudArchive.buildVersion(versionID, archiveTypeS);
             return fileContent;
@@ -635,9 +636,8 @@ public class CloudObjectService
                     + " - returnIfError=" + returnIfError
                     + " - archiveTypeS=" + archiveTypeS
                     , 10);
-            Object[] getVersionArchiveStream = {NAME, objectID, archiveTypeS, returnFullVersion, returnIfError};
-            ecslogger.debug("{}: getVersionArchive entered - objectID={} - archiveTypeS={} - returnFullVersion={} - returnIfError={}", paramArray);
-            
+            Object[] paramArray = {NAME, objectID, versionID, archiveTypeS, returnIfError};
+            ecslogger.debug("{}: getVersionArchive entered - objectID={} versionID = {} - archiveTypeS={} - returnIfError={}", paramArray);
             CloudArchive cloudArchive = new CloudArchive(s3service, bucket, objectID, objectStoreBase, archiveTypeS, logger);
             cloudArchive.buildVersion(versionID, outputStream);
 
