@@ -79,6 +79,10 @@ import org.cdlib.mrt.s3.service.NodeIO;
 import org.cdlib.mrt.store.NodeInf;
 import org.cdlib.mrt.store.action.CloudArchive;
 import org.cdlib.mrt.utility.StringUtil;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * @author dloy
  */
@@ -88,6 +92,8 @@ public class CANCloudService
     protected static final String NAME = "CANCloudService";
     protected static final String MESSAGE = NAME + ": ";
     protected static final boolean DEBUG = false;
+    protected Logger ecslogger = LoggerFactory.getLogger("ecslogger.store.cloud.CloudObjectService");
+    private Object[] paramArray = {};
 
     protected CloudStoreInf s3service = null;
     protected String bucket = null;
@@ -135,6 +141,7 @@ public class CANCloudService
                 + " - bucket=" + bucket
                 ;
         logger.logMessage(msg, 3, true);
+        ecslogger.warn(msg);
     }
     
     public VersionState addVersion (
@@ -152,6 +159,7 @@ public class CANCloudService
             log(MESSAGE + "addVersion entered"
                     + " - objectID=" + objectID
                     , 10);
+            ecslogger.debug("{}: addVersion entered - objectID={}", NAME, objectID);
             return versionState;
         
         } catch (Exception ex) {
@@ -187,6 +195,7 @@ public class CANCloudService
             log(MESSAGE + "addVersion entered"
                     + " - objectID=" + objectID
                     , 10);
+            ecslogger.debug("{}: updateVersion entered - objectID={}", NAME, objectID);
             return versionState;
         
         } catch (Exception ex) {
@@ -209,6 +218,7 @@ public class CANCloudService
             log(MESSAGE + "copyObject entered"
                     + " - objectID=" + objectID
                     , 10);
+            ecslogger.debug("{}: copyObject entered - objectID={}", NAME, objectID);
             return objectState;
             
         } catch (Exception ex) {
@@ -238,6 +248,7 @@ public class CANCloudService
             log(MESSAGE + "deleteVersion entered"
                     + " - objectID=" + objectID
                     , 10);
+            ecslogger.debug("{}: deleteVersion entered - objectID={}", NAME, objectID);
             return state;
 
        } catch (Exception ex) {
@@ -264,6 +275,7 @@ public class CANCloudService
             log(MESSAGE + "deleteObject entered"
                     + " - objectID=" + objectID
                     , 10);
+            ecslogger.debug("{}: deleteObject entered - objectID={}", NAME, objectID);
             return state;
 
        } catch (Exception ex) {
@@ -286,6 +298,8 @@ public class CANCloudService
                     + " - objectID=" + objectID
                     + " - versionID=" + versionID
                     , 10);
+            Object[] paramArray = {NAME, objectID, versionID};
+            ecslogger.debug("{}: getVersionContent entered - objectID={} - versionID={}", paramArray);
             ComponentContent content = versionContent.callEx();
             return content;
 
@@ -308,6 +322,7 @@ public class CANCloudService
             log(MESSAGE + "getObjectState entered"
                     + " - objectID=" + objectID
                     , 10);
+            ecslogger.debug("{}: getObjectState entered - objectID={}", NAME, objectID);
             return (ObjectState)stateObject.callEx();
 
        } catch (Exception ex) {
@@ -329,6 +344,8 @@ public class CANCloudService
                     + " - objectID=" + objectID
                     + " - versionID=" + versionID
                     , 10);
+            Object[] paramArray = {NAME, objectID, versionID};
+            ecslogger.debug("{}: getVersionState entered - objectID={} - versionID={}", paramArray);
             return (VersionState)stateVersion.callEx();
 
         } catch (Exception ex) {
@@ -358,6 +375,8 @@ public class CANCloudService
                     + " - fileName=" + fileID
                     + " - dump=" + fileState.dump("")
                     , 10);
+            Object[] paramArray = {NAME, objectID, versionID, fileID, fileState.dump("")};
+            ecslogger.debug("{}: getFileState entered - objectID={} - versionID={} - fileName={} - dump={}", paramArray);
             return fileState;
 
        } catch (Exception ex) {
@@ -380,6 +399,8 @@ public class CANCloudService
                     + " - versionID=" + versionID
                     + " - fileName=" + fileName
                     , 10);
+            Object[] paramArray = {NAME, objectID, versionID, fileName};
+            ecslogger.debug("{}: getFileFixityState entered - objectID={} - versionID={} - fileName={}", paramArray);
             return (FileFixityState)fixityFile.callEx();
 
         } catch (Exception ex) {
@@ -395,9 +416,10 @@ public class CANCloudService
     {
         try {
             FixityObject fixityObject = FixityObject.getFixityObject(s3service, bucket, objectID,logger);
-            log(MESSAGE + "FileFixityState entered"
+            log(MESSAGE + "getObjectFixityState entered"
                     + " - objectID=" + objectID
                     , 10);
+            ecslogger.debug("{}: getObjectFixityState entered - objectID={}", NAME, objectID);
             return fixityObject.callEx();
 
         } catch (Exception ex) {
@@ -420,6 +442,8 @@ public class CANCloudService
                     + " - versionID=" + versionID
                     + " - fileName=" + fileName
                     , 10);
+            Object[] paramArray = {NAME, objectID, versionID, fileName};
+            ecslogger.debug("{}: getFile entered - objectID={} - versionID={} - fileName={}", paramArray);
             ContentFile content = ContentFile.getContentFile(s3service, bucket, objectID, versionID, fileName, true, logger);
             return content.callEx();
 
@@ -438,11 +462,13 @@ public class CANCloudService
         throws TException
     {
         try {
-            log(MESSAGE + "getFile entered"
+            log(MESSAGE + "getFileStream entered"
                     + " - objectID=" + objectID
                     + " - versionID=" + versionID
                     + " - fileName=" + fileName
                     , 10);
+            Object[] paramArray = {NAME, objectID, versionID, fileName};
+            ecslogger.debug("{}: getFileStream entered - objectID={} - versionID={} - fileName={}", paramArray);
             ContentFileStream content = ContentFileStream.getContentFileStream(
                     s3service, bucket, objectID, versionID, fileName, outputStream, logger);
             content.callEx();
@@ -470,6 +496,8 @@ public class CANCloudService
                     + " - returnIfError=" + returnIfError
                     + " - archiveTypeS=" + archiveTypeS
                     , 10);
+            Object[] paramArray = {NAME, objectID, archiveTypeS, returnFullVersion, returnIfError};
+            ecslogger.debug("{}: getObject entered - objectID={} - archiveTypeS={} - returnFullVersion={} - returnIfError={}", paramArray);
             CloudArchive cloudArchive = new CloudArchive(s3service, bucket, objectID, buildTemp, archiveTypeS, logger);
             FileContent fileContent = cloudArchive.buildObject(archiveTypeS, returnFullVersion);
             return fileContent;
@@ -497,13 +525,15 @@ public class CANCloudService
     {
         File buildTemp = FileUtil.getTempDir("tmpbuild");
         try {
-            log(MESSAGE + "getObject entered"
+            log(MESSAGE + "getObjectStream entered"
                     + " - objectID=" + objectID
                     + " - archiveTypeS=" + archiveTypeS
                     + " - returnFullVersion=" + returnFullVersion
                     + " - returnIfError=" + returnIfError
                     + " - archiveTypeS=" + archiveTypeS
                     , 10);
+            Object[] paramArray = {NAME, objectID, archiveTypeS, returnFullVersion, returnIfError};
+            ecslogger.debug("{}: getObjectStream entered - objectID={} - archiveTypeS={} - returnFullVersion={} - returnIfError={}", paramArray);
             CloudArchive cloudArchive = new CloudArchive(s3service, bucket, objectID, buildTemp, archiveTypeS, logger);
             cloudArchive.buildObject(outputStream, returnFullVersion);
 
@@ -531,6 +561,8 @@ public class CANCloudService
                     + " - objectID=" + objectID
                     + " - validate=" + validate
                     , 10);
+            Object[] paramArray = {NAME, objectID, validate};
+            ecslogger.debug("{}: getCloudManifest entered - objectID={} - validate={}", paramArray);
             ContentCloudManifest content = ContentCloudManifest.getContentCloudManifest(s3service, bucket, objectID, validate, logger);
             FileContent fileContent = content.callEx();
             return fileContent;
@@ -553,6 +585,8 @@ public class CANCloudService
                     + " - objectID=" + objectID
                     + " - validate=" + validate
                     , 10);
+            Object[] paramArray = {NAME, objectID, validate};
+            ecslogger.debug("{}: getCloudManifestStream entered - objectID={} - validate={}", paramArray);
             ContentCloudManifestStream content = ContentCloudManifestStream.getContentCloudManifestStream(s3service, bucket, objectID, validate, outStream, logger);
             content.callEx();
 
@@ -580,7 +614,8 @@ public class CANCloudService
                     + " - returnIfError=" + returnIfError
                     + " - archiveTypeS=" + archiveTypeS
                     , 10);
-            
+            Object[] paramArray = {NAME, objectID, versionID, archiveTypeS, returnIfError};
+            ecslogger.debug("{}: getVersionArchive entered - objectID={} versionID = {} - archiveTypeS={} - returnIfError={}", paramArray);
             CloudArchive cloudArchive = new CloudArchive(s3service, bucket, objectID, buildTemp, archiveTypeS, logger);
             FileContent fileContent = cloudArchive.buildVersion(versionID, archiveTypeS);
             return fileContent;
@@ -633,14 +668,15 @@ public class CANCloudService
     {
         File buildTemp = FileUtil.getTempDir("tmpbuild");
         try {
-            log(MESSAGE + "getVersionArchive entered"
+            log(MESSAGE + "getVersionArchiveStream entered"
                     + " - objectID=" + objectID
                     + " - versionID=" + versionID
                     + " - archiveTypeS=" + archiveTypeS
                     + " - returnIfError=" + returnIfError
                     + " - archiveTypeS=" + archiveTypeS
                     , 10);
-            
+            Object[] paramArray = {NAME, objectID, versionID, archiveTypeS, returnIfError};
+            ecslogger.debug("{}: getVersionArchiveStream entered - objectID={} versionID = {} - archiveTypeS={} - returnIfError={}", paramArray);
             CloudArchive cloudArchive = new CloudArchive(s3service, bucket, objectID, buildTemp, archiveTypeS, logger);
             cloudArchive.buildVersion(versionID, outputStream);
 
@@ -666,6 +702,8 @@ public class CANCloudService
                     + " - versionID=" + cvlRequest.versionID
                     + " - linkBaseURL=" + cvlRequest.linkBaseURL
                     , 10);
+            Object[] paramArray = {NAME, cvlRequest.objectID, cvlRequest.versionID, cvlRequest.linkBaseURL};
+            ecslogger.debug("{}: getVersionLink entered - objectID={} - versionID={} - linkBaseURL={}", paramArray);
             if (logger == null) {
                 System.out.println("***null logger");
             }
@@ -691,11 +729,13 @@ public class CANCloudService
         throws TException
     {
         try {
-            log(MESSAGE + "getVersionLink entered"
+            log(MESSAGE + "getIngestLink entered"
                     + " - objectID=" + objectID
                     + " - versionID=" + versionID
                     + " - linkBaseURL=" + linkBaseURL
                     , 10);
+            Object[] paramArray = {NAME, objectID, versionID, linkBaseURL};
+            ecslogger.debug("{}: getIngestLink entered - objectID={} - versionID={} - linkBaseURL={}", paramArray);
             if (logger == null) {
                 System.out.println("***null logger");
             }
@@ -769,7 +809,9 @@ public class CANCloudService
             tex = new TException.GENERAL_EXCEPTION(ex);
         }
         logger.logError(tex.toString(), 0);
+        ecslogger.error(tex.toString());
         logger.logError(tex.dump(MESSAGE), 20);
+        ecslogger.debug(tex.dump(MESSAGE));
         return tex;
     }
     

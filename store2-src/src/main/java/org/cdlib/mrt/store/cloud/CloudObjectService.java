@@ -505,7 +505,7 @@ public class CloudObjectService
                     + " - archiveTypeS=" + archiveTypeS
                     , 10);
             Object[] paramArray = {NAME, objectID, archiveTypeS, returnFullVersion, returnIfError};
-            ecslogger.debug("{}: getObject entered - objectID={} - archiveTypeS={} - returnFullVersion={} - returnIfError={}", paramArray);
+            ecslogger.debug("{}: getObjectStream entered - objectID={} - archiveTypeS={} - returnFullVersion={} - returnIfError={}", paramArray);
             CloudArchive cloudArchive = new CloudArchive(s3service, bucket, objectID, objectStoreBase, archiveTypeS, logger);
             cloudArchive.buildObject(outputStream, returnFullVersion);
 
@@ -666,7 +666,7 @@ public class CloudObjectService
                     + " - versionID=" + versionID
                     + " - linkBaseURL=" + linkBaseURL
                     , 10);
-            Object[] getVersionArchiveStream = {NAME, objectID, versionID, linkBaseURL};
+            Object[] paramArray = {NAME, objectID, versionID, linkBaseURL};
             ecslogger.debug("{}: getVersionLink entered - objectID={} - versionID={} - linkBaseURL={}", paramArray);
             if (logger == null) {
                 System.out.println("***null logger");
