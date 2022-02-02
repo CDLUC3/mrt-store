@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+  <Appenders>
+    <Console name="ECS-Console" target="SYSTEM_OUT">
+            <EcsLayout serviceName="store" serviceNodeName="${env:HOSTNAME}"/>
+    </Console>
+  </Appenders>
+  <Loggers>
+    <Root level="debug"> <AppenderRef ref="ECS-Console"/> </Root>
+  </Loggers>
+</Configuration>
+

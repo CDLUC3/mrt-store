@@ -80,8 +80,8 @@ import org.cdlib.mrt.store.NodeInf;
 import org.cdlib.mrt.store.action.CloudArchive;
 import org.cdlib.mrt.utility.StringUtil;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /**
  * @author dloy
@@ -92,7 +92,7 @@ public class CANCloudService
     protected static final String NAME = "CANCloudService";
     protected static final String MESSAGE = NAME + ": ";
     protected static final boolean DEBUG = false;
-    protected Logger ecslogger = LoggerFactory.getLogger("ecslogger.store.cloud.CloudObjectService");
+    protected Logger ecslogger = LogManager.getLogger();
     private Object[] paramArray = {};
 
     protected CloudStoreInf s3service = null;

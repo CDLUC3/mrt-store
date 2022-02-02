@@ -78,8 +78,8 @@ import org.cdlib.mrt.s3.service.CloudStoreInf;
 import org.cdlib.mrt.store.NodeInf;
 import org.cdlib.mrt.store.action.CloudArchive;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /**
  * @author dloy
@@ -91,7 +91,7 @@ public class CloudObjectService
     protected static final String NAME = "CloudObjectService";
     protected static final String MESSAGE = NAME + ": ";
     protected static final boolean DEBUG = false;
-    protected Logger ecslogger = LoggerFactory.getLogger("ecslogger.store.cloud.CloudObjectService");
+    protected Logger ecslogger = LogManager.getLogger();
     private Object[] paramArray = {};
 
     protected CloudStoreInf s3service = null;
