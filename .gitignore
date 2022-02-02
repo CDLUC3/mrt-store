@@ -4,3 +4,4 @@ target/
 .classpath
 */.gitignore
 *.swp
+store-war/war
