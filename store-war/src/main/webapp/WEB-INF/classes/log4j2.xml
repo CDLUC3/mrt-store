@@ -2,11 +2,27 @@
 <Configuration status="WARN">
   <Appenders>
     <Console name="ECS-Console" target="SYSTEM_OUT">
-            <EcsLayout serviceName="store" serviceNodeName="${env:HOSTNAME}"/>
+      <EcsLayout serviceName="store" serviceNodeName="${env:HOSTNAME}"/>
     </Console>
+
+    <RollingFile name="ECS-File" fileName="logs/log4j-ecs-json2.log"
+        filePattern="logs/log4j-ecs-json-%d{yyyy-MM-dd}-%i.log">
+      <EcsLayout serviceName="store" serviceNodeName="${env:HOSTNAME}"
+          includeOrigin="true"/>
+      <Policies>
+        <SizeBasedTriggeringPolicy size="19500KB" />
+      </Policies>
+      <DefaultRolloverStrategy max="10"/>
+    </RollingFile>
+
   </Appenders>
+
   <Loggers>
-    <Root level="debug"> <AppenderRef ref="ECS-Console"/> </Root>
+    <Root level="info">
+      <AppenderRef ref="ECS-Console"/>
+      <!--<AppenderRef ref="ECS-File"/>-->
+    </Root>
+    <Logger name="org.cdlib.mrt.store" level="debug"> <AppenderRef ref="ECS-File"/> </Logger>
   </Loggers>
 </Configuration>
 

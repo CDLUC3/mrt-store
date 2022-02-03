@@ -75,6 +75,10 @@ import java.util.Properties;
 import java.net.InetAddress;  
 import java.net.UnknownHostException;  
 
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
+
 /**
  * Consume queue data and submit to store service
  * - zookeeper is the defined queueing service
@@ -85,6 +89,7 @@ public class Consumer extends HttpServlet
 
     private static final String NAME = "Consumer";
     private static final String MESSAGE = NAME + ": ";
+    protected static Logger ecslogger = LogManager.getLogger();
     private volatile Thread consumerThread = null;
     private volatile Thread cleanupThread = null;
 
@@ -112,30 +117,33 @@ public class Consumer extends HttpServlet
             storageServiceInit = StorageServiceInit.getStorageServiceInit(servletConfig);
             storageService = storageServiceInit.getStorageService();
 	} catch (Exception e) {
-	    System.err.println("[warn] " + MESSAGE + "Could not create store service in daemon init. ");
+	    //System.err.println("[warn] " + MESSAGE + "Could not create store service in daemon init. ");
+            ecslogger.warn("Could not create store service in daemon init.");
 	}
 
 	try {
             queueConnectionString = storageService.getStorageConfig().getQueueService();
 	    if (StringUtil.isNotEmpty(queueConnectionString)) {
-	    	System.out.println("[info] " + MESSAGE + "Setting queue connection string: " + queueConnectionString);
+	    	//System.out.println("[info] " + MESSAGE + "Setting queue connection string: " + queueConnectionString);
+                ecslogger.info("Setting queue connection string: {}", queueConnectionString);
 		this.queueConnectionString = queueConnectionString;
 	    }
 	} catch (Exception e) {
-	    System.err.println("[warn] " + MESSAGE + "Could not set queue connection string: " + queueConnectionString +
-		 "  - using default: " + this.queueConnectionString);
+	    //System.err.println("[warn] " + MESSAGE + "Could not set queue connection string: " + queueConnectionString + "  - using default: " + this.queueConnectionString);
+            ecslogger.warn("Could not set queue connection string: {} - using default: {}", queueConnectionString, this.queueConnectionString);
 	}
 
 	try {
 	    queueSizeLimit = storageService.getStorageConfig().getQueueSizeLimit();
 	    if (StringUtil.isNotEmpty(queueSizeLimit)) {
-	    	System.out.println("[info] " + MESSAGE + "Setting queue size limit: " + queueSizeLimit);
+	    	//System.out.println("[info] " + MESSAGE + "Setting queue size limit: " + queueSizeLimit);
+                ecslogger.info("Setting queue size limit: {}", queueSizeLimit);
                 this.queueSizeLimit = new Long(queueSizeLimit).longValue();
 	    }
 	} catch (Exception e) {
 	    e.printStackTrace(System.err);
-	    System.err.println("[warn] " + MESSAGE + "Could not set queue size limit: " + queueNode +
-		 "  - using default: " + this.queueSizeLimit);
+	    //System.err.println("[warn] " + MESSAGE + "Could not set queue size limit: " + queueNode + "  - using default: " + this.queueSizeLimit);
+            ecslogger.warn("Could not set queue size limit: {} - using default: {}", queueNode, this.queueSizeLimit);
 	}
 
 	try {
@@ -146,36 +154,44 @@ public class Consumer extends HttpServlet
 	    if (largeWorker) {
 		numThreads = storageService.getStorageConfig().getQueueNumThreadsLarge(); 
 	        queueNode = queueNodeLarge;
-	    	System.out.println("[info] " + MESSAGE + "Large worker detected: " + hostname);
+	    	//System.out.println("[info] " + MESSAGE + "Large worker detected: " + hostname);
+                ecslogger.info("Large worker detected: {}", hostname);
 	    } else {
 	    	queueNode = queueNodeSmall;
-	    	System.out.println("[info] " + MESSAGE + "Small worker detected: " + hostname);
+	    	//System.out.println("[info] " + MESSAGE + "Small worker detected: " + hostname);
+                ecslogger.info("Small worker detected: {}", hostname);
 	    }
 	    if (StringUtil.isNotEmpty(numThreads)) {
-	    	System.out.println("[info] " + MESSAGE + "Setting thread pool size: " + numThreads);
+	    	//System.out.println("[info] " + MESSAGE + "Setting thread pool size: " + numThreads);
+                ecslogger.info("Setting thread pool size: {}", numThreads);
 		this.numThreads = new Integer(numThreads).intValue();
 	    }
 	    if (StringUtil.isNotEmpty(queueNode)) {
-	    	System.out.println("[info] " + MESSAGE + "Setting consumer queue to: " + queueNode);
+	    	//System.out.println("[info] " + MESSAGE + "Setting consumer queue to: " + queueNode);
+                ecslogger.info("Setting consumer queue to: {}", queueNode);
 	    }
 	} catch (Exception e) {
-	    System.err.println("[warn] " + MESSAGE + "Could not set thread pool size: " + numThreads + "  - using default: " + this.numThreads);
+	    //System.err.println("[warn] " + MESSAGE + "Could not set thread pool size: " + numThreads + "  - using default: " + this.numThreads);
+            ecslogger.warn("Could not set thread pool size: {} - using default: {}", numThreads, this.numThreads);
 	}
 
 	try {
 	    pollingInterval = storageService.getStorageConfig().getQueuePollingInterval();
 	    if (StringUtil.isNotEmpty(pollingInterval)) {
-	    	System.out.println("[info] " + MESSAGE + "Setting polling interval: " + pollingInterval);
+	    	//System.out.println("[info] " + MESSAGE + "Setting polling interval: " + pollingInterval);
+                ecslogger.info("Setting polling interval: {}", pollingInterval);
 		this.pollingInterval = new Integer(pollingInterval).intValue();
 	    }
 	} catch (Exception e) {
-	    System.err.println("[warn] " + MESSAGE + "Could not set polling interval: " + pollingInterval + "  - using default: " + this.pollingInterval);
+	    //System.err.println("[warn] " + MESSAGE + "Could not set polling interval: " + pollingInterval + "  - using default: " + this.pollingInterval);
+            ecslogger.warn("Could not set polling interval: {} - using default: {}", pollingInterval, this.pollingInterval);
 	}
 
         try {
             // Start the Consumer thread
             if (consumerThread == null) {
-	    	System.out.println("[info] " + MESSAGE + "starting consumer daemon");
+	    	//System.out.println("[info] " + MESSAGE + "starting consumer daemon");
+                ecslogger.info("Starting consumer daemon");
 		startConsumerThread(servletConfig);
 	    }
         } catch (Exception e) {
@@ -185,7 +201,8 @@ public class Consumer extends HttpServlet
         try {
             // Start the Queue cleanup thread
             if (cleanupThread == null) {
-	    	System.out.println("[info] " + MESSAGE + "starting Queue cleanup daemon");
+	    	//System.out.println("[info] " + MESSAGE + "starting Queue cleanup daemon");
+                ecslogger.info("Starting queue cleanup daemon");
 		startCleanupThread(servletConfig);
 	    }
         } catch (Exception e) {
@@ -202,7 +219,8 @@ public class Consumer extends HttpServlet
     {
         try {
             if (consumerThread != null) {
-                System.out.println("[info] " + MESSAGE + "consumer daemon already started");
+                //System.out.println("[info] " + MESSAGE + "consumer daemon already started");
+                ecslogger.info("Consumer daemon already started");
                 return;
             }
 
@@ -213,7 +231,8 @@ public class Consumer extends HttpServlet
             consumerThread.setDaemon(true);                // Kill thread when servlet dies
             consumerThread.start();
 
-	    System.out.println("[info] " + MESSAGE + "consumer daemon started");
+	    //System.out.println("[info] " + MESSAGE + "consumer daemon started");
+            ecslogger.info("Consumer daemon started");
 
             return;
 
@@ -230,7 +249,8 @@ public class Consumer extends HttpServlet
     {
         try {
             if (cleanupThread != null) {
-                System.out.println("[info] " + MESSAGE + "Queue cleanup daemon already started");
+                //System.out.println("[info] " + MESSAGE + "Queue cleanup daemon already started");
+                ecslogger.info("Queue cleanup daemon already started");
                 return;
             }
 
@@ -246,7 +266,8 @@ public class Consumer extends HttpServlet
             //System.out.println("[info] " + MESSAGE + "------> Sample large queue request");
             //QueueUtil.queueAccessRequest("{'status':201,'token':'LARGE-request-token','cloud-content-byte':29906290233,'delivery-node':7001}");
 
-	    System.out.println("[info] " + MESSAGE + "cleanup daemon started");
+	    //System.out.println("[info] " + MESSAGE + "cleanup daemon started");
+            ecslogger.info("Queue cleanup daemon started");
 
             return;
 
@@ -264,14 +285,16 @@ public class Consumer extends HttpServlet
            InetAddress id = InetAddress.getLocalHost();  
 	   return id.getHostName();
         } catch (UnknownHostException e) {  
-	   System.err.println("[error] " + MESSAGE + "could not determine hostname.");
+	   //System.err.println("[error] " + MESSAGE + "could not determine hostname.");
+           ecslogger.error("could not determine hostname.");
 	   return null;
         }  
     }
 
     public void destroy() {
 	try {
-	    System.out.println("[info] " + MESSAGE + "interrupting consumer daemon");
+	    //System.out.println("[info] " + MESSAGE + "interrupting consumer daemon");
+            ecslogger.info("interrupting consumer daemon");
             consumerThread.interrupt();
 	    saveState();
 	} catch (Exception e) {
@@ -280,7 +303,8 @@ public class Consumer extends HttpServlet
     }
 
     public void saveState() {
-        System.out.println("[info] " + MESSAGE + "Shutdown detected, saving state, if applicable.");
+        //System.out.println("[info] " + MESSAGE + "Shutdown detected, saving state, if applicable.");
+        ecslogger.info("Shutdown detected, saving state, if applicable.");
     }
 
 }
@@ -290,6 +314,7 @@ class ConsumerDaemon implements Runnable
    
     private static final String NAME = "ConsumerDaemon";
     private static final String MESSAGE = NAME + ": ";
+    protected static Logger ecslogger = LogManager.getLogger();
 
     private StorageServiceInit storageServiceInit = null;
     private StorageServiceInf storageService = null;
@@ -346,7 +371,8 @@ class ConsumerDaemon implements Runnable
         ThreadPoolExecutor executorService = new ThreadPoolExecutor(poolSize, poolSize, (long) 5, TimeUnit.SECONDS, (BlockingQueue) workQueue);
 
 	sessionID = zooKeeper.getSessionId();
-	System.out.println("[info]" + MESSAGE + "session id: " + Long.toHexString(sessionID));
+	//System.out.println("[info]" + MESSAGE + "session id: " + Long.toHexString(sessionID));
+        ecslogger.info("session id: {}", Long.toHexString(sessionID));
 	sessionAuth = zooKeeper.getSessionPasswd();
         Item item = null;
 
@@ -356,7 +382,8 @@ class ConsumerDaemon implements Runnable
 
                 // Wait for next interval.
                 if (! init) {
-                    System.out.println(MESSAGE + "Waiting for polling interval(seconds): " + pollingInterval);
+                    //System.out.println(MESSAGE + "Waiting for polling interval(seconds): " + pollingInterval);
+                    ecslogger.info("Waiting for polling interval(seconds): {}", pollingInterval);
                     Thread.yield();
                     Thread.currentThread().sleep(pollingInterval.longValue() * 1000);
 		    smallQueueCheck();
@@ -368,9 +395,11 @@ class ConsumerDaemon implements Runnable
                 if (onHold()) {
 		    try {
                         distributedQueue.peek();
-                        System.out.println(MESSAGE + "detected 'on hold' condition");
+                        //System.out.println(MESSAGE + "detected 'on hold' condition");
+                        ecslogger.info("detected 'on hold' condition");
 		    } catch (ConnectionLossException cle) {
-			System.err.println("[warn] " + MESSAGE + "Queueing service is down.");
+			//System.err.println("[warn] " + MESSAGE + "Queueing service is down.");
+                        ecslogger.warn("Queueing service is down.");
 			cle.printStackTrace(System.err);
 		    } catch (Exception e) {
 		    }
@@ -379,7 +408,8 @@ class ConsumerDaemon implements Runnable
 
                 // have we shutdown?
                 if (Thread.currentThread().isInterrupted()) {
-                    System.out.println(MESSAGE + "interruption detected.");
+                    //System.out.println(MESSAGE + "interruption detected.");
+                    ecslogger.info("Interruption detected.");
       		    throw new InterruptedException();
                 }
 
@@ -391,24 +421,28 @@ class ConsumerDaemon implements Runnable
 		    while (true) {
 		        numActiveTasks = executorService.getActiveCount();
 			if (largeWorker && smallQueueBool && numActiveTasks == 0) {
-			    System.out.println(MESSAGE + "Checking for additional Access tasks on SMALL queue.  Current tasks: " + numActiveTasks + " - Max: " + poolSize);
+			    //System.out.println(MESSAGE + "Checking for additional Access tasks on SMALL queue.  Current tasks: " + numActiveTasks + " - Max: " + poolSize);
+                            ecslogger.info("Checking for additional Access tasks on SMALL queue.  Current tasks: {} - Max: {}", numActiveTasks, poolSize);
 			    smallQueueBool = false;
 			    smallQueueCounter = 0;
 			    item = distributedSmallQueue.consume();
                             executorService.execute(new ConsumeData(storageService, item, distributedSmallQueue, queueConnectionString, queueNode));
 			}
 			if (numActiveTasks < poolSize) {
-			    System.out.println(MESSAGE + "Checking for additional Access tasks.  Current tasks: " + numActiveTasks + " - Max: " + poolSize);
+			    //System.out.println(MESSAGE + "Checking for additional Access tasks.  Current tasks: " + numActiveTasks + " - Max: " + poolSize);
+                            ecslogger.info("Checking for additional Access tasks.  Current tasks: {} - Max: {}", numActiveTasks, poolSize);
 			    item = distributedQueue.consume();
                             executorService.execute(new ConsumeData(storageService, item, distributedQueue, queueConnectionString, queueNode));
 			} else {
-			    System.out.println(MESSAGE + "Work queue is full, NOT checking for additional Access tasks: " + numActiveTasks + " - Max: " + poolSize);
+			    //System.out.println(MESSAGE + "Work queue is full, NOT checking for additional Access tasks: " + numActiveTasks + " - Max: " + poolSize);
+                            ecslogger.info("Work queue is full, Not checking for additional Access tasks.  Current tasks: {} - Max: {}", numActiveTasks, poolSize);
 			    break;
 			}
 		    }
 
         	} catch (ConnectionLossException cle) {
-		    System.err.println("[error] " + MESSAGE + "Lost connection to queueing service.");
+		    //System.err.println("[error] " + MESSAGE + "Lost connection to queueing service.");
+                    ecslogger.error("Lost connection to queueing service.");
 		    cle.printStackTrace(System.err);
 		    String[] parse = cle.getMessage().split(queueNode + "/");	// ConnectionLoss for /q/qn-000000000970 
 		    if (parse.length > 1) {
@@ -416,7 +450,8 @@ class ConsumerDaemon implements Runnable
 			int i = 0;
 			final int MAX_ATTEMPT = 3;
 		        while (i < MAX_ATTEMPT) {
-	    	            System.out.println("[info]" + MESSAGE +  i + ":Attempting to requeue: " + parse[1]);
+	    	            //System.out.println("[info]" + MESSAGE +  i + ":Attempting to requeue: " + parse[1]);
+                            ecslogger.error("{} :Attempting to requeue: {}", i, parse[1]);
 		            if (requeue(parse[1])) {
 			        break;
 		    	    }
@@ -424,31 +459,38 @@ class ConsumerDaemon implements Runnable
 	    	            Thread.currentThread().sleep(30 * 1000);		// wait for ZK to recover
 		        }
 			if (i >= MAX_ATTEMPT){
-	    	            System.out.println("[error]" + MESSAGE + "Could not requeue ITEM: " + parse[1]);
+	    	            //System.out.println("[error]" + MESSAGE + "Could not requeue ITEM: " + parse[1]);
+                            ecslogger.error("Could not requeue ITEM: {}", parse[1]);
 			    // session expired ?  If so, can we recover or just eror
 			    // throw new org.apache.zookeeper.KeeperException.SessionExpiredException();
 		            //zooKeeper = new ZooKeeper(connectionString, sessionTimeout, new Ignorer(), sessionID, sessionAuth);
 			}
 		    } else {
-		        System.err.println("[info] " + MESSAGE + "Did not interrupt queue create.  We're OK.");
+		        //System.err.println("[info] " + MESSAGE + "Did not interrupt queue create.  We're OK.");
+                        ecslogger.info("Did not interrupt queue create.  We're OK.");
 		    }   
         	} catch (SessionExpiredException see) {
 		    see.printStackTrace(System.err);
-		    System.err.println("[warn] " + MESSAGE + "Session expired.  Attempting to recreate session.");
+		    //System.err.println("[warn] " + MESSAGE + "Session expired.  Attempting to recreate session.");
+                    ecslogger.warn("Session expired.  Attempting to recreate session.");
             	    zooKeeper = new ZooKeeper(queueConnectionString, DistributedQueue.sessionTimeout, new Ignorer());
                     distributedQueue = new DistributedQueue(zooKeeper, queueNode, null);  
 		} catch (RejectedExecutionException ree) {
-	            System.out.println("[info] " + MESSAGE + "Thread pool limit reached. no submission, and requeuing: " + item.toString());
+	            //System.out.println("[info] " + MESSAGE + "Thread pool limit reached. no submission, and requeuing: " + item.toString());
+                    ecslogger.info("Thread pool limit reached. no submission, and requeuing: {}", item.toString());
 		    distributedQueue.requeue(item.getId());
         	    Thread.currentThread().sleep(5 * 1000);         // let thread pool relax a bit
 		} catch (NoSuchElementException nsee) {
 		    // no data in queue
-		    System.out.println("[info] " + MESSAGE + "No data in queue to process");
+		    //System.out.println("[info] " + MESSAGE + "No data in queue to process");
+                    ecslogger.info("No data in queue to process");
 		} catch (IllegalArgumentException iae) {
 		    // no queue exists
-		    System.out.println("[info] " + MESSAGE + "New queue does not yet exist: " + queueNode);
+		    //System.out.println("[info] " + MESSAGE + "New queue does not yet exist: " + queueNode);
+                    ecslogger.info("New queue does not yet exist: {}", queueNode);
 		} catch (Exception e) {
-		    System.err.println("[warn] " + MESSAGE + "General exception.");
+		    //System.err.println("[warn] " + MESSAGE + "General exception.");
+                    ecslogger.warn("General exception.");
 	            e.printStackTrace();
 		}
 	    }
@@ -457,12 +499,14 @@ class ConsumerDaemon implements Runnable
 		try {
 	    	    zooKeeper.close();
 		} catch (Exception ze) {}
-                System.out.println(MESSAGE + "shutting down consumer daemon.");
+                //System.out.println(MESSAGE + "shutting down consumer daemon.");
+                ecslogger.info("Shutting down consumer daemon.");
 	        executorService.shutdown();
 
 		int cnt = 0;
 		while (! executorService.awaitTermination(15L, TimeUnit.SECONDS)) {
-                    System.out.println(MESSAGE + "waiting for tasks to complete.");
+                    //System.out.println(MESSAGE + "waiting for tasks to complete.");
+                    ecslogger.info("Waiting for tasks to complete.");
 		    cnt++;
 		    if (cnt == 8) {	// 2 minutes
 			// force shutdown
@@ -473,7 +517,8 @@ class ConsumerDaemon implements Runnable
 		e.printStackTrace(System.err);
             }
 	} catch (Exception e) {
-            System.out.println(MESSAGE + "Exception detected, shutting down consumer daemon.");
+            //System.out.println(MESSAGE + "Exception detected, shutting down consumer daemon.");
+            ecslogger.warn("Exception detected, shutting down consumer daemon.");
 	    e.printStackTrace(System.err);
 	    executorService.shutdown();
         } finally {
@@ -493,7 +538,8 @@ class ConsumerDaemon implements Runnable
         try {
 	    File holdFile = new File(storageService.getStorageConfig().getQueueHoldFile());
 	    if (holdFile.exists()) {
-	        System.out.println("[info]" + NAME + ": hold file exists, not processing queue: " + holdFile.getAbsolutePath());
+	        //System.out.println("[info]" + NAME + ": hold file exists, not processing queue: " + holdFile.getAbsolutePath());
+                ecslogger.info("Hold file exists, not processing queue: {}" + holdFile.getAbsolutePath());
 	        return true;
 	    }
         } catch (Exception e) {
@@ -514,7 +560,8 @@ class ConsumerDaemon implements Runnable
 
 	        item = distributedQueue.updateStatus(id, Item.CONSUMED, Item.PENDING);
 	    } catch (SessionExpiredException see) {
-	        System.err.println("[error]" + MESSAGE +  "Session expired.  Attempting to recreate session while requeueing.");
+	        //System.err.println("[error]" + MESSAGE +  "Session expired.  Attempting to recreate session while requeueing.");
+                ecslogger.error("Session expired.  Attempting to recreate session while requeueing.");
                 zooKeeper = new ZooKeeper(queueConnectionString, DistributedQueue.sessionTimeout, new Ignorer());
                 distributedQueue = new DistributedQueue(zooKeeper, queueNode, null);
 
@@ -522,9 +569,11 @@ class ConsumerDaemon implements Runnable
 	    }
 
 	    if (item != null) {
-		System.out.println("** [info] ** " + MESSAGE + "Successfully requeued: " + item.toString());
+		//System.out.println("** [info] ** " + MESSAGE + "Successfully requeued: " + item.toString());
+                ecslogger.info("Successfully requeued: {}", item.toString());
 	    } else {
-	        System.err.println("[error]" + MESSAGE +  "Could not requeue: " + id);
+	        //System.err.println("[error]" + MESSAGE +  "Could not requeue: " + id);
+                ecslogger.error("Could not requeue: {}", id);
 		return false;
 	    }
         } catch (Exception e) {
@@ -537,7 +586,8 @@ class ConsumerDaemon implements Runnable
    public class Ignorer implements Watcher {
        public void process(WatchedEvent event){
            if (event.getState().equals("Disconnected"))
-               System.out.println("Disconnected: " + event.toString());
+               //System.out.println("Disconnected: " + event.toString());
+               ecslogger.info("Disconnected: {}", event.toString());
        }
    }
 
@@ -549,6 +599,7 @@ class ConsumeData implements Runnable
    
     private static final String NAME = "ConsumeData";
     private static final String MESSAGE = NAME + ":";
+    protected static Logger ecslogger = LogManager.getLogger();
     private static final boolean DEBUG = true;
     protected static final String FS = System.getProperty("file.separator");
 
@@ -575,7 +626,8 @@ class ConsumeData implements Runnable
     {
         try {
 	    String data = new String(item.getData());
-            if (DEBUG) System.out.println("[info] START: consuming queue data:" + data);
+            //if (DEBUG) System.out.println("[info] START: consuming queue data:" + data);
+            ecslogger.debug("START: consuming queue data: {}", data);        
 
 	    JSONObject jo = QueueUtil.string2json(data);
 	    String token = jo.getString("token");
@@ -583,38 +635,44 @@ class ConsumeData implements Runnable
 	    TokenRun tokenRun = TokenRun.getTokenRun(data, storageService.getStorageConfig());
 	    tokenRun.run();
 	    if (tokenRun.getRunStatus() != TokenRun.TokenRunStatus.OK) {
-                if (DEBUG) System.out.println("[error] TokenRun error:" + tokenRun.getRunStatus());
+                //if (DEBUG) System.out.println("[error] TokenRun error:" + tokenRun.getRunStatus());
+                ecslogger.debug("TokenRun error: {}", tokenRun.getRunStatus());        
 	        distributedQueue.fail(item.getId());
             } else {
 		// complete or delete??
-            	if (DEBUG) System.out.println("[item] END: completed queue data:" + data);
+            	//if (DEBUG) System.out.println("[item] END: completed queue data:" + data);
+                ecslogger.debug("END: completed queue data: {}", data);        
 	        distributedQueue.complete(item.getId());
 	    }
         } catch (SessionExpiredException see) {
             see.printStackTrace(System.err);
-            System.err.println("[warn] ConsumeData" + MESSAGE + "Session expired.  Attempting to recreate session.");
+            //System.err.println("[warn] ConsumeData" + MESSAGE + "Session expired.  Attempting to recreate session.");
+            ecslogger.warn("Session expired.  Attempting to recreate session.");        
 	    try {
                 zooKeeper = new ZooKeeper(queueConnectionString, DistributedQueue.sessionTimeout, new Ignorer());
                 distributedQueue = new DistributedQueue(zooKeeper, queueNode, null);
 	        distributedQueue.complete(item.getId());
 	    } catch (Exception e) {
                 e.printStackTrace(System.err);
-                System.out.println("[error] Consuming queue data: Could not recreate session.");
+                //System.out.println("[error] Consuming queue data: Could not recreate session.");
+                ecslogger.error("Session expired.  Attempting to recreate session.");        
 	    }
         } catch (ConnectionLossException cle) {
             cle.printStackTrace(System.err);
-            System.err.println("[warn] ConsumeData" + MESSAGE + "Connection loss.  Attempting to reconnect.");
+            //System.err.println("[warn] ConsumeData" + MESSAGE + "Connection loss.  Attempting to reconnect.");
 	    try {
                 zooKeeper = new ZooKeeper(queueConnectionString, DistributedQueue.sessionTimeout, new Ignorer());
                 distributedQueue = new DistributedQueue(zooKeeper, queueNode, null);
 	        distributedQueue.complete(item.getId());
 	    } catch (Exception e) {
                 e.printStackTrace(System.err);
-                System.out.println("[error] Consuming queue data: Could not reconnect.");
+                //System.out.println("[error] Consuming queue data: Could not reconnect.");
+                ecslogger.error("Consuming queue data: Could not reconnect.");        
 	    }
         } catch (Exception e) {
             e.printStackTrace(System.err);
-            System.out.println("[error] Consuming queue data");
+            //System.out.println("[error] Consuming queue data");
+            ecslogger.error("Consuming queue data");        
         } finally {
 	} 
     }
@@ -622,7 +680,8 @@ class ConsumeData implements Runnable
    public class Ignorer implements Watcher {
        public void process(WatchedEvent event){
            if (event.getState().equals("Disconnected"))
-               System.out.println("Disconnected: " + event.toString());
+               //System.out.println("Disconnected: " + event.toString());
+               ecslogger.info("Disconnected: {} event.toString()");        
        }
    }
 }
@@ -633,6 +692,7 @@ class CleanupDaemon implements Runnable
 
     private static final String NAME = "CleanupDaemon";
     private static final String MESSAGE = NAME + ": ";
+    protected static Logger ecslogger = LogManager.getLogger();
 
     private String queueConnectionString = null;
     private String queueNode = null;
@@ -667,7 +727,7 @@ class CleanupDaemon implements Runnable
         String status = null;
 
         sessionID = zooKeeper.getSessionId();
-        System.out.println("[info]" + MESSAGE + "session id: " + Long.toHexString(sessionID));
+        //System.out.println("[info]" + MESSAGE + "session id: " + Long.toHexString(sessionID));
         sessionAuth = zooKeeper.getSessionPasswd();
 
         try {
@@ -675,7 +735,8 @@ class CleanupDaemon implements Runnable
 
                 // Wait for next interval.
                 if (! init) {
-                    System.out.println(MESSAGE + "Waiting for polling interval(seconds): " + pollingInterval);
+                    //System.out.println(MESSAGE + "Waiting for polling interval(seconds): " + pollingInterval);
+                    ecslogger.info("Waiting for polling interval(seconds): {}", pollingInterval);
                     Thread.yield();
                     Thread.currentThread().sleep(pollingInterval.longValue() * 1000);
                 } else {
@@ -684,7 +745,8 @@ class CleanupDaemon implements Runnable
 
                 // have we shutdown?
                 if (Thread.currentThread().isInterrupted()) {
-                    System.out.println(MESSAGE + "interruption detected.");
+                    //System.out.println(MESSAGE + "interruption detected.");
+                    ecslogger.info("interruption detected.");
                     throw new InterruptedException();
                 }
 
@@ -694,30 +756,37 @@ class CleanupDaemon implements Runnable
 
                     // To prevent long shutdown, no more than poolsize tasks queued.
                     while (true) {
-                        System.out.println(MESSAGE + "Cleaning queue: " + queueConnectionString + " " + queueNode);
+                        //System.out.println(MESSAGE + "Cleaning queue: " + queueConnectionString + " " + queueNode);
+                        ecslogger.info("Cleaning queue: {} {}", queueConnectionString, queueNode);
 			distributedQueue.cleanup(Item.COMPLETED);
 
                         Thread.currentThread().sleep(5 * 1000);		// wait a short amount of time
                     }
 
                 } catch (ConnectionLossException cle) {
-                    System.err.println("[error] " + MESSAGE + "Lost connection to queueing service.");
+                    //System.err.println("[error] " + MESSAGE + "Lost connection to queueing service.");
+                    ecslogger.error("Lost connection to queueing service.");
                     cle.printStackTrace(System.err);
                 } catch (SessionExpiredException see) {
                     see.printStackTrace(System.err);
-                    System.err.println("[warn] " + MESSAGE + "Session expired.  Attempting to recreate session.");
+                    //System.err.println("[warn] " + MESSAGE + "Session expired.  Attempting to recreate session.");
+                    ecslogger.error("Session expired.  Attempting to recreate session.");
                     zooKeeper = new ZooKeeper(queueConnectionString, DistributedQueue.sessionTimeout, new Ignorer());
                     distributedQueue = new DistributedQueue(zooKeeper, queueNode, null);
                 } catch (RejectedExecutionException ree) {
-                    System.out.println("[info] " + MESSAGE + "Thread pool limit reached. no submission");
+                    //System.out.println("[info] " + MESSAGE + "Thread pool limit reached. no submission");
+                    ecslogger.info("Thread pool limit reached. no submission");
                 } catch (NoSuchElementException nsee) {
                     // no data in queue
-                    System.out.println("[info] " + MESSAGE + "No data in queue to clean");
+                    //System.out.println("[info] " + MESSAGE + "No data in queue to clean");
+                    ecslogger.info("No data in queue to clean");
                 } catch (IllegalArgumentException iae) {
                     // no queue exists
-                    System.out.println("[info] " + MESSAGE + "New queue does not yet exist: " + queueNode);
+                    //System.out.println("[info] " + MESSAGE + "New queue does not yet exist: " + queueNode);
+                    ecslogger.info("New queue does not yet exist: {}", queueNode);
                 } catch (Exception e) {
-                    System.err.println("[warn] " + MESSAGE + "General exception.");
+                    //System.err.println("[warn] " + MESSAGE + "General exception.");
+                    ecslogger.warn("General exception.");
                     e.printStackTrace();
                 }
             }
@@ -728,7 +797,8 @@ class CleanupDaemon implements Runnable
                 e.printStackTrace(System.err);
             }
         } catch (Exception e) {
-            System.out.println(MESSAGE + "Exception detected, shutting down cleanup daemon.");
+            //System.out.println(MESSAGE + "Exception detected, shutting down cleanup daemon.");
+            ecslogger.warn("Exception detected, shutting down cleanup daemon.");
             e.printStackTrace(System.err);
         } finally {
         }
@@ -737,7 +807,8 @@ class CleanupDaemon implements Runnable
    public class Ignorer implements Watcher {
        public void process(WatchedEvent event){
            if (event.getState().equals("Disconnected"))
-               System.out.println("Disconnected: " + event.toString());
+               //System.out.println("Disconnected: " + event.toString());
+               ecslogger.info("Disconnected: {} event.toString()");        
        }
    }
 

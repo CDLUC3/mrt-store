@@ -92,7 +92,7 @@ public class CANCloudService
     protected static final String NAME = "CANCloudService";
     protected static final String MESSAGE = NAME + ": ";
     protected static final boolean DEBUG = false;
-    protected Logger ecslogger = LogManager.getLogger();
+    protected static Logger ecslogger = LogManager.getLogger();
     private Object[] paramArray = {};
 
     protected CloudStoreInf s3service = null;
