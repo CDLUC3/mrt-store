@@ -2,12 +2,23 @@
 <Configuration status="WARN">
   <Appenders>
     <Console name="ECS-Console" target="SYSTEM_OUT">
-      <EcsLayout serviceName="store" serviceNodeName="${env:HOSTNAME}"/>
+      <EcsLayout
+          serviceName="store"
+          serviceNodeName="${env:HOSTNAME}"
+          eventDataset="tomcat.store"
+          includeMarkers="true"
+          stackTraceAsArray="true"
+          includeOrigin="true"/>
     </Console>
 
     <RollingFile name="ECS-File" fileName="logs/log4j-ecs-json2.log"
         filePattern="logs/log4j-ecs-json-%d{yyyy-MM-dd}-%i.log">
-      <EcsLayout serviceName="store" serviceNodeName="${env:HOSTNAME}"
+      <EcsLayout
+          serviceName="store"
+          serviceNodeName="${env:HOSTNAME}"
+          eventDataset="tomcat.store"
+          includeMarkers="true"
+          stackTraceAsArray="true"
           includeOrigin="true"/>
       <Policies>
         <SizeBasedTriggeringPolicy size="19500KB" />

@@ -59,6 +59,10 @@ import org.cdlib.mrt.utility.TFileLogger;
 import org.json.JSONException;
 // import javax.json.JsonNumber;
 import org.json.JSONObject;
+
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 /**
  * Queue access request
  * zookeeper is the defined queueing service
@@ -69,6 +73,7 @@ public class QueueUtil
 
     protected static final String NAME = "QueueUtil";
     protected static final String MESSAGE = NAME + ": ";
+    protected static Logger ecslogger = LogManager.getLogger();
     protected static final boolean DEBUG = true;
     private static ZooKeeper zooKeeper;
     private static DistributedQueue distributedQueue;
@@ -111,17 +116,20 @@ public class QueueUtil
 	    long size = jo.getLong("cloud-content-byte");
 	    String token = jo.getString("token");
 	    if (size  > Consumer.queueSizeLimit) {
-		System.out.println("[info]" + MESSAGE + NAME + " Detected LARGE access request: " + token);
+		//System.out.println("[info]" + MESSAGE + NAME + " Detected LARGE access request: " + token);
+                ecslogger.info("Detected LARGE access request: {}", token);
 	        queueNode = Consumer.queueNodeLarge;
 	    } else {
-		System.out.println("[info]" + MESSAGE + NAME + " Detected SMALL access request: " + token);
+		//System.out.println("[info]" + MESSAGE + NAME + " Detected SMALL access request: " + token);
+                ecslogger.info("Detected SMALL access request: {}", token);
 	    }
 		
             zooKeeper = new ZooKeeper(Consumer.queueConnectionString, DistributedQueue.sessionTimeout, new Ignorer());
 	    String priority = calculatePriority(size);
             distributedQueue = new DistributedQueue(zooKeeper, queueNode, priority, null);
 
-	    System.out.println("[info]" + MESSAGE + NAME + " Writing access data to queue: " + queueNode);
+	    //System.out.println("[info]" + MESSAGE + NAME + " Writing access data to queue: " + queueNode);
+            ecslogger.info("Writing access data to queue: {}", queueNode);
             submit(request.getBytes());
             String msg = String.format("SUCCESS: %s completed successfully", getName());
 

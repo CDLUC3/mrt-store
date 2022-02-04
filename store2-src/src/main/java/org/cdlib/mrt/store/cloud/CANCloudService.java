@@ -80,8 +80,14 @@ import org.cdlib.mrt.store.NodeInf;
 import org.cdlib.mrt.store.action.CloudArchive;
 import org.cdlib.mrt.utility.StringUtil;
 
+// log4j experimentation
+import java.util.Map;
+import java.util.HashMap;
+import java.text.MessageFormat;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.message.StringMapMessage; 
+import org.apache.logging.log4j.message.ObjectMessage;
 
 /**
  * @author dloy
@@ -135,15 +141,113 @@ public class CANCloudService
     {
         s3service = accessNode.service;
         bucket = accessNode.container;
+
+        // Original log message using org.cdlib.mrt.utility.TException Logger
         String msg = "setService:"
                 + " - nodeIOName=" + nodeIOName
                 + " - nodeNumber=" + accessNode.nodeNumber
                 + " - bucket=" + bucket
                 ;
         logger.logMessage(msg, 3, true);
-        ecslogger.warn(msg);
+
+        // Formatted string message using log4j logger.  The string format is parsed only when loglevel is active.
+        ecslogger.warn("{}: setService entered - nodeIOName={} - nodeNumber={} - bucket={} ", NAME, nodeIOName, accessNode.nodeNumber, bucket);
+        // {
+	//   "@timestamp": "2022-02-03T23:48:13.676Z",
+	//   "log.level": "WARN",
+	//   "message": "CANCloudService: setService entered - nodeIOName=null - nodeNumber=7777 - bucket=my-bucket ",
+	//   "ecs.version": "1.2.0",
+	//   "service.name": "store",
+	//   "service.node.name": "store",
+	//   "event.dataset": "tomcat.store",
+	//   "process.thread.name": "localhost-startStop-1",
+	//   "log.logger": "org.cdlib.mrt.store.cloud.CANCloudService",
+	//   "log": {
+	//     "origin": {
+	//       "file": {
+	//         "name": "CANCloudService.java",
+	//         "line": 154
+	//       },
+	//       "function": "setService"
+	//     }
+	//   }
+	// }
+
+        // Using log4j-ecs-layout.StringMapMessage.  This lets me create new top level fields in the log event.
+        // The values of StringMapMessage keys must be strings.
+        // See: https://www.elastic.co/guide/en/ecs-logging/java/current/_structured_logging_with_log4j2.html
+        ecslogger.info(new StringMapMessage()
+            .with("message", MessageFormat.format("using StringMapMessage - {0}: setService entered - nodeIOName={1} - nodeNumber={2} - bucket={3}", NAME, nodeIOName, accessNode.nodeNumber, bucket))
+            .with("labels.nodeIOName", (nodeIOName == null) ? "null" : nodeIOName)
+            .with("labels.nodeNumber", accessNode.nodeNumber)
+            .with("labels.bucket", bucket)
+        );
+	// {
+	//   "@timestamp": "2022-02-03T23:48:13.685Z",
+	//   "log.level": "INFO",
+	//   "labels.bucket": "my-bucket",
+	//   "labels.nodeIOName": "null",
+	//   "labels.nodeNumber": 7777,
+	//   "message": "using StringMapMessage - CANCloudService: setService entered - nodeIOName=null - nodeNumber=7,777 - bucket=my-bucket",
+	//   "ecs.version": "1.2.0",
+	//   "service.name": "store",
+	//   "service.node.name": "store",
+	//   "event.dataset": "tomcat.store",
+	//   "process.thread.name": "localhost-startStop-1",
+	//   "log.logger": "org.cdlib.mrt.store.cloud.CANCloudService",
+	//   "log": {
+	//     "origin": {
+	//       "file": {
+	//         "name": "CANCloudService.java",
+	//         "line": 159
+	//       },
+	//       "function": "setService"
+	//     }
+	//   }
+	// }
+
+        // Using log4j-ecs-layout.ObjectMessage.  This lets me create complex structured data in the log event.
+        HashMap<String, Object> customMsgObj = new HashMap<>();
+        customMsgObj.put("nodeIOName", nodeIOName);
+        customMsgObj.put("nodeNumber", accessNode.nodeNumber);
+        customMsgObj.put("bucket", bucket);
+        // In this case the string format is rendered before loglevel is determined, so we save nothing by calling
+        // MessageMap.format from within the masObj map assignment.
+        String msgStg = MessageFormat.format("using MessageMap - {0}: setService entered - nodeIOName={1} - nodeNumber={2} - bucket={3}", NAME, nodeIOName, accessNode.nodeNumber, bucket);
+        HashMap<String, Object> msgObj = new HashMap<>();
+        msgObj.put("message", msgStg);
+        msgObj.put("custom", customMsgObj);
+        ecslogger.info(new ObjectMessage(msgObj));
+	// {
+	//   "@timestamp": "2022-02-03T23:48:13.688Z",
+	//   "log.level": "INFO",
+	//   "custom": {
+	//     "bucket": "my-bucket",
+	//     "nodeIOName": null,
+	//     "nodeNumber": 7777
+	//   },
+	//   "message": "using MessageMap - CANCloudService: setService entered - nodeIOName=null - nodeNumber=7,777 - bucket=my-bucket",
+	//   "ecs.version": "1.2.0",
+	//   "service.name": "store",
+	//   "service.node.name": "store",
+	//   "event.dataset": "tomcat.store",
+	//   "process.thread.name": "localhost-startStop-1",
+	//   "log.logger": "org.cdlib.mrt.store.cloud.CANCloudService",
+	//   "log": {
+	//     "origin": {
+	//       "file": {
+	//         "name": "CANCloudService.java",
+	//         "line": 176
+	//       },
+	//       "function": "setService"
+	//     }
+	//   }
+	// }
+
+        
     }
     
+
     public VersionState addVersion (
                 //File objectStoreBase,
                 Identifier objectID,
@@ -160,6 +264,11 @@ public class CANCloudService
                     + " - objectID=" + objectID
                     , 10);
             ecslogger.debug("{}: addVersion entered - objectID={}", NAME, objectID);
+            //String msg = MessageFormat.format("{}: addVersion entered - objectID={}", NAME, objectID);
+            //ecslogger.debug(new StringMapMessage()
+            //    .with("message", msg)
+            //    .with("objectID", objectID)
+            //);
             return versionState;
         
         } catch (Exception ex) {
