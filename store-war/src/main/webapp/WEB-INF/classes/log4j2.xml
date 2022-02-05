@@ -8,10 +8,12 @@
           eventDataset="tomcat.store"
           includeMarkers="true"
           stackTraceAsArray="true"
-          includeOrigin="true"/>
+          includeOrigin="true">
+          <KeyValuePair key="fqsn" value="${env:FQSN}"/>
+      </EcsLayout>
     </Console>
 
-    <RollingFile name="ECS-File" fileName="logs/log4j-ecs-json2.log"
+    <RollingFile name="ECS-File" fileName="logs/log4j-ecs-json.log"
         filePattern="logs/log4j-ecs-json-%d{yyyy-MM-dd}-%i.log">
       <EcsLayout
           serviceName="store"
@@ -29,11 +31,13 @@
   </Appenders>
 
   <Loggers>
-    <Root level="info">
+    <!--<Root level="${sys:myloglevel:-info}">-->
+    <Root level="${env:TOMCAT_LOGLEVEL:-warn}">
       <AppenderRef ref="ECS-Console"/>
-      <!--<AppenderRef ref="ECS-File"/>-->
     </Root>
-    <Logger name="org.cdlib.mrt.store" level="debug"> <AppenderRef ref="ECS-File"/> </Logger>
+    <Logger name="org.cdlib.mrt.store" level="${env:TOMCAT_LOGLEVEL:-warn}">
+      <AppenderRef ref="ECS-File"/>
+    </Logger>
   </Loggers>
 </Configuration>
 

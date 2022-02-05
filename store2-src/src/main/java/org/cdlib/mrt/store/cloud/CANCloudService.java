@@ -217,7 +217,7 @@ public class CANCloudService
         HashMap<String, Object> msgObj = new HashMap<>();
         msgObj.put("message", msgStg);
         msgObj.put("custom", customMsgObj);
-        ecslogger.info(new ObjectMessage(msgObj));
+        ecslogger.debug(new ObjectMessage(msgObj));
 	// {
 	//   "@timestamp": "2022-02-03T23:48:13.688Z",
 	//   "log.level": "INFO",
