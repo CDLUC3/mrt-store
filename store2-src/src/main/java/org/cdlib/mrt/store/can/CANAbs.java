@@ -53,6 +53,9 @@ import org.cdlib.mrt.utility.TException;
 import org.cdlib.mrt.utility.PropertiesUtil;
 import org.cdlib.mrt.utility.StringUtil;
 
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 /**
  * Base CAN handling
  * @author dloy
@@ -62,6 +65,7 @@ public abstract class CANAbs
     protected static final String NAME = "CANAbs";
     protected static final String MESSAGE = NAME + ": ";
     protected final static String NL = System.getProperty("line.separator");
+    protected static Logger ecslogger = LogManager.getLogger();
 
     protected LoggerInf logger = null;
     //protected ObjectLocationInf objectLocation;
@@ -161,10 +165,12 @@ public abstract class CANAbs
             if (DEBUG) System.out.println(MESSAGE + "getCAN"
                     + " - nodeID=" + can.getNodeID()
                     );
+            ecslogger.debug("{}: getCAN - nodeID={}", NAME, can.getNodeID());
             return can;
 
         } catch (Exception ex) {
             logger.logError(StringUtil.stackTrace(ex), 10);
+            ecslogger.error(StringUtil.stackTrace(ex));
             ex.printStackTrace();
             throw new TException.INVALID_OR_MISSING_PARM(
                 "Unable to instantiate ObjecStore: Exception" + ex, ex);
@@ -209,6 +215,8 @@ public abstract class CANAbs
                 + " - isVerifyOnRead=" + nodeState.isVerifyOnRead()
                 + " - isVerifyOnWrite=" + nodeState.isVerifyOnWrite()
         );
+        ecslogger.info("{}: setCAN - before new CAN - nodeNumber={} - nodeDescription{} - isVerifyOnRead={} - isVerifyOnWrite={}", 
+		NAME, accessNode.nodeNumber, accessNode.nodeDescription, nodeState.isVerifyOnRead(), nodeState.isVerifyOnWrite());
    
         CANCloudService canCloudService = CANCloudService.getCANCloudService(accessNode, 
                 nodeState.isVerifyOnRead(), nodeState.isVerifyOnWrite(), logger);
@@ -217,6 +225,7 @@ public abstract class CANAbs
 
         if (DEBUG) System.out.println(MESSAGE + "setCAN - after new CAN"
                 + " - nodeID=" + can.getNodeID());
+        ecslogger.debug("{}: setCAN - after new CAN - nodeID={}", NAME, can.getNodeID());
         return can;
     }
 
@@ -247,6 +256,7 @@ public abstract class CANAbs
 
         if (DEBUG) System.out.println(MESSAGE + "setNode-"
                 + " - nodeID=" + nodeForm.getNodeID());
+        ecslogger.debug("{}: setNode - nodeID={}", NAME, nodeForm.getNodeID());
         return nodeForm;
 
 
@@ -265,6 +275,7 @@ public abstract class CANAbs
                 + " - nodeID=" + nodeID
         //        + " - " + PropertiesUtil.dumpProperties("", canProp, 50)
                 );
+        ecslogger.debug("{}: setCANForm - nodeID={}", NAME, nodeID);
         nodeForm.setNodeState(nodeState);
         nodeForm.setNodeID(nodeID);
         String protocol = nodeState.getAccessProtocol();
@@ -355,6 +366,7 @@ public abstract class CANAbs
                 isTemp = false;
             }
             if (DEBUG) System.out.println("isTempFile: " + path + " - isTemp=" + isTemp);
+            ecslogger.debug("{}: isTempFile: {} - isTemp={}", NAME, path, isTemp);
             return isTemp;
         } catch (Exception ex) {
             throw new TException(ex);
