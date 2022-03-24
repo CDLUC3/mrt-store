@@ -1,139 +1,134 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <groupId>org.cdlib.mrt</groupId>
-    <artifactId>mrt-storewar</artifactId>
-    <packaging>war</packaging>
-    <version>1.0-SNAPSHOT</version>
-    <name>UC3-mrtStorePub-war</name>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.cdlib.mrt</groupId>
+  <artifactId>mrt-storewar</artifactId>
+  <packaging>war</packaging>
+  <version>1.0-SNAPSHOT</version>
+  <name>UC3-mrtStorePub-war</name>
+  <url>http://uc3.cdlib.org</url>
 
-    <url>http://uc3.cdlib.org</url>
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <propertyDir>test</propertyDir>
+  </properties>
 
-    <!-- force UTF-8 -->
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <propertyDir>test</propertyDir>
-    </properties>
+  <profiles>
+    <profile>
+      <id>uc3</id>
+      <activation>
+      <activeByDefault>true</activeByDefault>
+      </activation>
+      <properties>
+        <warLocation>war/${propertyDir}</warLocation>
+        <warName>storage.war</warName>
+      </properties>
+    </profile>
+  </profiles>
 
-    <profiles>
-      <profile>
-          <id>uc3</id>
-          <activation>
-            <activeByDefault>true</activeByDefault>
-          </activation>
-          <properties>
-              <warLocation>war/${propertyDir}</warLocation>
-              <warName>storage.war</warName>
-          </properties>
-      </profile>
-    </profiles>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>copy</id>
+            <phase>install</phase>
+            <goals>
+              <goal>copy</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.cdlib.mrt</groupId>
+                  <artifactId>mrt-storewar</artifactId>
+                  <version>1.0-SNAPSHOT</version>
+                  <type>war</type>
+                  <overWrite>true</overWrite>
+                  <outputDirectory>./${warLocation}</outputDirectory>
+                  <destFileName>${warName}</destFileName>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 
-    <build>
-        <plugins>
+  <dependencies>
 
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>copy</id>
-                        <phase>install</phase>
-                        <goals>
-                            <goal>copy</goal>
-                        </goals>
-                        <configuration>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>org.cdlib.mrt</groupId>
-                                    <artifactId>mrt-storewar</artifactId>
+    <!-- Internal dependencies -->
+    <dependency>
+      <groupId>org.cdlib.mrt</groupId>
+      <artifactId>mrt-storeconf</artifactId>
+      <version>1.0-SNAPSHOT</version>
+    </dependency>
 
-                                    <version>1.0-SNAPSHOT</version>
-                                    <type>war</type>
-                                    <overWrite>true</overWrite>
-                                    <outputDirectory>./${warLocation}</outputDirectory>
-                                    <destFileName>${warName}</destFileName>
-                                </artifactItem>
+    <dependency>
+      <groupId>org.cdlib.mrt</groupId>
+      <artifactId>mrt-store2pub-src</artifactId>
+      <version>1.0-SNAPSHOT</version>
+    </dependency>
 
-                            </artifactItems>
+    <dependency>
+      <groupId>org.cdlib.mrt</groupId>
+      <artifactId>mrt-jena</artifactId>
+      <version>2.0-SNAPSHOT</version>
+    </dependency>
 
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
+    <!-- 3rd party dependencies -->
+    <dependency>
+      <groupId>asm</groupId>
+      <artifactId>asm</artifactId>
+      <version>3.1</version>
+    </dependency>
 
-    <dependencies>
-        
-        <dependency>
-            <groupId>org.glassfish.jersey.containers</groupId>
-            <artifactId>jersey-container-servlet</artifactId>
-            <version>2.25.1</version>
-        </dependency>
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
+      <version>2.4</version>
+      <scope>provided</scope>
+    </dependency>
 
-        <dependency>
-            <groupId>org.glassfish.jersey.media</groupId>
-            <artifactId>jersey-media-multipart</artifactId>
-            <version>2.25.1</version>
-        </dependency>
+    <dependency>
+      <groupId>org.glassfish.jersey.containers</groupId>
+      <artifactId>jersey-container-servlet</artifactId>
+      <version>2.25.1</version>
+    </dependency>
 
-        <dependency>
-            <groupId>org.glassfish.jersey.core</groupId>
-            <artifactId>jersey-client</artifactId>
-            <version>2.25.1</version>
-        </dependency>
-    
-        <dependency>
-            <groupId>org.cdlib.mrt</groupId>
-            <artifactId>mrt-storeconf</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
-        
-        <dependency>
-            <groupId>org.cdlib.mrt</groupId>
-            <artifactId>mrt-store2pub-src</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
-        
-        <dependency>
-            <groupId>org.cdlib.mrt</groupId>
-            <artifactId>mrt-jena</artifactId>
-            <version>2.0-SNAPSHOT</version>
-        </dependency>
+    <dependency>
+      <groupId>org.glassfish.jersey.core</groupId>
+      <artifactId>jersey-client</artifactId>
+      <version>2.25.1</version>
+    </dependency>
 
-        <dependency>
-            <groupId>asm</groupId>
-            <artifactId>asm</artifactId>
-            <version>3.1</version>
-        </dependency>
+    <dependency>
+      <groupId>org.glassfish.jersey.media</groupId>
+      <artifactId>jersey-media-multipart</artifactId>
+      <version>2.25.1</version>
+    </dependency>
 
-        <dependency>
-            <groupId>javax.servlet</groupId>
+    <dependency>
+      <groupId>org.apache.tika</groupId>
+      <artifactId>tika-core</artifactId>
+      <version>1.20</version>
+    </dependency>
 
-            <artifactId>servlet-api</artifactId>
-            <version>2.4</version>
-            <scope>provided</scope>
-        </dependency>
-  
-  <!-- upgrade tika handling >> -->
-        <dependency>
-            <groupId>org.apache.tika</groupId>
-            <artifactId>tika-core</artifactId>
-            <version>1.20</version>
-        </dependency>
-        
-        <dependency>
-            <groupId>xerces</groupId>
-            <artifactId>xercesImpl</artifactId>
-            <version>2.11.0</version>
-        </dependency>
-        
-        <dependency>
-            <groupId>xml-apis</groupId>
-            <artifactId>xml-apis</artifactId>
-            <version>1.4.01</version>
-        </dependency> 
-<!-- << upgrade tika handling -->
-    </dependencies>
+    <dependency>
+      <groupId>xerces</groupId>
+      <artifactId>xercesImpl</artifactId>
+      <version>2.11.0</version>
+    </dependency>
+
+    <dependency>
+      <groupId>xml-apis</groupId>
+      <artifactId>xml-apis</artifactId>
+      <version>1.4.01</version>
+    </dependency> 
+
+  </dependencies>
 
 </project>
