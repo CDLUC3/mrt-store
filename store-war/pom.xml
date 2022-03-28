@@ -59,8 +59,25 @@
   </build>
 
   <dependencies>
+    <dependency>
+      <groupId>asm</groupId>
+      <artifactId>asm</artifactId>
+      <version>3.1</version>
+    </dependency>
 
-    <!-- Internal dependencies -->
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
+      <version>2.4</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.tika</groupId>
+      <artifactId>tika-core</artifactId>
+      <version>1.20</version>
+    </dependency>
+
     <dependency>
       <groupId>org.cdlib.mrt</groupId>
       <artifactId>mrt-storeconf</artifactId>
@@ -77,20 +94,6 @@
       <groupId>org.cdlib.mrt</groupId>
       <artifactId>mrt-jena</artifactId>
       <version>2.0-SNAPSHOT</version>
-    </dependency>
-
-    <!-- 3rd party dependencies -->
-    <dependency>
-      <groupId>asm</groupId>
-      <artifactId>asm</artifactId>
-      <version>3.1</version>
-    </dependency>
-
-    <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>servlet-api</artifactId>
-      <version>2.4</version>
-      <scope>provided</scope>
     </dependency>
 
     <dependency>
@@ -112,12 +115,6 @@
     </dependency>
 
     <dependency>
-      <groupId>org.apache.tika</groupId>
-      <artifactId>tika-core</artifactId>
-      <version>1.20</version>
-    </dependency>
-
-    <dependency>
       <groupId>xerces</groupId>
       <artifactId>xercesImpl</artifactId>
       <version>2.11.0</version>
@@ -128,7 +125,6 @@
       <artifactId>xml-apis</artifactId>
       <version>1.4.01</version>
     </dependency> 
-
   </dependencies>
 
 </project>
