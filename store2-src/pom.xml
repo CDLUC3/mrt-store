@@ -49,6 +49,7 @@
   </build>
 
   <dependencies>
+
     <dependency>
       <groupId>javax.mail</groupId>
       <artifactId>mail</artifactId>
@@ -62,9 +63,27 @@
     </dependency>
 
     <dependency>
+      <groupId>javax.ws.rs</groupId>
+      <artifactId>javax.ws.rs-api</artifactId>
+      <version>2.0.1</version>
+    </dependency>
+
+    <dependency>
       <groupId>jaxen</groupId>
       <artifactId>jaxen</artifactId>
       <version>1.1.1</version>
+      <exclusions>
+        <exclusion>
+          <groupId>jdom</groupId>
+          <artifactId>jdom</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+    <dependency>
+      <groupId>org.jdom</groupId>
+      <artifactId>jdom</artifactId>
+      <version>1.1</version>
     </dependency>
 
     <dependency>
@@ -78,6 +97,18 @@
       <groupId>log4j</groupId>
       <artifactId>log4j</artifactId>
       <version>1.2.12</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.cdlib.mrt</groupId>
+      <artifactId>mrt-json</artifactId>
+      <version>2.0-SNAPSHOT</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.cdlib.mrt</groupId>
+      <artifactId>mrt-tools</artifactId>
+      <version>2.0-SNAPSHOT</version>
     </dependency>
 
     <dependency>
@@ -131,6 +162,12 @@
     <dependency>
       <groupId>org.glassfish.jersey.core</groupId>
       <artifactId>jersey-client</artifactId>
+      <version>2.25.1</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.glassfish.jersey.core</groupId>
+      <artifactId>jersey-server</artifactId>
       <version>2.25.1</version>
     </dependency>
 
