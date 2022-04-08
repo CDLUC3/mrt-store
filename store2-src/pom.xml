@@ -49,7 +49,6 @@
   </build>
 
   <dependencies>
-
     <dependency>
       <groupId>javax.mail</groupId>
       <artifactId>mail</artifactId>
@@ -68,6 +67,7 @@
       <version>2.0.1</version>
     </dependency>
 
+<!--
     <dependency>
       <groupId>jaxen</groupId>
       <artifactId>jaxen</artifactId>
@@ -79,6 +79,7 @@
         </exclusion>
       </exclusions>
     </dependency>
+-->
 
     <dependency>
       <groupId>org.jdom</groupId>
@@ -93,11 +94,13 @@
       <scope>test</scope>
     </dependency>
 
+<!--
     <dependency>
       <groupId>log4j</groupId>
       <artifactId>log4j</artifactId>
       <version>1.2.12</version>
     </dependency>
+-->
 
     <dependency>
       <groupId>org.cdlib.mrt</groupId>
@@ -115,6 +118,22 @@
       <groupId>org.apache.zookeeper</groupId>
       <artifactId>zookeeper</artifactId>
       <version>3.4.5</version>
+      <!-- we can drop these exclusions if we update version to 3.4.9 or higher -->
+      <!-- https://crunchify.com/maven-artifacts-error-jms-jmxtools-jmxri-dependencies -->
+      <exclusions>
+        <exclusion>
+          <groupId>com.sun.jmx</groupId>
+          <artifactId>jmxri</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>com.sun.jdmk</groupId>
+          <artifactId>jmxtools</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>javax.jms</groupId>
+          <artifactId>jms</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>
@@ -127,6 +146,7 @@
       <groupId>org.cdlib.mrt</groupId>
       <artifactId>mrt-cloudconf</artifactId>
       <version>1.0-SNAPSHOT</version>
+      <scope>runtime</scope>
     </dependency>
 
     <dependency>
@@ -151,19 +171,24 @@
       <groupId>org.cdlib.mrt</groupId>
       <artifactId>mrt-storeconf</artifactId>
       <version>1.0-SNAPSHOT</version>
+      <scope>runtime</scope>
     </dependency>
 
     <dependency>
+      <!-- should this get moved to store-war? -->
       <groupId>org.glassfish.jersey.containers</groupId>
       <artifactId>jersey-container-servlet</artifactId>
       <version>2.25.1</version>
+      <scope>runtime</scope>
     </dependency>
 
+<!--
     <dependency>
       <groupId>org.glassfish.jersey.core</groupId>
       <artifactId>jersey-client</artifactId>
       <version>2.25.1</version>
     </dependency>
+-->
 
     <dependency>
       <groupId>org.glassfish.jersey.core</groupId>
@@ -192,9 +217,14 @@
 </project>
 
 
-<!-- commented out dependencies -->
-    <!--dependency>
-      <groupId>net.sf</groupId>
-      <artifactId>jargs</artifactId>
-      <version>1.0</version>
-    </dependency-->
+<!--
+[INFO] - maven-dependency-plugin:2.1:analyze (default-cli) @ mrt-store2pub-src -
+[WARNING] Unused declared dependencies found:
+[WARNING]    jaxen:jaxen:jar:1.1.1:compile
+[WARNING]    log4j:log4j:jar:1.2.12:compile
+[WARNING]    org.cdlib.mrt:mrt-cloudconf:jar:1.0-SNAPSHOT:compile
+[WARNING]    org.cdlib.mrt:mrt-storeconf:jar:1.0-SNAPSHOT:compile
+[WARNING]    org.glassfish.jersey.containers:jersey-container-servlet:jar:2.25.1:compile
+[WARNING]    org.glassfish.jersey.core:jersey-client:jar:2.25.1:compile
+-->
+
