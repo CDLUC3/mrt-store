@@ -59,28 +59,6 @@
   </build>
 
   <dependencies>
-
-<!--
-    <dependency>
-      <groupId>asm</groupId>
-      <artifactId>asm</artifactId>
-      <version>3.1</version>
-    </dependency>
-
-    <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>servlet-api</artifactId>
-      <version>2.4</version>
-      <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.apache.tika</groupId>
-      <artifactId>tika-core</artifactId>
-      <version>1.20</version>
-    </dependency>
--->
-
     <dependency>
       <groupId>org.cdlib.mrt</groupId>
       <artifactId>mrt-storeconf</artifactId>
@@ -95,47 +73,12 @@
       <scope>runtime</scope>
     </dependency>
 
-<!--
-    <dependency>
-      <groupId>org.cdlib.mrt</groupId>
-      <artifactId>mrt-jena</artifactId>
-      <version>2.0-SNAPSHOT</version>
-    </dependency>
--->
-
     <dependency>
       <groupId>org.glassfish.jersey.containers</groupId>
       <artifactId>jersey-container-servlet</artifactId>
       <version>2.25.1</version>
       <scope>runtime</scope>
     </dependency>
-
-<!--
-    <dependency>
-      <groupId>org.glassfish.jersey.core</groupId>
-      <artifactId>jersey-client</artifactId>
-      <version>2.25.1</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.glassfish.jersey.media</groupId>
-      <artifactId>jersey-media-multipart</artifactId>
-      <version>2.25.1</version>
-    </dependency>
-
-    <dependency>
-      <groupId>xerces</groupId>
-      <artifactId>xercesImpl</artifactId>
-      <version>2.11.0</version>
-    </dependency>
-
-    <dependency>
-      <groupId>xml-apis</groupId>
-      <artifactId>xml-apis</artifactId>
-      <version>1.4.01</version>
-    </dependency> 
--->
-
   </dependencies>
 
 </project>
@@ -155,4 +98,11 @@
 [WARNING]    org.glassfish.jersey.media:jersey-media-multipart:jar:2.25.1:compile
 [WARNING]    xerces:xercesImpl:jar:2.11.0:compile
 [WARNING]    xml-apis:xml-apis:jar:1.4.01:compile
+
+Keeping as runtime:
+  org.cdlib.mrt:mrt-storeconf:jar:1.0-SNAPSHOT:runtime
+  org.cdlib.mrt:mrt-store2pub-src:jar:1.0-SNAPSHOT:runtime
+  org.glassfish.jersey.containers:jersey-container-servlet:jar:2.25.1:runtime
+    this is declared in store2-src/pom.xml also
+
 -->
