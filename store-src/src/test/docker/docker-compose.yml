@@ -1,0 +1,14 @@
+version: '3.9'
+services:
+  minio:
+    container_name: it-minio
+    image: minio/minio
+    ports:
+    - published: 8088
+      target: 9000
+    - published: 9001
+      target: 9001
+    environment:
+      MRT_MINIO_HOST: "${HOSTNAME}.cdlib.org"
+    entrypoint: sh
+    command: -c "mkdir -p /data/my-bucket /data/my-bucket-repl && minio server /data --address :9000 --console-address ':9001'"
