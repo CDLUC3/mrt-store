@@ -30,6 +30,7 @@ OF THE POSSIBILITY OF SUCH DAMAGE.
 package org.cdlib.mrt.cloud.action;
 
 import java.util.concurrent.Callable;
+import java.io.InputStream;
 
 import org.cdlib.mrt.cloud.VersionMap;
 import org.cdlib.mrt.cloud.utility.StoreMapStates;
@@ -162,6 +163,7 @@ public class DeleteObject
                 if (exception != null) return null;
                 if (DEBUG) System.out.println("Delete current:" + i);
             }
+            s3service.deleteManifest(bucket, objectID);
             return objectState;
 
         } catch(Exception ex) {
