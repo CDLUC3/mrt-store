@@ -136,14 +136,23 @@
       <dependency>
           <groupId>org.apache.zookeeper</groupId>
           <artifactId>zookeeper</artifactId>
-          <version>3.5.5</version>
+          <version>3.7.1</version>
           <!--
-          <version>3.4.5</version>
-          <version>3.5.5</version>
-          <version>3.6.2</version>
+          <version>3.4.5</version> works but warn
+          <version>3.4.14</version> works but warn
+          <version>3.5.5</version> fail
+          <version>3.5.9</version>  java.lang.NoClassDefFoundError: Could not initialize class org.apache.zookeeper.common.ClientX509Util
+          <version>3.6.3</version> java.lang.NoSuchMethodError: org.slf4j.helpers.MessageFormatter.arrayFormat(Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/String;
+          <version>3.7.0</version> works
+          <version>3.7.1</version> works
                     -->
       </dependency>
 
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>4.5.13</version>
+        </dependency>
       <dependency>
           <groupId>org.cdlib.mrt</groupId>
           <artifactId>cdl-zk-queue</artifactId>
