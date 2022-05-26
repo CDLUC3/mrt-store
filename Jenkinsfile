@@ -1,3 +1,4 @@
+
 @Library('merritt-build-library')
 import org.cdlib.mrt.build.BuildFunctions;
 
@@ -11,13 +12,13 @@ pipeline {
      */
     environment {      
       //Branch/tag names to incorporate into the build.  Create one var for each repo.
-      BRANCH_CORE = 'java-refactor'
+      BRANCH_CORE = 'main'
       BRANCH_CLOUD = 'main'
       BRANCH_ZK = 'main'
 
       //working vars
       M2DIR = "${HOME}/.m2-store"
-      DEF_BRANCH = "refactor"
+      DEF_BRANCH = "main"
     }
     agent any
 
