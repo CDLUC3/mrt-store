@@ -51,7 +51,11 @@
         <load-on-startup>${AccessDaemon}</load-on-startup>
     </servlet>
 
-
+    <servlet-mapping>
+        <servlet-name>default</servlet-name>
+        <url-pattern>/static/*</url-pattern>
+    </servlet-mapping>
+    
     <servlet-mapping>
         <servlet-name>Jersey Web Application</servlet-name>
         <url-pattern>/*</url-pattern>

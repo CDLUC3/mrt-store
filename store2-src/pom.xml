@@ -10,16 +10,14 @@
 
   <repositories>
     <repository>
-      <id>cdl-releases</id>
-      <url>http://mvn.cdlib.org/content/repositories/cdl-releases</url>
-    </repository>
-    <repository>
-      <id>cdl-snapshots</id>
-      <url>http://mvn.cdlib.org/content/repositories/cdl-snapshots</url>
-    </repository>
-    <repository>
-      <id>thirdparty</id>
-      <url>http://mvn.cdlib.org/content/repositories/thirdparty</url>
+      <id>central</id>
+      <url>https://repo1.maven.org/maven2/</url>
+      <releases>
+        <updatePolicy>never</updatePolicy>
+    </releases>
+    <snapshots>
+        <updatePolicy>never</updatePolicy>
+    </snapshots>
     </repository>
   </repositories>
 
@@ -74,11 +72,11 @@
           <version>2.0-SNAPSHOT</version>
       </dependency>
 
-      <dependency>
+      <!--dependency>
           <groupId>org.cdlib.mrt</groupId>
           <artifactId>mrt-jena</artifactId>
           <version>2.0-SNAPSHOT</version>
-      </dependency>
+      </dependency-->
 
       <dependency>
           <groupId>org.cdlib.mrt</groupId>
@@ -132,15 +130,29 @@
       <dependency>
         <groupId>log4j</groupId>
         <artifactId>log4j</artifactId>
-        <version>1.2.12</version>
+        <version>1.2.17</version>
       </dependency>
 
       <dependency>
           <groupId>org.apache.zookeeper</groupId>
           <artifactId>zookeeper</artifactId>
-          <version>3.4.5</version>
+          <version>3.7.1</version>
+          <!--
+          <version>3.4.5</version> works but warn
+          <version>3.4.14</version> works but warn
+          <version>3.5.5</version> fail
+          <version>3.5.9</version>  java.lang.NoClassDefFoundError: Could not initialize class org.apache.zookeeper.common.ClientX509Util
+          <version>3.6.3</version> java.lang.NoSuchMethodError: org.slf4j.helpers.MessageFormatter.arrayFormat(Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/String;
+          <version>3.7.0</version> works
+          <version>3.7.1</version> works
+                    -->
       </dependency>
 
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>4.5.13</version>
+        </dependency>
       <dependency>
           <groupId>org.cdlib.mrt</groupId>
           <artifactId>cdl-zk-queue</artifactId>
