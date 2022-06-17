@@ -26,6 +26,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <propertyDir>test</propertyDir>
+        <embedded_tomcat.version>8.5.2</embedded_tomcat.version>
     </properties>
 
     <profiles>
@@ -170,6 +171,24 @@
             <version>4.5.13</version>
         </dependency>   
         
+        <dependency>
+            <groupId>org.apache.tomcat.embed</groupId>
+            <artifactId>tomcat-embed-core</artifactId>
+            <version>${embedded_tomcat.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.tomcat.embed</groupId>
+            <artifactId>tomcat-embed-jasper</artifactId>
+            <scope>test</scope>
+            <version>${embedded_tomcat.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.tomcat.embed</groupId>
+            <artifactId>tomcat-embed-logging-juli</artifactId>
+            <scope>test</scope>
+            <version>${embedded_tomcat.version}</version>
+        </dependency>
 <!-- << upgrade tika handling -->
     </dependencies>
 
