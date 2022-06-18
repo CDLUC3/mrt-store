@@ -35,9 +35,9 @@
                 <!--module>store-src</module-->
                 <module>store2-src</module>
                 <module>store-war</module>
+                <module>store-war-it</module>
             </modules>
         </profile>
      </profiles>
     
 </project>
-

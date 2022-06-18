@@ -3,3 +3,4 @@ target/
 .project
 .classpath
 */.gitignore
+store-war/war/test/storage.war
