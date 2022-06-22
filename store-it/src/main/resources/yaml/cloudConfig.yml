@@ -1,0 +1,31 @@
+---
+node-table: "nodes-pairtree-docker"
+services: &services
+  aws-near: &aws-near
+    type: aws-near
+    service-properties:
+      serviceType: aws
+      accessMode: near-line
+      region: us-west-2
+
+  minio-docker: &minio-docker
+    type: minio-docker
+    service-properties:
+      serviceType: minio
+      endPoint: "http://minio-server:9000"
+      accessKey: minioadmin
+      secretKey: minioadmin
+
+nodes-tables:
+
+  nodes-pairtree-docker:
+      - # Minio Docker
+        identifier: 7777
+        <<: *minio-docker
+        bucket: my-bucket
+        desc: "docker minio 7777"
+      - # Minio Docker Replic
+        identifier: 8888
+        <<: *minio-docker
+        bucket: my-bucket-repl
+        desc: "docker minio 8888"
