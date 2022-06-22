@@ -1,5 +1,8 @@
 package org.cdlib.mrt.store;
 
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+
 import org.junit.Test;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.LifecycleException;
@@ -22,21 +25,28 @@ import java.io.IOException;
 import static org.junit.Assert.*;
 
 public class EmbedTestIT {
-    private Tomcat tomcat;
-    private int port = 8080;
-    private String cp = "/embedded-jar";
+    private static Tomcat tomcat;
+    private static int port = 9999;
+    private static String cp = "/embedded-jar";
 
-    public EmbedTestIT() throws LifecycleException, ServletException, InterruptedException {
+    @BeforeClass
+    public static void initTomcat() throws LifecycleException, ServletException, InterruptedException {
         tomcat = new Tomcat();
+        
         tomcat.setPort(port);
 
-        tomcat.addWebapp(cp, new File("target/mrt-storewar-it-1.0-SNAPSHOT").getAbsolutePath());
+        Context context = tomcat.addWebapp(cp, new File("target/mrt-storewar-it-1.0-SNAPSHOT").getAbsolutePath());
+        context.setPrivileged(true);
 
         tomcat.start();
 
         System.out.println("Tomcat started");
-        Thread.sleep(100000);
+        Thread.sleep(4000);
+    }
 
+    @AfterClass
+    public static void stopTomcat() throws LifecycleException {
+        tomcat.stop();
     }
 
     public String getContent(String url) {
@@ -53,6 +63,13 @@ public class EmbedTestIT {
     @Test
     public void SimpleTest() {
         String url = String.format("http://localhost:%d/%s/state", port, cp);
+        String s = getContent(url);
+        System.out.println(s);
+    }
+
+    @Test
+    public void SimpleTestStatic() {
+        String url = String.format("http://localhost:%d/%s/static/test.txt", port, cp);
         String s = getContent(url);
         System.out.println(s);
     }
