@@ -1,0 +1,24 @@
+version: '3.9'
+networks:
+  merrittnet:
+services:
+  minio-server:
+    container_name: minio-server
+    image: ${ECR_REGISTRY}/mrt-minio-it:dev
+    ports:
+    - published: 9000
+      target: 9000
+    - published: 9001
+      target: 9001
+    networks:
+      merrittnet:
+  it-service:
+    container_name: it-service
+    image: tomcat:8
+    volumes:
+    - "${MDIR}/store-it/target/mrt-store-it-1.0-SNAPSHOT.war:/usr/local/tomcat/webapps/store.war"
+    ports:
+    - published: 8080
+      target: 8080
+    networks:
+      merrittnet:
