@@ -132,6 +132,9 @@
                         <volume>${project.basedir}/target/mrt-store-it-1.0-SNAPSHOT.war:/usr/local/tomcat/webapps/store.war</volume>
                       </bind>
                     </volumes>
+                    <env>
+                      <CATALINA_OPTS>-Dfile.encoding=UTF8 -Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true</CATALINA_OPTS>
+                    </env>
                   </run>
                 </image>
               </images>
