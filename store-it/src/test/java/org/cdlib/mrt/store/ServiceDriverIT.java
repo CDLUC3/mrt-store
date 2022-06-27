@@ -4,6 +4,7 @@ import org.junit.Test;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+import org.apache.commons.lang3.CharSet;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -22,6 +23,8 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.Writer;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -80,22 +83,12 @@ public class ServiceDriverIT {
                 assertTrue(json.has("nod:nodeState"));
         }
 
-        @Test
-        public void addObject() throws IOException, JSONException, ParserConfigurationException, SAXException {
-                String ark = "ark%3A%2F1111%2F2222";
-                String url = String.format("http://localhost:%d/%s/add/7777/%s", port, cp, ark);
+        public JSONObject addObjectByManifest(String url, String checkm) throws IOException, JSONException {
                 try (CloseableHttpClient client = HttpClients.createDefault()) {
                         HttpPost post = new HttpPost(url);
-
-                        List<NameValuePair> params = new ArrayList<NameValuePair>();
-                        params.add(new BasicNameValuePair("url", "https://raw.githubusercontent.com/CDLUC3/mrt-doc/main/sampleFiles/4blocks.checkm"));
-                        params.add(new BasicNameValuePair("responseForm", "json"));
-                        post.setEntity(new UrlEncodedFormEntity(params));
-                        
                         MultipartEntityBuilder builder = MultipartEntityBuilder.create();
                         builder.addBinaryBody(
-                          //"manifest", new File("src/test/resources/test.checkm"), ContentType.APPLICATION_OCTET_STREAM, "file.ext"
-                          "manifest", new File("src/main/webapp/static/test.checkm"), ContentType.APPLICATION_OCTET_STREAM, "file.ext"
+                          "manifest", new File(checkm), ContentType.APPLICATION_OCTET_STREAM, "file.checkm"
                         );
                         builder.addTextBody("responseForm", "json");
                         HttpEntity multipart = builder.build();
@@ -106,24 +99,49 @@ public class ServiceDriverIT {
     
                         String s = new BasicResponseHandler().handleResponse(response).trim();
                         assertFalse(s.isEmpty());
-                        System.out.println(s);
 
                         JSONObject json =  new JSONObject(s);
                         assertNotNull(json);
                         assertTrue(json.has("ver:versionState"));
-
-                        url = String.format("http://localhost:%d/%s/state/7777/%s?t=json", port, cp, ark);
-                        json = getJsonContent(url);
-                        System.out.println(json.toString());
-                        assertTrue(json.has("obj:objectState"));
-
-                        url = String.format("http://localhost:%d/%s/manifest/7777/%s", port, cp, ark);
-                        s = getContent(url);
-                        DocumentBuilder db = DocumentBuilderFactory.newDefaultInstance().newDocumentBuilder();
-                        Document d = db.parse(new InputSource(new StringReader(s)));
-                        assertEquals("objectInfo", d.getDocumentElement().getTagName());
-                        System.out.println(s);
+                        return json;
                 }
+
+        }
+
+        public void verifyVersion(JSONObject json, String ark, int version, int fileCount) throws JSONException {
+                assertTrue(json.has("ver:versionState"));
+                JSONObject v = json.getJSONObject("ver:versionState");
+                assertTrue(v.getString("ver:version").contains(ark));
+                assertEquals(version, v.getInt("ver:identifier"));
+                assertEquals(fileCount, v.getInt("ver:numFiles"));
+        }
+
+        public void verifyObject(JSONObject json, String ark, int version, int fileCount) throws JSONException {
+                assertTrue(json.has("obj:objectState"));
+                JSONObject v = json.getJSONObject("obj:objectState");
+                assertEquals(ark, v.getString("obj:identifier"));
+                assertEquals(version, v.getInt("obj:numVersions"));
+                assertEquals(fileCount, v.getInt("obj:numFiles"));
+        }
+
+        @Test
+        public void AddObjectTest() throws IOException, JSONException, ParserConfigurationException, SAXException {
+                String ark = "ark:/1111/2222";
+                String ark_enc = URLEncoder.encode(ark, StandardCharsets.UTF_8);
+                String url = String.format("http://localhost:%d/%s/add/7777/%s", port, cp, ark_enc);
+                String checkm = "src/main/webapp/static/test.checkm";
+                JSONObject json = addObjectByManifest(url, checkm);
+                verifyVersion(json, ark_enc, 1, 8);
+
+                url = String.format("http://localhost:%d/%s/state/7777/%s?t=json", port, cp, ark_enc);
+                json = getJsonContent(url);
+                verifyObject(json, ark, 1, 8);
+
+                url = String.format("http://localhost:%d/%s/manifest/7777/%s", port, cp, ark_enc);
+                String s = getContent(url);
+                DocumentBuilder db = DocumentBuilderFactory.newDefaultInstance().newDocumentBuilder();
+                Document d = db.parse(new InputSource(new StringReader(s)));
+                assertEquals("objectInfo", d.getDocumentElement().getTagName());
         }
 
 }
