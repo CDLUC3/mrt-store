@@ -146,7 +146,14 @@ public class ServiceDriverIT {
                 JSONObject v = json.getJSONObject("obj:objectState");
                 assertEquals(ark, v.getString("obj:identifier"));
                 assertEquals(version, v.getInt("obj:numVersions"));
-                assertEquals(fileCount, v.getInt("obj:numFiles"));
+                assertEquals(fileCount, v.getInt("obj:numActualFiles"));
+        }
+
+        public void verifyFile(JSONObject json, String path, int size) throws JSONException {
+                assertTrue(json.has("fil:fileState"));
+                JSONObject v = json.getJSONObject("fil:fileState");
+                assertEquals(path, v.getString("fil:identifier"));
+                assertEquals(size, v.getInt("fil:size"));
         }
 
         public void verifyObjectInfo(Document d, String ark, int version, int fileCount) throws JSONException, XPathExpressionException {
@@ -157,7 +164,7 @@ public class ServiceDriverIT {
                 expr = xpath.compile("/objectInfo/object/current/text()");
                 result = expr.evaluate(d, XPathConstants.STRING).toString();
                 assertEquals(version, Integer.parseInt(result));
-                expr = xpath.compile("/objectInfo/object/fileCount/text()");
+                expr = xpath.compile("/objectInfo/object/actualCount/text()");
                 result = expr.evaluate(d, XPathConstants.STRING).toString();
                 assertEquals(fileCount, Integer.parseInt(result));
         }
@@ -175,7 +182,16 @@ public class ServiceDriverIT {
                         cp, 
                         URLEncoder.encode(ark, StandardCharsets.UTF_8)
                 );
-         }
+        }
+
+        public String updateUrl(String ark) {
+                return String.format(
+                        "http://localhost:%d/%s/update/7777/%s", 
+                        port, 
+                        cp, 
+                        URLEncoder.encode(ark, StandardCharsets.UTF_8)
+                );
+        }
 
         public String deleteUrl(String ark) {
                 return String.format(
@@ -205,6 +221,17 @@ public class ServiceDriverIT {
                 );
         }
 
+        public String stateUrl(String ark, int version, String path) {
+                return String.format(
+                        "http://localhost:%d/%s/state/7777/%s/%d/%s?t=json", 
+                        port, 
+                        cp, 
+                        URLEncoder.encode(ark, StandardCharsets.UTF_8),
+                        version,
+                        URLEncoder.encode(path, StandardCharsets.UTF_8)
+                );
+        }
+
         public String manifestUrl(String ark) {
                 return String.format(
                         "http://localhost:%d/%s/manifest/7777/%s", 
@@ -229,6 +256,10 @@ public class ServiceDriverIT {
                         json = getJsonContent(stateUrl(ark, 1), 200);
                         verifyVersion(json, ark, 1, 8);
         
+                        String path = "producer/hello.txt";
+                        json = getJsonContent(stateUrl(ark, 1, path), 200);
+                        verifyFile(json, path, 5);
+
                         String s = getContent(manifestUrl(ark), 200);
                         Document d = getDocument(s, "objectInfo");
                         verifyObjectInfo(d, ark, 1, 8);        
@@ -248,15 +279,23 @@ public class ServiceDriverIT {
                         JSONObject json = addObjectByManifest(addUrl(ark), checkm);
                         verifyVersion(json, ark, 1, 8);
         
-                        json = addObjectByManifest(addUrl(ark), checkmv2);
-                        verifyVersion(json, ark, 2, 1);
+                        json = addObjectByManifest(updateUrl(ark), checkmv2);
+                        verifyVersion(json, ark, 2, 9);
 
                         json = getJsonContent(stateUrl(ark), 200);
                         verifyObject(json, ark, 2, 9);
         
                         json = getJsonContent(stateUrl(ark, 2), 200);
-                        verifyVersion(json, ark, 2, 1);
+                        verifyVersion(json, ark, 2, 9);
         
+                        String path = "producer/hello.txt";
+                        json = getJsonContent(stateUrl(ark, 1, path), 200);
+                        verifyFile(json, path, 5);
+
+                        path = "producer/hello2.txt";
+                        json = getJsonContent(stateUrl(ark, 2, path), 200);
+                        verifyFile(json, path, 5);
+
                         String s = getContent(manifestUrl(ark), 200);
                         Document d = getDocument(s, "objectInfo");
                         verifyObjectInfo(d, ark, 2, 9);        
