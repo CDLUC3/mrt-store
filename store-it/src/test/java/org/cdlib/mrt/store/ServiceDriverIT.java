@@ -276,6 +276,15 @@ public class ServiceDriverIT {
                 );
         }
 
+        public String downloadProducerUrl(String ark) {
+                return String.format(
+                        "http://localhost:%d/%s/producer/7777/%s?t=zip", 
+                        port, 
+                        cp, 
+                        URLEncoder.encode(ark, StandardCharsets.UTF_8)
+                );
+        }
+
         public String stateUrl(String ark, int version) {
                 return String.format(
                         "http://localhost:%d/%s/state/7777/%s/%d?t=json", 
@@ -344,7 +353,12 @@ public class ServiceDriverIT {
                         verifyObjectFixity(json);
 
                         List<String> entries = getZipContent(downloadObjectUrl(ark), 200);
+                        assertEquals(9, entries.size());
                         assertTrue(entries.contains("ark+=1111=2222/1/producer/hello.txt"));
+
+                        entries = getZipContent(downloadProducerUrl(ark), 200);
+                        assertEquals(1, entries.size());
+                        assertTrue(entries.contains("hello.txt"));
 
                         json = getJsonContent(stateUrl(ark, 1), 200);
                         verifyVersion(json, ark, 1, 8);
@@ -385,8 +399,14 @@ public class ServiceDriverIT {
                         verifyObject(json, ark, 2, 9);
         
                         List<String> entries = getZipContent(downloadObjectUrl(ark), 200);
+                        assertEquals(18, entries.size());
                         assertTrue(entries.contains("ark+=1111=3333/1/producer/hello.txt"));
                         assertTrue(entries.contains("ark+=1111=3333/2/producer/hello2.txt"));
+
+                        entries = getZipContent(downloadProducerUrl(ark), 200);
+                        assertEquals(2, entries.size());
+                        assertTrue(entries.contains("hello.txt"));
+                        assertTrue(entries.contains("hello2.txt"));
 
                         json = getJsonContent(stateUrl(ark, 2), 200);
                         verifyVersion(json, ark, 2, 9);
