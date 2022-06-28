@@ -4,6 +4,7 @@ import org.junit.Test;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpResponseException;
@@ -15,6 +16,7 @@ import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -149,11 +151,31 @@ public class ServiceDriverIT {
                 assertEquals(fileCount, v.getInt("obj:numActualFiles"));
         }
 
+        public void verifyObjectFixity(JSONObject json) throws JSONException {
+                assertTrue(json.has("ofix:objectFixityState"));
+                JSONObject v = json.getJSONObject("ofix:objectFixityState");
+                assertTrue(v.getBoolean("ofix:match"));
+        }
+
         public void verifyFile(JSONObject json, String path, int size) throws JSONException {
                 assertTrue(json.has("fil:fileState"));
                 JSONObject v = json.getJSONObject("fil:fileState");
                 assertEquals(path, v.getString("fil:identifier"));
                 assertEquals(size, v.getInt("fil:size"));
+        }
+
+        public void verifyFileFixity(JSONObject json, String hash) throws JSONException {
+                assertTrue(json.has("fix:fileFixityState"));
+                JSONObject v = json.getJSONObject("fix:fileFixityState");
+                assertEquals(hash, v.getString("fix:fileDigest"));
+                JSONArray arr = v.getJSONArray("fix:sizeMatches");
+                for(int i=0; i<arr.length(); i++) {
+                        assertTrue(arr.getBoolean(i));
+                }
+                arr = v.getJSONArray("fix:digestMatches");
+                for(int i=0; i<arr.length(); i++) {
+                        assertTrue(arr.getBoolean(i));
+                }
         }
 
         public void verifyObjectInfo(Document d, String ark, int version, int fileCount) throws JSONException, XPathExpressionException {
@@ -211,6 +233,15 @@ public class ServiceDriverIT {
                 );
         }
 
+        public String fixityUrl(String ark) {
+                return String.format(
+                        "http://localhost:%d/%s/fixity/7777/%s?t=json", 
+                        port, 
+                        cp, 
+                        URLEncoder.encode(ark, StandardCharsets.UTF_8)
+                );
+        }
+
         public String stateUrl(String ark, int version) {
                 return String.format(
                         "http://localhost:%d/%s/state/7777/%s/%d?t=json", 
@@ -224,6 +255,28 @@ public class ServiceDriverIT {
         public String stateUrl(String ark, int version, String path) {
                 return String.format(
                         "http://localhost:%d/%s/state/7777/%s/%d/%s?t=json", 
+                        port, 
+                        cp, 
+                        URLEncoder.encode(ark, StandardCharsets.UTF_8),
+                        version,
+                        URLEncoder.encode(path, StandardCharsets.UTF_8)
+                );
+        }
+
+        public String fixityUrl(String ark, int version, String path) {
+                return String.format(
+                        "http://localhost:%d/%s/fixity/7777/%s/%d/%s?t=json", 
+                        port, 
+                        cp, 
+                        URLEncoder.encode(ark, StandardCharsets.UTF_8),
+                        version,
+                        URLEncoder.encode(path, StandardCharsets.UTF_8)
+                );
+        }
+
+        public String downloadUrl(String ark, int version, String path) {
+                return String.format(
+                        "http://localhost:%d/%s/content/7777/%s/%d/%s?t=json", 
                         port, 
                         cp, 
                         URLEncoder.encode(ark, StandardCharsets.UTF_8),
@@ -252,7 +305,10 @@ public class ServiceDriverIT {
         
                         json = getJsonContent(stateUrl(ark), 200);
                         verifyObject(json, ark, 1, 8);
-        
+
+                        json = getJsonContent(fixityUrl(ark), 200);
+                        verifyObjectFixity(json);
+
                         json = getJsonContent(stateUrl(ark, 1), 200);
                         verifyVersion(json, ark, 1, 8);
         
@@ -260,7 +316,13 @@ public class ServiceDriverIT {
                         json = getJsonContent(stateUrl(ark, 1, path), 200);
                         verifyFile(json, path, 5);
 
-                        String s = getContent(manifestUrl(ark), 200);
+                        json = getJsonContent(fixityUrl(ark, 1, path), 200);
+                        verifyFileFixity(json, "sha256=2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824");
+
+                        String s = getContent(downloadUrl(ark, 1, path), 200);
+                        assertEquals("hello", s);
+
+                        s = getContent(manifestUrl(ark), 200);
                         Document d = getDocument(s, "objectInfo");
                         verifyObjectInfo(d, ark, 1, 8);        
                 } finally {
