@@ -203,6 +203,13 @@ public class ServiceDriverIT {
                 }
         }
 
+        public void verifyPresignFile(JSONObject json) throws JSONException {
+                assertEquals("Presigned URL created", json.get("message"));
+                assertTrue(json.has("expires"));
+                assertTrue(json.has("url"));
+                assertEquals(200, json.getInt("status"));
+        }
+
         public void verifyObjectInfo(Document d, String ark, int version, int fileCount) throws JSONException, XPathExpressionException {
                 XPath xpath = xpathfactory.newXPath();
                 XPathExpression expr = xpath.compile("/objectInfo/object/@id");
@@ -328,6 +335,16 @@ public class ServiceDriverIT {
                 );
         }
 
+        public String presignFileUrl(String ark, int version, String path) {
+                String key = String.format("%s|%d|%s", ark, version, path);
+                return String.format(
+                        "http://localhost:%d/%s/presign-file/7777/%s", 
+                        port, 
+                        cp, 
+                        URLEncoder.encode(key, StandardCharsets.UTF_8)
+                );
+        }
+
         public String manifestUrl(String ark) {
                 return String.format(
                         "http://localhost:%d/%s/manifest/7777/%s", 
@@ -372,6 +389,9 @@ public class ServiceDriverIT {
 
                         String s = getContent(downloadUrl(ark, 1, path), 200);
                         assertEquals("hello", s);
+
+                        json = getJsonContent(presignFileUrl(ark, 1, path), 200);
+                        verifyPresignFile(json);
 
                         s = getContent(manifestUrl(ark), 200);
                         Document d = getDocument(s, "objectInfo");
