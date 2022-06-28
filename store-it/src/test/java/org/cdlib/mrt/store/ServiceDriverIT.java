@@ -21,8 +21,13 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -78,6 +83,26 @@ public class ServiceDriverIT {
                 assertNotNull(json);
                 return json;
         }
+
+        public List<String> getZipContent(String url, int status) throws HttpResponseException, IOException {
+                try (CloseableHttpClient client = HttpClients.createDefault()) {
+                    HttpGet request = new HttpGet(url);
+                    HttpResponse response = client.execute(request);
+                    assertEquals(status, response.getStatusLine().getStatusCode());
+
+                    List<String> entries = new ArrayList<>();
+                    if (status < 300) {
+                            try(ZipInputStream zis = new ZipInputStream(response.getEntity().getContent())){
+                                    for(ZipEntry ze = zis.getNextEntry(); ze != null; ze = zis.getNextEntry()) {
+                                            entries.add(ze.getName());
+                                    }
+                            }
+                    }
+
+                    return entries;
+                }
+        }
+
 
         @Test
         public void SimpleTest() throws IOException, JSONException {
@@ -242,6 +267,15 @@ public class ServiceDriverIT {
                 );
         }
 
+        public String downloadObjectUrl(String ark) {
+                return String.format(
+                        "http://localhost:%d/%s/content/7777/%s?t=zip", 
+                        port, 
+                        cp, 
+                        URLEncoder.encode(ark, StandardCharsets.UTF_8)
+                );
+        }
+
         public String stateUrl(String ark, int version) {
                 return String.format(
                         "http://localhost:%d/%s/state/7777/%s/%d?t=json", 
@@ -309,6 +343,9 @@ public class ServiceDriverIT {
                         json = getJsonContent(fixityUrl(ark), 200);
                         verifyObjectFixity(json);
 
+                        List<String> entries = getZipContent(downloadObjectUrl(ark), 200);
+                        assertTrue(entries.contains("ark+=1111=2222/1/producer/hello.txt"));
+
                         json = getJsonContent(stateUrl(ark, 1), 200);
                         verifyVersion(json, ark, 1, 8);
         
@@ -347,6 +384,10 @@ public class ServiceDriverIT {
                         json = getJsonContent(stateUrl(ark), 200);
                         verifyObject(json, ark, 2, 9);
         
+                        List<String> entries = getZipContent(downloadObjectUrl(ark), 200);
+                        assertTrue(entries.contains("ark+=1111=3333/1/producer/hello.txt"));
+                        assertTrue(entries.contains("ark+=1111=3333/2/producer/hello2.txt"));
+
                         json = getJsonContent(stateUrl(ark, 2), 200);
                         verifyVersion(json, ark, 2, 9);
         
