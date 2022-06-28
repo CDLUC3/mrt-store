@@ -26,6 +26,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -223,6 +224,21 @@ public class ServiceDriverIT {
                 assertEquals(fileCount, Integer.parseInt(result));
         }
 
+        public void verifyVersionLink(JSONObject json, String ark, int fileCount) throws JSONException {
+                assertEquals(ark, json.get("objectID"));
+                assertEquals(fileCount, json.getInt("versionFileCnt"));
+        }
+
+        public void verifyIngestLink(String s, int fileCount) {
+                int files = 0;
+                for(String row: s.split("\n")) {
+                        if (row.matches("^http.*")) {
+                                files++;
+                        }
+                }
+                assertEquals(fileCount, files);
+        }
+
         public Document getDocument(String body, String tag) throws SAXException, IOException {
                 Document d = db.parse(new InputSource(new StringReader(body)));
                 assertEquals(tag, d.getDocumentElement().getTagName());
@@ -302,6 +318,26 @@ public class ServiceDriverIT {
                 );
         }
 
+        public String ingestLinkUrl(String ark, int version) {
+                return String.format(
+                        "http://localhost:%d/%s/ingestlink/7777/%s/%d", 
+                        port, 
+                        cp, 
+                        URLEncoder.encode(ark, StandardCharsets.UTF_8),
+                        version
+                );
+        }
+
+        public String versionLinkUrl(String ark, int version) {
+                return String.format(
+                        "http://localhost:%d/%s/versionlink/7777/%s/%d", 
+                        port, 
+                        cp, 
+                        URLEncoder.encode(ark, StandardCharsets.UTF_8),
+                        version
+                );
+        }
+
         public String stateUrl(String ark, int version, String path) {
                 return String.format(
                         "http://localhost:%d/%s/state/7777/%s/%d/%s?t=json", 
@@ -361,33 +397,41 @@ public class ServiceDriverIT {
 
                 try {
                         JSONObject json = addObjectByManifest(addUrl(ark), checkm);
+                        //Version 1 has 8 files
                         verifyVersion(json, ark, 1, 8);
         
                         json = getJsonContent(stateUrl(ark), 200);
+                        //Version 1 has 8 files
                         verifyObject(json, ark, 1, 8);
 
                         json = getJsonContent(fixityUrl(ark), 200);
                         verifyObjectFixity(json);
 
                         List<String> entries = getZipContent(downloadObjectUrl(ark), 200);
+                        //Entry list has 8 files + a manifest
                         assertEquals(9, entries.size());
                         assertTrue(entries.contains("ark+=1111=2222/1/producer/hello.txt"));
 
                         entries = getZipContent(downloadProducerUrl(ark), 200);
+                        //Entry list has 1 producer file
                         assertEquals(1, entries.size());
                         assertTrue(entries.contains("hello.txt"));
 
                         json = getJsonContent(stateUrl(ark, 1), 200);
+                        //Version 1 has 8 files
                         verifyVersion(json, ark, 1, 8);
         
                         String path = "producer/hello.txt";
                         json = getJsonContent(stateUrl(ark, 1, path), 200);
+                        //hello.txt has 5 bytes
                         verifyFile(json, path, 5);
 
                         json = getJsonContent(fixityUrl(ark, 1, path), 200);
+                        //hello.txt has the checksum listed below
                         verifyFileFixity(json, "sha256=2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824");
 
                         String s = getContent(downloadUrl(ark, 1, path), 200);
+                        //hello.txt contains the string "hello"
                         assertEquals("hello", s);
 
                         json = getJsonContent(presignFileUrl(ark, 1, path), 200);
@@ -395,7 +439,13 @@ public class ServiceDriverIT {
 
                         s = getContent(manifestUrl(ark), 200);
                         Document d = getDocument(s, "objectInfo");
+                        //object manifest has 8 files
                         verifyObjectInfo(d, ark, 1, 8);        
+
+                        s = getContent(ingestLinkUrl(ark, 1), 200);
+                        //ingest link has 1 file + a manifest
+                        verifyIngestLink(s, 2);
+                        assertFalse(s.isEmpty());
                 } finally {
                         deleteObject(deleteUrl(ark));
                         getContent(stateUrl(ark), 404);        
@@ -410,38 +460,56 @@ public class ServiceDriverIT {
 
                 try {
                         JSONObject json = addObjectByManifest(addUrl(ark), checkm);
+                        //version 1 has 8 files
                         verifyVersion(json, ark, 1, 8);
         
                         json = addObjectByManifest(updateUrl(ark), checkmv2);
+                        //version 2 has 9 files (8+1)
                         verifyVersion(json, ark, 2, 9);
 
                         json = getJsonContent(stateUrl(ark), 200);
+                        //object has 9 files
                         verifyObject(json, ark, 2, 9);
         
                         List<String> entries = getZipContent(downloadObjectUrl(ark), 200);
+                        //object zip file has 18 entries: 8 (v1) + 9 (v2) + 1 (manifest)
                         assertEquals(18, entries.size());
                         assertTrue(entries.contains("ark+=1111=3333/1/producer/hello.txt"));
                         assertTrue(entries.contains("ark+=1111=3333/2/producer/hello2.txt"));
 
                         entries = getZipContent(downloadProducerUrl(ark), 200);
+                        //producer zip file has 2 entries
                         assertEquals(2, entries.size());
                         assertTrue(entries.contains("hello.txt"));
                         assertTrue(entries.contains("hello2.txt"));
 
                         json = getJsonContent(stateUrl(ark, 2), 200);
+                        //version 2 has 9 files
                         verifyVersion(json, ark, 2, 9);
         
                         String path = "producer/hello.txt";
                         json = getJsonContent(stateUrl(ark, 1, path), 200);
+                        //file hello.txt is 5 bytes
                         verifyFile(json, path, 5);
 
                         path = "producer/hello2.txt";
                         json = getJsonContent(stateUrl(ark, 2, path), 200);
+                        //file hello.txt is 5 bytes
                         verifyFile(json, path, 5);
 
                         String s = getContent(manifestUrl(ark), 200);
                         Document d = getDocument(s, "objectInfo");
-                        verifyObjectInfo(d, ark, 2, 9);        
+                        //object manifest has 9 files
+                        verifyObjectInfo(d, ark, 2, 9);
+                        
+                        s = getContent(ingestLinkUrl(ark, 2), 200);
+                        //ingest link has 2 files + a manifest
+                        verifyIngestLink(s, 3);
+                        assertFalse(s.isEmpty());
+
+                        json = getJsonContent(versionLinkUrl(ark, 2), 200);
+                        //version link has 9 files
+                        verifyVersionLink(json, ark, 9);
                 } finally {
                         deleteObject(deleteUrl(ark));
                         getContent(stateUrl(ark), 404);        
