@@ -68,7 +68,9 @@ public class ServiceDriverIT {
                 try (CloseableHttpClient client = HttpClients.createDefault()) {
                     HttpGet request = new HttpGet(url);
                     HttpResponse response = client.execute(request);
-                    assertEquals(status, response.getStatusLine().getStatusCode());
+                    if (status > 0) {
+                        assertEquals(status, response.getStatusLine().getStatusCode());
+                    }
 
                     if (status > 300) {
                         return "";
@@ -416,7 +418,16 @@ public class ServiceDriverIT {
                 );
         }
 
-        public void assembleObject(String url) throws IOException {
+        public String tokenRetrieveUrl(String token) {
+                return String.format(
+                        "http://localhost:%d/%s/presign-obj-by-token/%s", 
+                        port, 
+                        cp,
+                        token
+                );
+        }
+
+        public JSONObject assembleObject(String url) throws IOException, JSONException {
                 try (CloseableHttpClient client = HttpClients.createDefault()) {
                         HttpPost post = new HttpPost(url);
 
@@ -427,7 +438,8 @@ public class ServiceDriverIT {
                         assertEquals(200, response.getStatusLine().getStatusCode());
     
                         String s = new BasicResponseHandler().handleResponse(response).trim();
-                        System.out.println(s);
+                        JSONObject json =  new JSONObject(s);
+                        return json;
                 }
 
         }
@@ -495,7 +507,7 @@ public class ServiceDriverIT {
         }
 
         @Test
-        public void AddObjectAndVerTest() throws IOException, JSONException, ParserConfigurationException, SAXException, XPathExpressionException {
+        public void AddObjectAndVerTest() throws IOException, JSONException, ParserConfigurationException, SAXException, XPathExpressionException, InterruptedException {
                 String ark = "ark:/1111/3333";
                 String checkm = "src/main/webapp/static/object1/test.checkm";
                 String checkmv2 = "src/main/webapp/static/object1v2/test.checkm";
@@ -525,7 +537,22 @@ public class ServiceDriverIT {
                         assertTrue(entries.contains("hello.txt"));
                         assertTrue(entries.contains("hello2.txt"));
 
-                        assembleObject(assembleObjectUrl(ark));
+                        json = assembleObject(assembleObjectUrl(ark));
+                        assertEquals(200, json.getInt("status"));
+                        assertEquals("Request queued, use token to check status", json.get("message"));                        
+
+                        String token = json.getString("token");
+                        int attempt = 0;
+                        json = getJsonContent(tokenRetrieveUrl(token), 0);
+                        while(json.getInt("status") == 202 && attempt < 10) {
+                                attempt++;
+                                Thread.sleep(1500);
+                                json = getJsonContent(tokenRetrieveUrl(token), 0);
+                        }
+
+                        assertEquals(200, json.getInt("status"));
+                        assertTrue(json.has("url"));
+                        assertEquals("Payload contains token info", json.get("message"));                        
 
                         json = getJsonContent(stateUrl(ark, 2), 200);
                         //version 2 has 9 files

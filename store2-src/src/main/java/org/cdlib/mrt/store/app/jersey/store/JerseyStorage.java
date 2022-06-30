@@ -290,6 +290,9 @@ public class JerseyStorage
 
     @GET
     @Path("cloudcontainer/{containername}")
+    //This endpoint had supported email delivery of objects
+    //It is now only used for internal testing
+    @Deprecated
     public Response callCloudContainer(
             @PathParam("containername") String containerName,
             @Context CloseableService cs,
@@ -460,6 +463,8 @@ public class JerseyStorage
     
     @POST
     @Path("copy/{node}/{objectid}")
+    //Deprecated per David
+    @Deprecated
     public Response copyObject(
             @PathParam("node") String nodeS,
             @PathParam("objectid") String objectIDS,
@@ -856,6 +861,8 @@ public class JerseyStorage
 
     @GET
     @Path("stream/{nodeid}/{objectid}")
+    //Deprecated per David
+    @Deprecated
     public Response getObjectStream(
             @PathParam("nodeid") String nodeIDS,
             @PathParam("objectid") String objectIDS,
@@ -903,6 +910,8 @@ public class JerseyStorage
     @POST
     @Path("async/{nodeid}/{objectid}")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
+    //Deprecated per David
+    @Deprecated
     public Response setObjectAsync(
             @PathParam("nodeid") String nodeIDS,
             @PathParam("objectid") String objectIDS,
@@ -933,6 +942,8 @@ public class JerseyStorage
     @POST
     @Path("async/{nodeid}/{objectid}/{versionid}")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
+    //Deprecated per David
+    @Deprecated
     public Response setVersionAsync(
             @PathParam("nodeid") String nodeIDS,
             @PathParam("objectid") String objectIDS,
@@ -1043,6 +1054,8 @@ public class JerseyStorage
     @POST
     @Path("producerasync/{nodeid}/{objectid}/{versionid}")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
+    //Deprecated per David
+    @Deprecated
     public Response setProducerAsync(
             @PathParam("nodeid") String nodeIDS,
             @PathParam("objectid") String objectIDS,
@@ -1073,6 +1086,8 @@ public class JerseyStorage
     @POST
     @Path("producerasync/{nodeid}/{objectid}")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
+    //Deprecated per David
+    @Deprecated
     public Response setProducerAsyncCurrent(
             @PathParam("nodeid") String nodeIDS,
             @PathParam("objectid") String objectIDS,
