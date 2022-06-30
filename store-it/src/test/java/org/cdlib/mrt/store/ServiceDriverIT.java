@@ -300,7 +300,7 @@ public class ServiceDriverIT {
 
         public String downloadObjectUrl(String ark) {
                 return String.format(
-                        "http://localhost:%d/%s/content/%d/%s?t=zip", 
+                        "http://localhost:%d/%s/content/%d/%s?t=zip&X=false", 
                         port, 
                         cp, 
                         node,
@@ -526,8 +526,8 @@ public class ServiceDriverIT {
                         verifyObject(json, ark, 2, 9);
         
                         List<String> entries = getZipContent(downloadObjectUrl(ark), 200);
-                        //object zip file has 18 entries: 8 (v1) + 9 (v2) + 1 (manifest)
-                        assertEquals(18, entries.size());
+                        //object zip file has 10 entries: 8 (v1) + 1 (v2) + 1 (manifest)
+                        assertEquals(10, entries.size());
                         assertTrue(entries.contains("ark+=1111=3333/1/producer/hello.txt"));
                         assertTrue(entries.contains("ark+=1111=3333/2/producer/hello2.txt"));
 
@@ -536,23 +536,6 @@ public class ServiceDriverIT {
                         assertEquals(2, entries.size());
                         assertTrue(entries.contains("hello.txt"));
                         assertTrue(entries.contains("hello2.txt"));
-
-                        json = assembleObject(assembleObjectUrl(ark));
-                        assertEquals(200, json.getInt("status"));
-                        assertEquals("Request queued, use token to check status", json.get("message"));                        
-
-                        String token = json.getString("token");
-                        int attempt = 0;
-                        json = getJsonContent(tokenRetrieveUrl(token), 0);
-                        while(json.getInt("status") == 202 && attempt < 10) {
-                                attempt++;
-                                Thread.sleep(1500);
-                                json = getJsonContent(tokenRetrieveUrl(token), 0);
-                        }
-
-                        assertEquals(200, json.getInt("status"));
-                        assertTrue(json.has("url"));
-                        assertEquals("Payload contains token info", json.get("message"));                        
 
                         json = getJsonContent(stateUrl(ark, 2), 200);
                         //version 2 has 9 files
@@ -581,6 +564,104 @@ public class ServiceDriverIT {
                         json = getJsonContent(versionLinkUrl(ark, 2), 200);
                         //version link has 9 files
                         verifyVersionLink(json, ark, 9);
+                } finally {
+                        deleteObject(deleteUrl(ark));
+                        getContent(stateUrl(ark), 404);        
+                }
+        }
+
+        @Test
+        public void AddObjectAndVerNoChangeTest() throws IOException, JSONException, ParserConfigurationException, SAXException, XPathExpressionException, InterruptedException {
+                String ark = "ark:/1111/5555";
+                String checkm = "src/main/webapp/static/object1/test.checkm";
+                String checkmv2 = "src/main/webapp/static/object1v2/test.checkm";
+                String checkmv3 = "src/main/webapp/static/object1v3/test.checkm";
+
+                try {
+                        JSONObject json = addObjectByManifest(addUrl(ark), checkm);
+                        //version 1 has 8 files
+                        verifyVersion(json, ark, 1, 8);
+        
+                        json = addObjectByManifest(updateUrl(ark), checkmv2);
+                        //version 2 has 9 files (8+1)
+                        verifyVersion(json, ark, 2, 9);
+
+                        json = addObjectByManifest(updateUrl(ark), checkmv3);
+                        //version 2 has 9 files (8+1)
+                        verifyVersion(json, ark, 3, 9);
+
+                        json = getJsonContent(stateUrl(ark), 200);
+                        //object has 9 files
+                        verifyObject(json, ark, 3, 9);
+        
+                        List<String> entries = getZipContent(downloadObjectUrl(ark), 200);
+                        //object zip file has 10 entries: 8 (v1) + 1 (v2) + 0 (v3) + 1 (manifest)
+                        assertEquals(10, entries.size());
+                        assertTrue(entries.contains("ark+=1111=5555/1/producer/hello.txt"));
+                        assertTrue(entries.contains("ark+=1111=5555/2/producer/hello2.txt"));
+                        assertFalse(entries.contains("ark+=1111=5555/3/producer/hello.txt"));
+
+                        entries = getZipContent(downloadProducerUrl(ark), 200);
+                        //producer zip file has 2 entries
+                        assertEquals(2, entries.size());
+                        assertTrue(entries.contains("hello.txt"));
+                        assertTrue(entries.contains("hello2.txt"));
+
+                        json = getJsonContent(stateUrl(ark, 3), 200);
+                        //version 2 has 9 files
+                        verifyVersion(json, ark, 3, 9);
+        
+                        String s = getContent(manifestUrl(ark), 200);
+                        Document d = getDocument(s, "objectInfo");
+                        //object manifest has 9 files
+                        verifyObjectInfo(d, ark, 3, 9);
+                        
+                        s = getContent(ingestLinkUrl(ark, 3), 200);
+                        //ingest link has 2 files + a manifest
+                        verifyIngestLink(s, 3);
+                        assertFalse(s.isEmpty());
+
+                        json = getJsonContent(versionLinkUrl(ark, 3), 200);
+                        //version link has 9 files
+                        verifyVersionLink(json, ark, 9);
+                } finally {
+                        deleteObject(deleteUrl(ark));
+                        getContent(stateUrl(ark), 404);        
+                }
+        }
+
+        @Test
+        public void AddObjectAndAssemble() throws IOException, JSONException, ParserConfigurationException, SAXException, XPathExpressionException, InterruptedException {
+                String ark = "ark:/1111/4444";
+                String checkm = "src/main/webapp/static/object1/test.checkm";
+                String checkmv2 = "src/main/webapp/static/object1v2/test.checkm";
+
+                try {
+                        JSONObject json = addObjectByManifest(addUrl(ark), checkm);
+                        //version 1 has 8 files
+                        verifyVersion(json, ark, 1, 8);
+        
+                        json = addObjectByManifest(updateUrl(ark), checkmv2);
+                        //version 2 has 9 files (8+1)
+                        verifyVersion(json, ark, 2, 9);
+
+                        json = assembleObject(assembleObjectUrl(ark));
+                        assertEquals(200, json.getInt("status"));
+                        assertEquals("Request queued, use token to check status", json.get("message"));                        
+
+                        String token = json.getString("token");
+                        int attempt = 0;
+                        json = getJsonContent(tokenRetrieveUrl(token), 0);
+                        while(json.getInt("status") == 202 && attempt < 10) {
+                                attempt++;
+                                Thread.sleep(1500);
+                                json = getJsonContent(tokenRetrieveUrl(token), 0);
+                        }
+
+                        assertEquals(200, json.getInt("status"));
+                        assertTrue(json.has("url"));
+                        assertEquals("Payload contains token info", json.get("message"));                        
+
                 } finally {
                         deleteObject(deleteUrl(ark));
                         getContent(stateUrl(ark), 404);        
