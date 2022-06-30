@@ -49,6 +49,7 @@ import static org.junit.Assert.*;
 
 public class ServiceDriverIT {
         private int port = 8080;
+        private int node = 7777;
         private String cp = "store";
         private DocumentBuilder db;
         private XPathFactory xpathfactory;
@@ -114,7 +115,7 @@ public class ServiceDriverIT {
 
         @Test
         public void SimpleTest7777() throws IOException, JSONException {
-                String url = String.format("http://localhost:%d/%s/state/7777?t=json", port, cp);
+                String url = String.format("http://localhost:%d/%s/state/%d?t=json", port, cp, node);
                 JSONObject json = getJsonContent(url, 200);
                 assertTrue(json.has("nod:nodeState"));
         }
@@ -247,72 +248,80 @@ public class ServiceDriverIT {
 
         public String addUrl(String ark) {
                 return String.format(
-                        "http://localhost:%d/%s/add/7777/%s", 
+                        "http://localhost:%d/%s/add/%d/%s", 
                         port, 
                         cp, 
+                        node,
                         URLEncoder.encode(ark, StandardCharsets.UTF_8)
                 );
         }
 
         public String updateUrl(String ark) {
                 return String.format(
-                        "http://localhost:%d/%s/update/7777/%s", 
+                        "http://localhost:%d/%s/update/%d/%s", 
                         port, 
                         cp, 
+                        node,
                         URLEncoder.encode(ark, StandardCharsets.UTF_8)
                 );
         }
 
         public String deleteUrl(String ark) {
                 return String.format(
-                        "http://localhost:%d/%s/content/7777/%s?t=json",
+                        "http://localhost:%d/%s/content/%d/%s?t=json",
                         port, 
                         cp, 
+                        node,
                         URLEncoder.encode(ark, StandardCharsets.UTF_8)
                 );
          }
 
         public String stateUrl(String ark) {
                 return String.format(
-                        "http://localhost:%d/%s/state/7777/%s?t=json", 
+                        "http://localhost:%d/%s/state/%d/%s?t=json", 
                         port, 
                         cp, 
+                        node,
                         URLEncoder.encode(ark, StandardCharsets.UTF_8)
                 );
         }
 
         public String fixityUrl(String ark) {
                 return String.format(
-                        "http://localhost:%d/%s/fixity/7777/%s?t=json", 
+                        "http://localhost:%d/%s/fixity/%d/%s?t=json", 
                         port, 
                         cp, 
+                        node,
                         URLEncoder.encode(ark, StandardCharsets.UTF_8)
                 );
         }
 
         public String downloadObjectUrl(String ark) {
                 return String.format(
-                        "http://localhost:%d/%s/content/7777/%s?t=zip", 
+                        "http://localhost:%d/%s/content/%d/%s?t=zip", 
                         port, 
                         cp, 
+                        node,
                         URLEncoder.encode(ark, StandardCharsets.UTF_8)
                 );
         }
 
         public String downloadProducerUrl(String ark) {
                 return String.format(
-                        "http://localhost:%d/%s/producer/7777/%s?t=zip", 
+                        "http://localhost:%d/%s/producer/%d/%s?t=zip", 
                         port, 
                         cp, 
+                        node,
                         URLEncoder.encode(ark, StandardCharsets.UTF_8)
                 );
         }
 
         public String stateUrl(String ark, int version) {
                 return String.format(
-                        "http://localhost:%d/%s/state/7777/%s/%d?t=json", 
+                        "http://localhost:%d/%s/state/%d/%s/%d?t=json", 
                         port, 
                         cp, 
+                        node,
                         URLEncoder.encode(ark, StandardCharsets.UTF_8),
                         version
                 );
@@ -320,9 +329,10 @@ public class ServiceDriverIT {
 
         public String ingestLinkUrl(String ark, int version) {
                 return String.format(
-                        "http://localhost:%d/%s/ingestlink/7777/%s/%d", 
+                        "http://localhost:%d/%s/ingestlink/%d/%s/%d", 
                         port, 
                         cp, 
+                        node,
                         URLEncoder.encode(ark, StandardCharsets.UTF_8),
                         version
                 );
@@ -330,19 +340,31 @@ public class ServiceDriverIT {
 
         public String versionLinkUrl(String ark, int version) {
                 return String.format(
-                        "http://localhost:%d/%s/versionlink/7777/%s/%d", 
+                        "http://localhost:%d/%s/versionlink/%d/%s/%d", 
                         port, 
                         cp, 
+                        node,
                         URLEncoder.encode(ark, StandardCharsets.UTF_8),
                         version
                 );
         }
 
-        public String stateUrl(String ark, int version, String path) {
+        public String assembleObjectUrl(String ark) {
                 return String.format(
-                        "http://localhost:%d/%s/state/7777/%s/%d/%s?t=json", 
+                        "http://localhost:%d/%s/assemble-obj/%d/%s", 
                         port, 
                         cp, 
+                        node,
+                        URLEncoder.encode(ark, StandardCharsets.UTF_8)
+                );
+        }
+
+        public String stateUrl(String ark, int version, String path) {
+                return String.format(
+                        "http://localhost:%d/%s/state/%d/%s/%d/%s?t=json", 
+                        port, 
+                        cp, 
+                        node,
                         URLEncoder.encode(ark, StandardCharsets.UTF_8),
                         version,
                         URLEncoder.encode(path, StandardCharsets.UTF_8)
@@ -351,9 +373,10 @@ public class ServiceDriverIT {
 
         public String fixityUrl(String ark, int version, String path) {
                 return String.format(
-                        "http://localhost:%d/%s/fixity/7777/%s/%d/%s?t=json", 
+                        "http://localhost:%d/%s/fixity/%d/%s/%d/%s?t=json", 
                         port, 
                         cp, 
+                        node,
                         URLEncoder.encode(ark, StandardCharsets.UTF_8),
                         version,
                         URLEncoder.encode(path, StandardCharsets.UTF_8)
@@ -362,9 +385,10 @@ public class ServiceDriverIT {
 
         public String downloadUrl(String ark, int version, String path) {
                 return String.format(
-                        "http://localhost:%d/%s/content/7777/%s/%d/%s?t=json", 
+                        "http://localhost:%d/%s/content/%d/%s/%d/%s?t=json", 
                         port, 
                         cp, 
+                        node,
                         URLEncoder.encode(ark, StandardCharsets.UTF_8),
                         version,
                         URLEncoder.encode(path, StandardCharsets.UTF_8)
@@ -374,20 +398,38 @@ public class ServiceDriverIT {
         public String presignFileUrl(String ark, int version, String path) {
                 String key = String.format("%s|%d|%s", ark, version, path);
                 return String.format(
-                        "http://localhost:%d/%s/presign-file/7777/%s", 
+                        "http://localhost:%d/%s/presign-file/%d/%s", 
                         port, 
                         cp, 
+                        node,
                         URLEncoder.encode(key, StandardCharsets.UTF_8)
                 );
         }
 
         public String manifestUrl(String ark) {
                 return String.format(
-                        "http://localhost:%d/%s/manifest/7777/%s", 
+                        "http://localhost:%d/%s/manifest/%d/%s", 
                         port, 
                         cp,
+                        node,
                         URLEncoder.encode(ark, StandardCharsets.UTF_8)
                 );
+        }
+
+        public void assembleObject(String url) throws IOException {
+                try (CloseableHttpClient client = HttpClients.createDefault()) {
+                        HttpPost post = new HttpPost(url);
+
+                        //List<NameValuePair> params = new ArrayList<NameValuePair>();
+                        //post.setEntity(new UrlEncodedFormEntity(params));
+
+                        HttpResponse response = client.execute(post);
+                        assertEquals(200, response.getStatusLine().getStatusCode());
+    
+                        String s = new BasicResponseHandler().handleResponse(response).trim();
+                        System.out.println(s);
+                }
+
         }
 
         @Test
@@ -482,6 +524,8 @@ public class ServiceDriverIT {
                         assertEquals(2, entries.size());
                         assertTrue(entries.contains("hello.txt"));
                         assertTrue(entries.contains("hello2.txt"));
+
+                        assembleObject(assembleObjectUrl(ark));
 
                         json = getJsonContent(stateUrl(ark, 2), 200);
                         //version 2 has 9 files

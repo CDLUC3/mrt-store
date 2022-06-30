@@ -14,14 +14,34 @@ services:
       merrittnet:
   it-server:
     container_name: it-server
-    image: tomcat:8
+    image: tomcat:8-jre8
     volumes:
     - "${MDIR}/store-it/target/mrt-store-it-1.0-SNAPSHOT.war:/usr/local/tomcat/webapps/store.war"
     - "${MDIR}/store-it/src/test/resources:/resources"
     ports:
     - published: 8080
       target: 8080
+    - published: 8099
+      target: 8099
     environment:
       CATALINA_OPTS: "-Dfile.encoding=UTF8 -Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true"
+      JPDA_ADDRESS: 8099
+      JPDA_TRANSPORT: dt_socket
     networks:
       merrittnet:
+    depends_on:
+    - zoo
+    - minio-server
+    # Allow debugger to be attached to the server
+    entrypoint: ["catalina.sh", "jpda", "run"]
+  zoo:
+    container_name: zoo
+    image: zookeeper:3.4
+    ports:
+    - published: 2181
+      target: 2181
+    networks:
+      merrittnet:
+    restart: unless-stopped
+    stdin_open: true
+    tty: true

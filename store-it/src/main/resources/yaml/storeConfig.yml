@@ -17,7 +17,7 @@ store-info:
     - mrt-oaidc.xml
     - mrt-provenance.xml
     - stash-wrapper.xml
-  archiveNode: 7777
+  archiveNode: 8888
   nodePath: "yaml:"
   fileLogger:
     messageMaximumLevel: 5
@@ -30,7 +30,7 @@ store-info:
     QueueService: "zoo:2181"
     QueueLargeWorker: "store"
     QueueSizeLimit: "600000000"
-    QueueHoldFile: "/tmp"
+    QueueHoldFile: "/tmp/AccessHold"
     PollingInterval: "15"
     NumThreadsSmall: "5"
     NumThreadsLarge: "3"

@@ -114,7 +114,7 @@
                   </run>
                 </image>
                 <image>
-                  <name>tomcat:8</name>
+                  <name>tomcat:8-jre8</name>
                   <alias>it-server</alias>
                   <run>
                     <network>
@@ -135,6 +135,16 @@
                     <env>
                       <CATALINA_OPTS>-Dfile.encoding=UTF8 -Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true</CATALINA_OPTS>
                     </env>
+                  </run>
+                </image>
+                <image>
+                  <name>zookeeper:3.4</name>
+                  <alias>zoo</alias>
+                  <run>
+                    <network>
+                      <name>network</name>
+                      <alias>zoo</alias>
+                    </network>
                   </run>
                 </image>
               </images>
