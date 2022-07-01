@@ -59,7 +59,7 @@ public class ServiceDriverIT {
                 } catch (NumberFormatException e) {
                         System.err.println("it-server.port not set, defaulting to " + port);
                 }
-                db = DocumentBuilderFactory.newDefaultInstance().newDocumentBuilder();
+                db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
                 xpathfactory = new XPathFactoryImpl();
         }
 
