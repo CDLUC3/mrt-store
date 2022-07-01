@@ -21,12 +21,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -147,6 +145,23 @@ public class ServiceDriverIT {
 
         }
 
+        public JSONObject copyObject(String url) throws IOException, JSONException {
+                try (CloseableHttpClient client = HttpClients.createDefault()) {
+                        HttpPost post = new HttpPost(url);
+                        
+                        HttpResponse response = client.execute(post);
+                        assertEquals(200, response.getStatusLine().getStatusCode());
+    
+                        String s = new BasicResponseHandler().handleResponse(response).trim();
+                        assertFalse(s.isEmpty());
+
+                        JSONObject json =  new JSONObject(s);
+                        assertNotNull(json);
+                        return json;
+                }
+
+        }
+
         public JSONObject deleteObject(String url) throws IOException, JSONException {
                 try (CloseableHttpClient client = HttpClients.createDefault()) {
                         HttpDelete del = new HttpDelete(url);
@@ -258,6 +273,17 @@ public class ServiceDriverIT {
                 );
         }
 
+        public String copyUrl(String ark, int copynode) {
+                return String.format(
+                        "http://localhost:%d/%s/copy/%d/%d/%s?t=json", 
+                        port, 
+                        cp, 
+                        node,
+                        copynode,
+                        URLEncoder.encode(ark, StandardCharsets.UTF_8)
+                );
+        }
+
         public String updateUrl(String ark) {
                 return String.format(
                         "http://localhost:%d/%s/update/%d/%s", 
@@ -278,14 +304,18 @@ public class ServiceDriverIT {
                 );
          }
 
-        public String stateUrl(String ark) {
+        public String nodeStateUrl(int curnode, String ark) {
                 return String.format(
                         "http://localhost:%d/%s/state/%d/%s?t=json", 
                         port, 
                         cp, 
-                        node,
+                        curnode,
                         URLEncoder.encode(ark, StandardCharsets.UTF_8)
                 );
+        }
+
+        public String stateUrl(String ark) {
+                return nodeStateUrl(node, ark);
         }
 
         public String fixityUrl(String ark) {
@@ -500,6 +530,33 @@ public class ServiceDriverIT {
                         //ingest link has 1 file + a manifest
                         verifyIngestLink(s, 2);
                         assertFalse(s.isEmpty());
+                } finally {
+                        deleteObject(deleteUrl(ark));
+                        getContent(stateUrl(ark), 404);        
+                }
+        }
+
+        @Test
+        public void CopyObjectTest() throws IOException, JSONException, ParserConfigurationException, SAXException, XPathExpressionException {
+                String ark = "ark:/1111/6666";
+                String checkm = "src/main/webapp/static/object1/test.checkm";
+
+                try {
+                        JSONObject json = addObjectByManifest(addUrl(ark), checkm);
+                        //Version 1 has 8 files
+                        verifyVersion(json, ark, 1, 8);
+
+                        json = getJsonContent(stateUrl(ark), 200);
+                        //Version 1 has 8 files
+                        verifyObject(json, ark, 1, 8);
+
+                        json = copyObject(copyUrl(ark, 8888));
+                        //Version 1 has 8 files
+                        verifyObject(json, ark, 1, 8);
+
+                        json = getJsonContent(nodeStateUrl(8888, ark), 200);
+                        //Version 1 has 8 files
+                        verifyObject(json, ark, 1, 8);
                 } finally {
                         deleteObject(deleteUrl(ark));
                         getContent(stateUrl(ark), 404);        

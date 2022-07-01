@@ -74,7 +74,7 @@ pipeline {
                 }
             }
         }
-       stage('Build Store') {
+        stage('Build Store') {
             steps {
                 dir('mrt-store'){
                   script {

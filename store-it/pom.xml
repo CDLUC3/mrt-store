@@ -25,6 +25,8 @@
     <itDockerRegistry>itDockerRegistry</itDockerRegistry>
     <java.compiler>1.8</java.compiler>
     <propertyDir>test</propertyDir>
+    <docker.skip>${env.SKIP_DOCKER_TEST}</docker.skip>
+    <skipTests>${env.SKIP_DOCKER_TEST}</skipTests>
   </properties>
 
   <profiles>
