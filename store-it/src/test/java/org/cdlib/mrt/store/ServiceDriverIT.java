@@ -42,6 +42,7 @@ import javax.xml.xpath.XPathConstants;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.io.UnsupportedEncodingException;
 
 import static org.junit.Assert.*;
 
@@ -179,10 +180,10 @@ public class ServiceDriverIT {
         }
 
 
-        public void verifyVersion(JSONObject json, String ark, int version, int fileCount) throws JSONException {
+        public void verifyVersion(JSONObject json, String ark, int version, int fileCount) throws JSONException, UnsupportedEncodingException {
                 assertTrue(json.has("ver:versionState"));
                 JSONObject v = json.getJSONObject("ver:versionState");
-                assertTrue(v.getString("ver:version").contains(URLEncoder.encode(ark, StandardCharsets.UTF_8)));
+                assertTrue(v.getString("ver:version").contains(URLEncoder.encode(ark, StandardCharsets.UTF_8.name())));
                 assertEquals(version, v.getInt("ver:identifier"));
                 assertEquals(fileCount, v.getInt("ver:numFiles"));
         }
@@ -263,188 +264,188 @@ public class ServiceDriverIT {
                 return d;
         }
 
-        public String addUrl(String ark) {
+        public String addUrl(String ark) throws UnsupportedEncodingException {
                 return String.format(
                         "http://localhost:%d/%s/add/%d/%s", 
                         port, 
                         cp, 
                         node,
-                        URLEncoder.encode(ark, StandardCharsets.UTF_8)
+                        URLEncoder.encode(ark, StandardCharsets.UTF_8.name())
                 );
         }
 
-        public String copyUrl(String ark, int copynode) {
+        public String copyUrl(String ark, int copynode) throws UnsupportedEncodingException {
                 return String.format(
                         "http://localhost:%d/%s/copy/%d/%d/%s?t=json", 
                         port, 
                         cp, 
                         node,
                         copynode,
-                        URLEncoder.encode(ark, StandardCharsets.UTF_8)
+                        URLEncoder.encode(ark, StandardCharsets.UTF_8.name())
                 );
         }
 
-        public String updateUrl(String ark) {
+        public String updateUrl(String ark) throws UnsupportedEncodingException {
                 return String.format(
                         "http://localhost:%d/%s/update/%d/%s", 
                         port, 
                         cp, 
                         node,
-                        URLEncoder.encode(ark, StandardCharsets.UTF_8)
+                        URLEncoder.encode(ark, StandardCharsets.UTF_8.name())
                 );
         }
 
-        public String deleteUrl(String ark) {
+        public String deleteUrl(String ark) throws UnsupportedEncodingException {
                 return String.format(
                         "http://localhost:%d/%s/content/%d/%s?t=json",
                         port, 
                         cp, 
                         node,
-                        URLEncoder.encode(ark, StandardCharsets.UTF_8)
+                        URLEncoder.encode(ark, StandardCharsets.UTF_8.name())
                 );
          }
 
-        public String nodeStateUrl(int curnode, String ark) {
+        public String nodeStateUrl(int curnode, String ark) throws UnsupportedEncodingException {
                 return String.format(
                         "http://localhost:%d/%s/state/%d/%s?t=json", 
                         port, 
                         cp, 
                         curnode,
-                        URLEncoder.encode(ark, StandardCharsets.UTF_8)
+                        URLEncoder.encode(ark, StandardCharsets.UTF_8.name())
                 );
         }
 
-        public String stateUrl(String ark) {
+        public String stateUrl(String ark) throws UnsupportedEncodingException {
                 return nodeStateUrl(node, ark);
         }
 
-        public String fixityUrl(String ark) {
+        public String fixityUrl(String ark) throws UnsupportedEncodingException {
                 return String.format(
                         "http://localhost:%d/%s/fixity/%d/%s?t=json", 
                         port, 
                         cp, 
                         node,
-                        URLEncoder.encode(ark, StandardCharsets.UTF_8)
+                        URLEncoder.encode(ark, StandardCharsets.UTF_8.name())
                 );
         }
 
-        public String downloadObjectUrl(String ark) {
+        public String downloadObjectUrl(String ark) throws UnsupportedEncodingException {
                 return String.format(
                         "http://localhost:%d/%s/content/%d/%s?t=zip&X=false", 
                         port, 
                         cp, 
                         node,
-                        URLEncoder.encode(ark, StandardCharsets.UTF_8)
+                        URLEncoder.encode(ark, StandardCharsets.UTF_8.name())
                 );
         }
 
-        public String downloadProducerUrl(String ark) {
+        public String downloadProducerUrl(String ark) throws UnsupportedEncodingException {
                 return String.format(
                         "http://localhost:%d/%s/producer/%d/%s?t=zip", 
                         port, 
                         cp, 
                         node,
-                        URLEncoder.encode(ark, StandardCharsets.UTF_8)
+                        URLEncoder.encode(ark, StandardCharsets.UTF_8.name())
                 );
         }
 
-        public String stateUrl(String ark, int version) {
+        public String stateUrl(String ark, int version) throws UnsupportedEncodingException {
                 return String.format(
                         "http://localhost:%d/%s/state/%d/%s/%d?t=json", 
                         port, 
                         cp, 
                         node,
-                        URLEncoder.encode(ark, StandardCharsets.UTF_8),
+                        URLEncoder.encode(ark, StandardCharsets.UTF_8.name()),
                         version
                 );
         }
 
-        public String ingestLinkUrl(String ark, int version) {
+        public String ingestLinkUrl(String ark, int version) throws UnsupportedEncodingException {
                 return String.format(
                         "http://localhost:%d/%s/ingestlink/%d/%s/%d", 
                         port, 
                         cp, 
                         node,
-                        URLEncoder.encode(ark, StandardCharsets.UTF_8),
+                        URLEncoder.encode(ark, StandardCharsets.UTF_8.name()),
                         version
                 );
         }
 
-        public String versionLinkUrl(String ark, int version) {
+        public String versionLinkUrl(String ark, int version) throws UnsupportedEncodingException {
                 return String.format(
                         "http://localhost:%d/%s/versionlink/%d/%s/%d", 
                         port, 
                         cp, 
                         node,
-                        URLEncoder.encode(ark, StandardCharsets.UTF_8),
+                        URLEncoder.encode(ark, StandardCharsets.UTF_8.name()),
                         version
                 );
         }
 
-        public String assembleObjectUrl(String ark) {
+        public String assembleObjectUrl(String ark) throws UnsupportedEncodingException {
                 return String.format(
                         "http://localhost:%d/%s/assemble-obj/%d/%s", 
                         port, 
                         cp, 
                         node,
-                        URLEncoder.encode(ark, StandardCharsets.UTF_8)
+                        URLEncoder.encode(ark, StandardCharsets.UTF_8.name())
                 );
         }
 
-        public String stateUrl(String ark, int version, String path) {
+        public String stateUrl(String ark, int version, String path) throws UnsupportedEncodingException {
                 return String.format(
                         "http://localhost:%d/%s/state/%d/%s/%d/%s?t=json", 
                         port, 
                         cp, 
                         node,
-                        URLEncoder.encode(ark, StandardCharsets.UTF_8),
+                        URLEncoder.encode(ark, StandardCharsets.UTF_8.name()),
                         version,
-                        URLEncoder.encode(path, StandardCharsets.UTF_8)
+                        URLEncoder.encode(path, StandardCharsets.UTF_8.name())
                 );
         }
 
-        public String fixityUrl(String ark, int version, String path) {
+        public String fixityUrl(String ark, int version, String path) throws UnsupportedEncodingException {
                 return String.format(
                         "http://localhost:%d/%s/fixity/%d/%s/%d/%s?t=json", 
                         port, 
                         cp, 
                         node,
-                        URLEncoder.encode(ark, StandardCharsets.UTF_8),
+                        URLEncoder.encode(ark, StandardCharsets.UTF_8.name()),
                         version,
-                        URLEncoder.encode(path, StandardCharsets.UTF_8)
+                        URLEncoder.encode(path, StandardCharsets.UTF_8.name())
                 );
         }
 
-        public String downloadUrl(String ark, int version, String path) {
+        public String downloadUrl(String ark, int version, String path) throws UnsupportedEncodingException {
                 return String.format(
                         "http://localhost:%d/%s/content/%d/%s/%d/%s?t=json", 
                         port, 
                         cp, 
                         node,
-                        URLEncoder.encode(ark, StandardCharsets.UTF_8),
+                        URLEncoder.encode(ark, StandardCharsets.UTF_8.name()),
                         version,
-                        URLEncoder.encode(path, StandardCharsets.UTF_8)
+                        URLEncoder.encode(path, StandardCharsets.UTF_8.name())
                 );
         }
 
-        public String presignFileUrl(String ark, int version, String path) {
+        public String presignFileUrl(String ark, int version, String path) throws UnsupportedEncodingException {
                 String key = String.format("%s|%d|%s", ark, version, path);
                 return String.format(
                         "http://localhost:%d/%s/presign-file/%d/%s", 
                         port, 
                         cp, 
                         node,
-                        URLEncoder.encode(key, StandardCharsets.UTF_8)
+                        URLEncoder.encode(key, StandardCharsets.UTF_8.name())
                 );
         }
 
-        public String manifestUrl(String ark) {
+        public String manifestUrl(String ark) throws UnsupportedEncodingException {
                 return String.format(
                         "http://localhost:%d/%s/manifest/%d/%s", 
                         port, 
                         cp,
                         node,
-                        URLEncoder.encode(ark, StandardCharsets.UTF_8)
+                        URLEncoder.encode(ark, StandardCharsets.UTF_8.name())
                 );
         }
 
