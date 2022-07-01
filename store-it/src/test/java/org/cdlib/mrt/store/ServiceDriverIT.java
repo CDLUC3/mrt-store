@@ -296,11 +296,15 @@ public class ServiceDriverIT {
         }
 
         public String deleteUrl(String ark) throws UnsupportedEncodingException {
+                return deleteUrl(node, ark);
+        }
+
+        public String deleteUrl(int curnode, String ark) throws UnsupportedEncodingException {
                 return String.format(
                         "http://localhost:%d/%s/content/%d/%s?t=json",
                         port, 
                         cp, 
-                        node,
+                        curnode,
                         URLEncoder.encode(ark, StandardCharsets.UTF_8.name())
                 );
          }
@@ -476,6 +480,39 @@ public class ServiceDriverIT {
         }
 
         @Test
+        public void PreloadedIntoContainerTest() throws IOException, JSONException, ParserConfigurationException, SAXException, XPathExpressionException {
+                String ark = "ark:/5555/5555";
+
+                try {    
+                        JSONObject json = getJsonContent(stateUrl(ark), 200);
+                        //Version 1 has 8 files
+                        verifyObject(json, ark, 1, 1);
+
+                        json = getJsonContent(fixityUrl(ark), 200);
+                        verifyObjectFixity(json);
+
+                        json = getJsonContent(stateUrl(ark, 1), 200);
+                        //Version 1 has 8 files
+                        verifyVersion(json, ark, 1, 1);
+        
+                        String path = "producer/hello.txt";
+                        json = getJsonContent(stateUrl(ark, 1, path), 200);
+                        //hello.txt has 5 bytes
+                        verifyFile(json, path, 5);
+
+                        json = getJsonContent(fixityUrl(ark, 1, path), 200);
+                        //hello.txt has the checksum listed below
+                        verifyFileFixity(json, "sha256=2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824");
+
+                        String s = getContent(downloadUrl(ark, 1, path), 200);
+                        //hello.txt contains the string "hello"
+                        assertEquals("hello", s);
+
+                } finally {
+                }
+        }
+
+        @Test
         public void AddObjectTest() throws IOException, JSONException, ParserConfigurationException, SAXException, XPathExpressionException {
                 String ark = "ark:/1111/2222";
                 String checkm = "src/main/webapp/static/object1/test.checkm";
@@ -560,6 +597,9 @@ public class ServiceDriverIT {
                         verifyObject(json, ark, 1, 8);
                 } finally {
                         deleteObject(deleteUrl(ark));
+                        getContent(stateUrl(ark), 404);        
+
+                        deleteObject(deleteUrl(8888, ark));
                         getContent(stateUrl(ark), 404);        
                 }
         }

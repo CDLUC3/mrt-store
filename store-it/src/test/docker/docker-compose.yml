@@ -8,7 +8,7 @@ services:
     ports:
     - published: 9000
       target: 9000
-    - published: 9001
+    - published: 8098
       target: 9001
     networks:
       merrittnet:
