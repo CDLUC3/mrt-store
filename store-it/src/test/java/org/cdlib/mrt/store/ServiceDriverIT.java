@@ -479,7 +479,7 @@ public class ServiceDriverIT {
 
         }
 
-        @Test
+        //@Test
         public void PreloadedIntoContainerTest() throws IOException, JSONException, ParserConfigurationException, SAXException, XPathExpressionException {
                 String ark = "ark:/5555/5555";
 
