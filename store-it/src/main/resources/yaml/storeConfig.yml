@@ -1,0 +1,36 @@
+---
+which-store-info: "store-info"
+store-info:
+  baseURI: "http://it-server:8080/store"
+  supportURI: mailto:merritt-support@ucop.edu
+  verifyOnRead: true
+  verifyOnWrite: true
+  producerFilter:
+    - mrt-erc.txt
+    - mrt-eml.txt
+    - mrt-dc.xml
+    - mrt-delete.txt
+    - mrt-dua.txt
+    - mrt-dataone-manifest.txt
+    - mrt-datacite.xml
+    - mrt-embargo.txt
+    - mrt-oaidc.xml
+    - mrt-provenance.xml
+    - stash-wrapper.xml
+  archiveNode: 8888
+  nodePath: "yaml:"
+  fileLogger:
+    messageMaximumLevel: 5
+    messageMaximumError: 10
+    path: /tmp/
+    name: store
+    qualifier: yyMMdd
+    trace: 5
+  queueInfo:
+    QueueService: "zoo:2181"
+    QueueLargeWorker: "store"
+    QueueSizeLimit: "600000000"
+    QueueHoldFile: "/tmp/AccessHold"
+    PollingInterval: "15"
+    NumThreadsSmall: "5"
+    NumThreadsLarge: "3"

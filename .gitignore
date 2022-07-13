@@ -3,3 +3,7 @@ target/
 .project
 .classpath
 */.gitignore
+store-it/store.war
+store-war-it/war/test/storage.war
+store-war/war/test/storage.war
+.attach_pid*
