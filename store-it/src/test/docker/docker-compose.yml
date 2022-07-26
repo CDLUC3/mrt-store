@@ -30,12 +30,12 @@ services:
     networks:
       merrittnet:
     depends_on:
-    - zoo
+    - zoo-it
     - minio-server
     # Allow debugger to be attached to the server
     entrypoint: ["catalina.sh", "jpda", "run"]
-  zoo:
-    container_name: zoo
+  zoo-it:
+    container_name: zoo-it
     image: zookeeper:3.4
     ports:
     - published: 2181

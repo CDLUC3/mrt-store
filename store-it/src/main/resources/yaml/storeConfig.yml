@@ -27,7 +27,7 @@ store-info:
     qualifier: yyMMdd
     trace: 5
   queueInfo:
-    QueueService: "zoo:2181"
+    QueueService: "zoo-it:2181"
     QueueLargeWorker: "store"
     QueueSizeLimit: "600000000"
     QueueHoldFile: "/tmp/AccessHold"
