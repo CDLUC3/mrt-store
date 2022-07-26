@@ -141,11 +141,11 @@
                 </image>
                 <image>
                   <name>zookeeper:3.4</name>
-                  <alias>zoo</alias>
+                  <alias>zoo-it</alias>
                   <run>
                     <network>
                       <name>network</name>
-                      <alias>zoo</alias>
+                      <alias>zoo-it</alias>
                     </network>
                   </run>
                 </image>
