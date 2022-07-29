@@ -507,15 +507,20 @@ public class ServiceDriverIT {
                         String s = getContent(downloadUrl(ark, 1, path), 200);
                         //hello.txt contains the string "hello"
                         assertEquals("hello", s);
-
+                } catch(Exception e) {
+                        e.printStackTrace();
+                        throw e;
+                } catch(AssertionError e) {
+                        e.printStackTrace();
+                        throw e;
                 } finally {
                 }
         }
 
         @Test
-        public void AddObjectTest() throws IOException, JSONException, ParserConfigurationException, SAXException, XPathExpressionException {
+        public void AddObjectTest() throws Exception {
                 String ark = "ark:/1111/2222";
-                String checkm = "src/main/webapp/static/object1/test.checkm";
+                String checkm = "src/test/resources/object1.checkm";
 
                 try {
                         JSONObject json = addObjectByManifest(addUrl(ark), checkm);
@@ -568,6 +573,12 @@ public class ServiceDriverIT {
                         //ingest link has 1 file + a manifest
                         verifyIngestLink(s, 2);
                         assertFalse(s.isEmpty());
+                } catch(Exception e) {
+                        e.printStackTrace();
+                        throw e;
+                } catch(AssertionError e) {
+                        e.printStackTrace();
+                        throw e;
                 } finally {
                         deleteObject(deleteUrl(ark));
                         getContent(stateUrl(ark), 404);        
@@ -575,9 +586,9 @@ public class ServiceDriverIT {
         }
 
         @Test
-        public void CopyObjectTest() throws IOException, JSONException, ParserConfigurationException, SAXException, XPathExpressionException {
+        public void CopyObjectTest() throws UnsupportedEncodingException, IOException, JSONException {
                 String ark = "ark:/1111/6666";
-                String checkm = "src/main/webapp/static/object1/test.checkm";
+                String checkm = "src/test/resources/object1.checkm";
 
                 try {
                         JSONObject json = addObjectByManifest(addUrl(ark), checkm);
@@ -595,6 +606,12 @@ public class ServiceDriverIT {
                         json = getJsonContent(nodeStateUrl(8888, ark), 200);
                         //Version 1 has 8 files
                         verifyObject(json, ark, 1, 8);
+                } catch(Exception e) {
+                        e.printStackTrace();
+                        throw e;
+                } catch(AssertionError e) {
+                        e.printStackTrace();
+                        throw e;
                 } finally {
                         deleteObject(deleteUrl(ark));
                         getContent(stateUrl(ark), 404);        
@@ -605,10 +622,10 @@ public class ServiceDriverIT {
         }
 
         @Test
-        public void AddObjectAndVerTest() throws IOException, JSONException, ParserConfigurationException, SAXException, XPathExpressionException, InterruptedException {
+        public void AddObjectAndVerTest() throws Exception {
                 String ark = "ark:/1111/3333";
-                String checkm = "src/main/webapp/static/object1/test.checkm";
-                String checkmv2 = "src/main/webapp/static/object1v2/test.checkm";
+                String checkm = "src/test/resources/object1.checkm";
+                String checkmv2 = "src/test/resources/object1v2.checkm";
 
                 try {
                         JSONObject json = addObjectByManifest(addUrl(ark), checkm);
@@ -662,6 +679,12 @@ public class ServiceDriverIT {
                         json = getJsonContent(versionLinkUrl(ark, 2), 200);
                         //version link has 9 files
                         verifyVersionLink(json, ark, 9);
+                } catch(Exception e) {
+                        e.printStackTrace();
+                        throw e;
+                } catch(AssertionError e) {
+                        e.printStackTrace();
+                        throw e;
                 } finally {
                         deleteObject(deleteUrl(ark));
                         getContent(stateUrl(ark), 404);        
@@ -669,11 +692,11 @@ public class ServiceDriverIT {
         }
 
         @Test
-        public void AddObjectAndVerNoChangeTest() throws IOException, JSONException, ParserConfigurationException, SAXException, XPathExpressionException, InterruptedException {
+        public void AddObjectAndVerNoChangeTest() throws Exception {
                 String ark = "ark:/1111/5555";
-                String checkm = "src/main/webapp/static/object1/test.checkm";
-                String checkmv2 = "src/main/webapp/static/object1v2/test.checkm";
-                String checkmv3 = "src/main/webapp/static/object1v3/test.checkm";
+                String checkm = "src/test/resources/object1.checkm";
+                String checkmv2 = "src/test/resources/object1v2.checkm";
+                String checkmv3 = "src/test/resources/object1v3.checkm";
 
                 try {
                         JSONObject json = addObjectByManifest(addUrl(ark), checkm);
@@ -722,6 +745,12 @@ public class ServiceDriverIT {
                         json = getJsonContent(versionLinkUrl(ark, 3), 200);
                         //version link has 9 files
                         verifyVersionLink(json, ark, 9);
+                } catch(Exception e) {
+                        e.printStackTrace();
+                        throw e;
+                } catch(AssertionError e) {
+                        e.printStackTrace();
+                        throw e;
                 } finally {
                         deleteObject(deleteUrl(ark));
                         getContent(stateUrl(ark), 404);        
@@ -729,10 +758,10 @@ public class ServiceDriverIT {
         }
 
         @Test
-        public void AddObjectAndAssemble() throws IOException, JSONException, ParserConfigurationException, SAXException, XPathExpressionException, InterruptedException {
+        public void AddObjectAndAssemble() throws Exception {
                 String ark = "ark:/1111/4444";
-                String checkm = "src/main/webapp/static/object1/test.checkm";
-                String checkmv2 = "src/main/webapp/static/object1v2/test.checkm";
+                String checkm = "src/test/resources/object1.checkm";
+                String checkmv2 = "src/test/resources/object1v2.checkm";
 
                 try {
                         JSONObject json = addObjectByManifest(addUrl(ark), checkm);
@@ -759,7 +788,12 @@ public class ServiceDriverIT {
                         assertEquals(200, json.getInt("status"));
                         assertTrue(json.has("url"));
                         assertEquals("Payload contains token info", json.get("message"));                        
-
+                } catch(Exception e) {
+                        e.printStackTrace();
+                        throw e;
+                } catch(AssertionError e) {
+                        e.printStackTrace();
+                        throw e;
                 } finally {
                         deleteObject(deleteUrl(ark));
                         getContent(stateUrl(ark), 404);        
