@@ -25,7 +25,6 @@ services:
     image: tomcat:8-jre8
     volumes:
     - "${MDIR}/store-it/target/mrt-store-it-1.0-SNAPSHOT.war:/usr/local/tomcat/webapps/store.war"
-    - "${MDIR}/store-it/src/test/resources:/resources"
     ports:
     - published: 8080
       target: 8080
