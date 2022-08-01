@@ -44,9 +44,6 @@ services:
   zoo-it:
     container_name: zoo-it
     image: zookeeper:3.4
-    ports:
-    - published: 2181
-      target: 2181
     networks:
       merrittnet:
     restart: unless-stopped
