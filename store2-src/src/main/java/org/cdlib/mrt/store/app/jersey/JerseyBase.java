@@ -33,6 +33,7 @@ package org.cdlib.mrt.store.app.jersey;
 import org.glassfish.jersey.server.CloseableService;
 import org.cdlib.mrt.store.app.ValidateCmdParms;
 import org.cdlib.mrt.store.app.*;
+import java.net.InetAddress;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -89,6 +90,7 @@ import org.cdlib.mrt.utility.TFileLogger;
 import org.cdlib.mrt.utility.LoggerInf;
 import org.cdlib.mrt.utility.PropertiesUtil;
 import org.cdlib.mrt.utility.StringUtil;
+import org.json.JSONObject;
 /**
  * Base Jersey handling for both Storage and CAN services
  * The attempt is to keep the Jersey layer as thin as possible.
@@ -2681,7 +2683,29 @@ public class JerseyBase
 
         return Response.ok(typeFile.file, typeFile.formatType.getMimeType()).build();
     }
-
+    
+    protected Response getHostnameServ(
+            CloseableService cs,
+            ServletConfig sc)
+        throws TException
+    {
+        try {
+            String hostname = InetAddress.getLocalHost().getHostName();
+            String canonicalHostname = InetAddress.getLocalHost().getCanonicalHostName();
+            String hostAddress = InetAddress.getLocalHost().getHostAddress();
+            JSONObject json = new JSONObject();
+            json.put("hostname", hostname);
+            json.put("canonicalHostname", canonicalHostname);
+            json.put("hostAddress", hostAddress);
+            String jsonS = json.toString(2);
+            return Response 
+                    .ok(StringUtil.stringToStream(jsonS, "utf8"), MediaType.APPLICATION_OCTET_STREAM)
+                    .build();
+            
+        } catch (Exception ex) {
+            throw new TException(ex);
+        }
+    }
 
     /**
      * Return a Jersey Response object after formatting an exception

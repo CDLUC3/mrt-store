@@ -1039,6 +1039,17 @@ public class JerseyStorage
             sc);
     }
     
+    @GET
+    @Path("hostname")
+    public Response getHostname(
+            @Context CloseableService cs,
+            @Context ServletConfig sc)
+        throws TException
+    {
+        return getHostnameServ(
+            cs,
+            sc);
+    }
     
     @POST
     @Path("producerasync/{nodeid}/{objectid}/{versionid}")
