@@ -1,7 +1,7 @@
 ---
 which-store-info: "store-info"
 store-info:
-  baseURI: "http://it-server:8080/store"
+  baseURI: "http://mock-merritt-it:4567/store"
   supportURI: mailto:merritt-support@ucop.edu
   verifyOnRead: true
   verifyOnWrite: true

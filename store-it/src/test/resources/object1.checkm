@@ -1,0 +1,14 @@
+#%checkm_0.7
+#%profile | http://uc3.cdlib.org/registry/store/manifest/mrt-add-manifest
+#%prefix | nfo:<http://www.semanticdesktop.org/ontologies/2007/03/22/nfo#>
+#%prefix | nie:<http://www.semanticdesktop.org/ontologies/2007/01/19/nie/#>
+#%prefix | mrt:<http://uc3.cdlib.org/ontology/mrt/mom#>
+#%columns | nfo:fileURL | nfo:hashAlgorithm | nfo:hashValue | nfo:fileSize | nfo:fileLastModified | nfo:fileName | nie:mimeType
+http://mock-merritt-it:4567/storage-input/producer/mrt-dc.xml | sha256 | 35dd45b157fc7352ebf2954c4658baa89073cba762fd40b7f9f16bc54a9a2af8 | 525 | 2017-10-03T15:29:19-07:00 | producer/mrt-dc.xml | application/xml
+http://mock-merritt-it:4567/storage-input/system/mrt-owner.txt | sha256 | 1a00b96724193d940c3823c981bd95dce7b5785d468d79971fc188555c35e4f0 | 16 | 2017-10-03T15:29:19-07:00 | system/mrt-owner.txt | text/plain
+http://mock-merritt-it:4567/storage-input/system/mrt-erc.txt | sha256 | a5adc23d32740161d2b100069975d3262c79b5c5330edea81c1c09408aaaec49 | 93 | 2017-10-03T15:29:19-07:00 | system/mrt-erc.txt | text/plain
+http://mock-merritt-it:4567/storage-input/system/mrt-mom.txt | sha256 | b15277ee61ed9a25e753de3c0c71a8ac01066f91322cb16ef07c3690a9f570d3 | 104 | 2017-10-03T15:29:19-07:00 | system/mrt-mom.txt | text/plain
+http://mock-merritt-it:4567/storage-input/system/mrt-ingest.txt | sha256 | 8beef10c35d4cfacee042c98fb1587c55e0052f6150ec1e7589d17685836cdb9 | 1568 | 2017-10-03T15:29:19-07:00 | system/mrt-ingest.txt | text/plain
+http://mock-merritt-it:4567/storage-input/system/mrt-membership.txt | sha256 | be4528f2066fb75a898710cc7bc321dfea67c02a7c5887cc95b0a18800fd4e53 | 22 | 2017-10-03T15:29:19-07:00 | system/mrt-membership.txt | text/plain
+http://mock-merritt-it:4567/storage-input/producer/hello.txt | sha256 | 2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824 | 5 | 2017-10-03T15:29:19-07:00 | producer/hello.txt | text/plain
+#%eof

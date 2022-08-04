@@ -12,12 +12,19 @@ services:
       target: 9001
     networks:
       merrittnet:
+  mock-merritt-it:
+    container_name: mock-merritt-it
+    image: ${ECR_REGISTRY}/mock-merritt-it:dev
+    ports:
+    - published: 8096
+      target: 4567
+    networks:
+      merrittnet:
   it-server:
     container_name: it-server
     image: tomcat:8-jre8
     volumes:
     - "${MDIR}/store-it/target/mrt-store-it-1.0-SNAPSHOT.war:/usr/local/tomcat/webapps/store.war"
-    - "${MDIR}/store-it/src/test/resources:/resources"
     ports:
     - published: 8080
       target: 8080
@@ -37,9 +44,6 @@ services:
   zoo-it:
     container_name: zoo-it
     image: zookeeper:3.4
-    ports:
-    - published: 2181
-      target: 2181
     networks:
       merrittnet:
     restart: unless-stopped

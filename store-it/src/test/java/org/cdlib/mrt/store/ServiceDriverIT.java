@@ -485,14 +485,12 @@ public class ServiceDriverIT {
 
                 try {    
                         JSONObject json = getJsonContent(stateUrl(ark), 200);
-                        //Version 1 has 8 files
                         verifyObject(json, ark, 1, 1);
 
                         json = getJsonContent(fixityUrl(ark), 200);
                         verifyObjectFixity(json);
 
                         json = getJsonContent(stateUrl(ark, 1), 200);
-                        //Version 1 has 8 files
                         verifyVersion(json, ark, 1, 1);
         
                         String path = "producer/hello.txt";
@@ -507,31 +505,36 @@ public class ServiceDriverIT {
                         String s = getContent(downloadUrl(ark, 1, path), 200);
                         //hello.txt contains the string "hello"
                         assertEquals("hello", s);
-
+                } catch(Exception e) {
+                        e.printStackTrace();
+                        throw e;
+                } catch(AssertionError e) {
+                        e.printStackTrace();
+                        throw e;
                 } finally {
                 }
         }
 
         @Test
-        public void AddObjectTest() throws IOException, JSONException, ParserConfigurationException, SAXException, XPathExpressionException {
+        public void AddObjectTest() throws Exception {
                 String ark = "ark:/1111/2222";
-                String checkm = "src/main/webapp/static/object1/test.checkm";
+                String checkm = "src/test/resources/object1.checkm";
 
                 try {
                         JSONObject json = addObjectByManifest(addUrl(ark), checkm);
-                        //Version 1 has 8 files
-                        verifyVersion(json, ark, 1, 8);
+                        //Version 1 has 7 files
+                        verifyVersion(json, ark, 1, 7);
         
                         json = getJsonContent(stateUrl(ark), 200);
-                        //Version 1 has 8 files
-                        verifyObject(json, ark, 1, 8);
+                        //Version 1 has 7 files
+                        verifyObject(json, ark, 1, 7);
 
                         json = getJsonContent(fixityUrl(ark), 200);
                         verifyObjectFixity(json);
 
                         List<String> entries = getZipContent(downloadObjectUrl(ark), 200);
-                        //Entry list has 8 files + a manifest
-                        assertEquals(9, entries.size());
+                        //Entry list has 7 files + a manifest
+                        assertEquals(8, entries.size());
                         assertTrue(entries.contains("ark+=1111=2222/1/producer/hello.txt"));
 
                         entries = getZipContent(downloadProducerUrl(ark), 200);
@@ -540,8 +543,8 @@ public class ServiceDriverIT {
                         assertTrue(entries.contains("hello.txt"));
 
                         json = getJsonContent(stateUrl(ark, 1), 200);
-                        //Version 1 has 8 files
-                        verifyVersion(json, ark, 1, 8);
+                        //Version 1 has 7 files
+                        verifyVersion(json, ark, 1, 7);
         
                         String path = "producer/hello.txt";
                         json = getJsonContent(stateUrl(ark, 1, path), 200);
@@ -561,13 +564,19 @@ public class ServiceDriverIT {
 
                         s = getContent(manifestUrl(ark), 200);
                         Document d = getDocument(s, "objectInfo");
-                        //object manifest has 8 files
-                        verifyObjectInfo(d, ark, 1, 8);        
+                        //object manifest has 7 files
+                        verifyObjectInfo(d, ark, 1, 7);        
 
                         s = getContent(ingestLinkUrl(ark, 1), 200);
-                        //ingest link has 1 file + a manifest
-                        verifyIngestLink(s, 2);
+                        //ingest link has 2 files + a manifest
+                        verifyIngestLink(s, 3);
                         assertFalse(s.isEmpty());
+                } catch(Exception e) {
+                        e.printStackTrace();
+                        throw e;
+                } catch(AssertionError e) {
+                        e.printStackTrace();
+                        throw e;
                 } finally {
                         deleteObject(deleteUrl(ark));
                         getContent(stateUrl(ark), 404);        
@@ -575,26 +584,32 @@ public class ServiceDriverIT {
         }
 
         @Test
-        public void CopyObjectTest() throws IOException, JSONException, ParserConfigurationException, SAXException, XPathExpressionException {
+        public void CopyObjectTest() throws UnsupportedEncodingException, IOException, JSONException {
                 String ark = "ark:/1111/6666";
-                String checkm = "src/main/webapp/static/object1/test.checkm";
+                String checkm = "src/test/resources/object1.checkm";
 
                 try {
                         JSONObject json = addObjectByManifest(addUrl(ark), checkm);
-                        //Version 1 has 8 files
-                        verifyVersion(json, ark, 1, 8);
+                        //Version 1 has 7 files
+                        verifyVersion(json, ark, 1, 7);
 
                         json = getJsonContent(stateUrl(ark), 200);
-                        //Version 1 has 8 files
-                        verifyObject(json, ark, 1, 8);
+                        //Version 1 has 7 files
+                        verifyObject(json, ark, 1, 7);
 
                         json = copyObject(copyUrl(ark, 8888));
-                        //Version 1 has 8 files
-                        verifyObject(json, ark, 1, 8);
+                        //Version 1 has 7 files
+                        verifyObject(json, ark, 1, 7);
 
                         json = getJsonContent(nodeStateUrl(8888, ark), 200);
-                        //Version 1 has 8 files
-                        verifyObject(json, ark, 1, 8);
+                        //Version 1 has 7 files
+                        verifyObject(json, ark, 1, 7);
+                } catch(Exception e) {
+                        e.printStackTrace();
+                        throw e;
+                } catch(AssertionError e) {
+                        e.printStackTrace();
+                        throw e;
                 } finally {
                         deleteObject(deleteUrl(ark));
                         getContent(stateUrl(ark), 404);        
@@ -605,27 +620,27 @@ public class ServiceDriverIT {
         }
 
         @Test
-        public void AddObjectAndVerTest() throws IOException, JSONException, ParserConfigurationException, SAXException, XPathExpressionException, InterruptedException {
+        public void AddObjectAndVerTest() throws Exception {
                 String ark = "ark:/1111/3333";
-                String checkm = "src/main/webapp/static/object1/test.checkm";
-                String checkmv2 = "src/main/webapp/static/object1v2/test.checkm";
+                String checkm = "src/test/resources/object1.checkm";
+                String checkmv2 = "src/test/resources/object1v2.checkm";
 
                 try {
                         JSONObject json = addObjectByManifest(addUrl(ark), checkm);
-                        //version 1 has 8 files
-                        verifyVersion(json, ark, 1, 8);
+                        //version 1 has 7 files
+                        verifyVersion(json, ark, 1, 7);
         
                         json = addObjectByManifest(updateUrl(ark), checkmv2);
-                        //version 2 has 9 files (8+1)
-                        verifyVersion(json, ark, 2, 9);
+                        //version 2 has 8 files (7+1)
+                        verifyVersion(json, ark, 2, 8);
 
                         json = getJsonContent(stateUrl(ark), 200);
-                        //object has 9 files
-                        verifyObject(json, ark, 2, 9);
+                        //object has 8 files
+                        verifyObject(json, ark, 2, 8);
         
                         List<String> entries = getZipContent(downloadObjectUrl(ark), 200);
-                        //object zip file has 10 entries: 8 (v1) + 1 (v2) + 1 (manifest)
-                        assertEquals(10, entries.size());
+                        //object zip file has 9 entries: 7 (v1) + 1 (v2) + 1 (manifest)
+                        assertEquals(9, entries.size());
                         assertTrue(entries.contains("ark+=1111=3333/1/producer/hello.txt"));
                         assertTrue(entries.contains("ark+=1111=3333/2/producer/hello2.txt"));
 
@@ -636,8 +651,8 @@ public class ServiceDriverIT {
                         assertTrue(entries.contains("hello2.txt"));
 
                         json = getJsonContent(stateUrl(ark, 2), 200);
-                        //version 2 has 9 files
-                        verifyVersion(json, ark, 2, 9);
+                        //version 2 has 8 files
+                        verifyVersion(json, ark, 2, 8);
         
                         String path = "producer/hello.txt";
                         json = getJsonContent(stateUrl(ark, 1, path), 200);
@@ -651,17 +666,23 @@ public class ServiceDriverIT {
 
                         String s = getContent(manifestUrl(ark), 200);
                         Document d = getDocument(s, "objectInfo");
-                        //object manifest has 9 files
-                        verifyObjectInfo(d, ark, 2, 9);
+                        //object manifest has 8 files
+                        verifyObjectInfo(d, ark, 2, 8);
                         
                         s = getContent(ingestLinkUrl(ark, 2), 200);
-                        //ingest link has 2 files + a manifest
-                        verifyIngestLink(s, 3);
+                        //ingest link has 3 files + a manifest
+                        verifyIngestLink(s, 4);
                         assertFalse(s.isEmpty());
 
                         json = getJsonContent(versionLinkUrl(ark, 2), 200);
-                        //version link has 9 files
-                        verifyVersionLink(json, ark, 9);
+                        //version link has 8 files
+                        verifyVersionLink(json, ark, 8);
+                } catch(Exception e) {
+                        e.printStackTrace();
+                        throw e;
+                } catch(AssertionError e) {
+                        e.printStackTrace();
+                        throw e;
                 } finally {
                         deleteObject(deleteUrl(ark));
                         getContent(stateUrl(ark), 404);        
@@ -669,32 +690,32 @@ public class ServiceDriverIT {
         }
 
         @Test
-        public void AddObjectAndVerNoChangeTest() throws IOException, JSONException, ParserConfigurationException, SAXException, XPathExpressionException, InterruptedException {
+        public void AddObjectAndVerNoChangeTest() throws Exception {
                 String ark = "ark:/1111/5555";
-                String checkm = "src/main/webapp/static/object1/test.checkm";
-                String checkmv2 = "src/main/webapp/static/object1v2/test.checkm";
-                String checkmv3 = "src/main/webapp/static/object1v3/test.checkm";
+                String checkm = "src/test/resources/object1.checkm";
+                String checkmv2 = "src/test/resources/object1v2.checkm";
+                String checkmv3 = "src/test/resources/object1v3.checkm";
 
                 try {
                         JSONObject json = addObjectByManifest(addUrl(ark), checkm);
-                        //version 1 has 8 files
-                        verifyVersion(json, ark, 1, 8);
+                        //version 1 has 7 files
+                        verifyVersion(json, ark, 1, 7);
         
                         json = addObjectByManifest(updateUrl(ark), checkmv2);
-                        //version 2 has 9 files (8+1)
-                        verifyVersion(json, ark, 2, 9);
+                        //version 2 has 8 files (7+1)
+                        verifyVersion(json, ark, 2, 8);
 
                         json = addObjectByManifest(updateUrl(ark), checkmv3);
-                        //version 2 has 9 files (8+1)
-                        verifyVersion(json, ark, 3, 9);
+                        //version 2 has 8 files (7+1)
+                        verifyVersion(json, ark, 3, 8);
 
                         json = getJsonContent(stateUrl(ark), 200);
-                        //object has 9 files
-                        verifyObject(json, ark, 3, 9);
+                        //object has 8 files
+                        verifyObject(json, ark, 3, 8);
         
                         List<String> entries = getZipContent(downloadObjectUrl(ark), 200);
-                        //object zip file has 10 entries: 8 (v1) + 1 (v2) + 0 (v3) + 1 (manifest)
-                        assertEquals(10, entries.size());
+                        //object zip file has 9 entries: 7 (v1) + 1 (v2) + 0 (v3) + 1 (manifest)
+                        assertEquals(9, entries.size());
                         assertTrue(entries.contains("ark+=1111=5555/1/producer/hello.txt"));
                         assertTrue(entries.contains("ark+=1111=5555/2/producer/hello2.txt"));
                         assertFalse(entries.contains("ark+=1111=5555/3/producer/hello.txt"));
@@ -706,22 +727,28 @@ public class ServiceDriverIT {
                         assertTrue(entries.contains("hello2.txt"));
 
                         json = getJsonContent(stateUrl(ark, 3), 200);
-                        //version 2 has 9 files
-                        verifyVersion(json, ark, 3, 9);
+                        //version 2 has 8 files
+                        verifyVersion(json, ark, 3, 8);
         
                         String s = getContent(manifestUrl(ark), 200);
                         Document d = getDocument(s, "objectInfo");
-                        //object manifest has 9 files
-                        verifyObjectInfo(d, ark, 3, 9);
+                        //object manifest has 8 files
+                        verifyObjectInfo(d, ark, 3, 8);
                         
                         s = getContent(ingestLinkUrl(ark, 3), 200);
-                        //ingest link has 2 files + a manifest
-                        verifyIngestLink(s, 3);
+                        //ingest link has 3 files + a manifest
+                        verifyIngestLink(s, 4);
                         assertFalse(s.isEmpty());
 
                         json = getJsonContent(versionLinkUrl(ark, 3), 200);
-                        //version link has 9 files
-                        verifyVersionLink(json, ark, 9);
+                        //version link has 8 files
+                        verifyVersionLink(json, ark, 8);
+                } catch(Exception e) {
+                        e.printStackTrace();
+                        throw e;
+                } catch(AssertionError e) {
+                        e.printStackTrace();
+                        throw e;
                 } finally {
                         deleteObject(deleteUrl(ark));
                         getContent(stateUrl(ark), 404);        
@@ -729,19 +756,19 @@ public class ServiceDriverIT {
         }
 
         @Test
-        public void AddObjectAndAssemble() throws IOException, JSONException, ParserConfigurationException, SAXException, XPathExpressionException, InterruptedException {
+        public void AddObjectAndAssemble() throws Exception {
                 String ark = "ark:/1111/4444";
-                String checkm = "src/main/webapp/static/object1/test.checkm";
-                String checkmv2 = "src/main/webapp/static/object1v2/test.checkm";
+                String checkm = "src/test/resources/object1.checkm";
+                String checkmv2 = "src/test/resources/object1v2.checkm";
 
                 try {
                         JSONObject json = addObjectByManifest(addUrl(ark), checkm);
-                        //version 1 has 8 files
-                        verifyVersion(json, ark, 1, 8);
+                        //version 1 has 7 files
+                        verifyVersion(json, ark, 1, 7);
         
                         json = addObjectByManifest(updateUrl(ark), checkmv2);
-                        //version 2 has 9 files (8+1)
-                        verifyVersion(json, ark, 2, 9);
+                        //version 2 has 8 files (7+1)
+                        verifyVersion(json, ark, 2, 8);
 
                         json = assembleObject(assembleObjectUrl(ark));
                         assertEquals(200, json.getInt("status"));
@@ -759,7 +786,12 @@ public class ServiceDriverIT {
                         assertEquals(200, json.getInt("status"));
                         assertTrue(json.has("url"));
                         assertEquals("Payload contains token info", json.get("message"));                        
-
+                } catch(Exception e) {
+                        e.printStackTrace();
+                        throw e;
+                } catch(AssertionError e) {
+                        e.printStackTrace();
+                        throw e;
                 } finally {
                         deleteObject(deleteUrl(ark));
                         getContent(stateUrl(ark), 404);        
