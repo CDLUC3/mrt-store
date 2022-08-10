@@ -55,7 +55,7 @@ pipeline {
                     new BuildFunctions().build_library(
                       'https://github.com/CDLUC3/mrt-cloud.git', 
                       env.BRANCH_CLOUD, 
-                      '-DskipTests'
+                      ''
                     )
                   }
                 }
