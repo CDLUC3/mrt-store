@@ -12,8 +12,8 @@ pipeline {
      */
     environment {      
       //Branch/tag names to incorporate into the build.  Create one var for each repo.
-      BRANCH_CORE = 'jtrim'
-      BRANCH_CLOUD = 'jtrim'
+      BRANCH_CORE = 'main'
+      BRANCH_CLOUD = 'main'
       BRANCH_ZK = 'main'
 
       //working vars
