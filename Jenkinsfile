@@ -1,4 +1,3 @@
-
 @Library('merritt-build-library')
 import org.cdlib.mrt.build.BuildFunctions;
 
@@ -18,7 +17,7 @@ pipeline {
 
       //working vars
       M2DIR = "${HOME}/.m2-store"
-      DEF_BRANCH = "jtrim"
+      DEF_BRANCH = "main"
     }
     agent any
 
@@ -55,7 +54,7 @@ pipeline {
                     new BuildFunctions().build_library(
                       'https://github.com/CDLUC3/mrt-cloud.git', 
                       env.BRANCH_CLOUD, 
-                      ''
+                      '-DskipTests'
                     )
                   }
                 }
