@@ -115,6 +115,13 @@
         <version>2.5</version>
     </dependency>
     
+    <dependency>
+	<groupId>javax.ws.rs</groupId>
+	<artifactId>javax.ws.rs-api</artifactId>
+	<version>2.0.1</version>
+    </dependency>
+
+    
         <dependency>
             <groupId>jaxen</groupId>
             <artifactId>jaxen</artifactId>
@@ -132,8 +139,8 @@
         <artifactId>log4j</artifactId>
         <version>1.2.17</version>
       </dependency>
-
-      <dependency>
+      
+        <dependency>
           <groupId>org.apache.zookeeper</groupId>
           <artifactId>zookeeper</artifactId>
           <version>3.7.1</version>

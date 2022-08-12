@@ -1,4 +1,3 @@
-
 @Library('merritt-build-library')
 import org.cdlib.mrt.build.BuildFunctions;
 

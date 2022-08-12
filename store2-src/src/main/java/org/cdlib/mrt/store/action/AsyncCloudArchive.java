@@ -29,25 +29,9 @@ OF THE POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************/
 package org.cdlib.mrt.store.action;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.InetAddress;
 import java.util.ArrayList;
-import java.util.concurrent.Callable;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Properties;
-import javax.ws.rs.core.StreamingOutput;
-
-import org.jdom.Attribute;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.input.SAXBuilder;
-import org.jdom.output.XMLOutputter;
-import org.jdom.xpath.XPath;
 
 
 import org.cdlib.mrt.core.FileContent;
@@ -57,18 +41,12 @@ import org.cdlib.mrt.s3.service.CloudStoreInf;
 import org.cdlib.mrt.s3.service.NodeIO;
 
 
-import org.cdlib.mrt.store.email.StorageEmail;
 import org.cdlib.mrt.store.TokenStatus;
 
 import org.cdlib.mrt.utility.TException;
 import org.cdlib.mrt.utility.LoggerInf;
-import org.cdlib.mrt.store.action.ActionAbs;
-import org.cdlib.mrt.utility.DateUtil;
 import org.cdlib.mrt.utility.FileUtil;
 import org.cdlib.mrt.utility.LoggerAbs;
-import org.cdlib.mrt.utility.PropertiesUtil;
-import org.cdlib.mrt.utility.StringUtil;
-import org.cdlib.mrt.utility.TallyTable;
 /**
  * Async container for creating a container object
  * @author dloy
