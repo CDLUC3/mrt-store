@@ -90,7 +90,9 @@ public class CloudArchive
     protected Tika tika = null;
     protected ArchiveBuilderBase.ArchiveType archiveType = null;
     protected String pairtreeName = null;
-    
+    protected boolean deleteFileAfterCopy = false;
+    protected long addListMs = 0;
+    protected long buildMs = 0;
 
     public CloudArchive(
             CloudStoreInf s3service, 
@@ -302,6 +304,7 @@ public class CloudArchive
     protected void addListObject(boolean returnFullObject)
         throws TException
     {
+        long startMs = System.currentTimeMillis();
         try {
             
             File newManifest = new File(copyBase, "manifest.xml");
@@ -322,6 +325,7 @@ public class CloudArchive
                     }
                 }
             }
+            if (DEBUG) System.out.println("addListObject size=" + FileUtil.getDirectorySize(copyBase));
             
         } catch (TException tex) {
             throw tex;
@@ -332,6 +336,8 @@ public class CloudArchive
             logger.logError(StringUtil.stackTrace(ex), 10);
             throw new TException.GENERAL_EXCEPTION(msg);
             
+        } finally {
+             addListMs = System.currentTimeMillis() - startMs;
         }
         
     }
@@ -339,6 +345,7 @@ public class CloudArchive
     protected void addListVersion(int outVersion)
         throws TException
     {
+        long startMs = System.currentTimeMillis();
         try {
             
             int current = map.getCurrent();
@@ -358,6 +365,7 @@ public class CloudArchive
                 ArchiveComponent archiveComponent = ArchiveComponent.fromKey(key);
                 addFile(archiveComponent, copyBase);
             }
+            System.out.println("addListVersion size=" + FileUtil.getDirectorySize(copyBase));
             
         } catch (TException tex) {
             throw tex;
@@ -368,6 +376,8 @@ public class CloudArchive
             logger.logError(StringUtil.stackTrace(ex), 10);
             throw new TException.GENERAL_EXCEPTION(msg);
             
+        } finally {
+             addListMs = System.currentTimeMillis() - startMs;
         }
         
     }
@@ -375,6 +385,7 @@ public class CloudArchive
     protected void addListProducer(int outVersion, ProducerComponent pc)
         throws TException
     {
+        long startMs = System.currentTimeMillis();
         try {
             
             int current = map.getCurrent();
@@ -406,6 +417,8 @@ public class CloudArchive
             logger.logError(StringUtil.stackTrace(ex), 10);
             throw new TException.GENERAL_EXCEPTION(msg);
             
+        } finally {
+             addListMs = System.currentTimeMillis() - startMs;
         }
         
     }
@@ -496,8 +509,9 @@ public class CloudArchive
             File containerFile = new File(workBase,containerName);
             //File containerFile = FileUtil.getTempFile("archive", "." + archiveType.getExtension());
             ArchiveBuilderBase archiveBuilder
-                    = ArchiveBuilderBase.getArchiveBuilderBase(archiveDir, containerFile, logger, archiveType);
+                    = ArchiveBuilderBase.getArchiveBuilderBase(archiveDir, containerFile, logger, archiveType).setDeleteFileAfterCopy(deleteFileAfterCopy);;
             archiveBuilder.buildArchive(includeBase);
+            buildMs = archiveBuilder.getBuildTimeMs();
             FileContent archiveContent = setFileContent(containerFile);
             return archiveContent;
 
@@ -521,10 +535,11 @@ public class CloudArchive
         try {
             ArchiveBuilderBase archiveBuilder
                     = ArchiveBuilderBase.getArchiveBuilderBase(
-                        archiveDir, outputStream, logger, archiveType);
+                        archiveDir, outputStream, logger, archiveType).setDeleteFileAfterCopy(deleteFileAfterCopy);
             
             archiveBuilder.buildArchive(includeBase);
-
+            buildMs = archiveBuilder.getBuildTimeMs();
+            
         } catch (Exception ex) {
             throw new TException.INVALID_ARCHITECTURE (
                     "Unable to find version.", ex);
@@ -702,5 +717,22 @@ public class CloudArchive
             
         }
         
+    }
+
+    public boolean isDeleteFileAfterCopy() {
+        return deleteFileAfterCopy;
+    }
+
+    public CloudArchive setDeleteFileAfterCopy(boolean deleteFileAfterCopy) {
+        this.deleteFileAfterCopy = deleteFileAfterCopy;
+        return this;
+    }
+
+    public long getBuildMs() {
+        return buildMs;
+    }
+
+    public long getAddListMs() {
+        return addListMs;
     }
 }
