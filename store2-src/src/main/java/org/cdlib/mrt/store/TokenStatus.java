@@ -42,7 +42,7 @@ import java.util.Vector;
 import org.cdlib.mrt.s3.service.CloudResponse;
 import org.cdlib.mrt.core.DateState;
 import org.cdlib.mrt.core.Identifier;
-import org.cdlib.mrt.utility.ArchiveBuilder;
+import org.cdlib.mrt.utility.ArchiveBuilderBase;
 import org.cdlib.mrt.utility.DateUtil;
 import org.cdlib.mrt.utility.StateInf;
 import org.cdlib.mrt.utility.TException;
@@ -118,7 +118,7 @@ public class TokenStatus
     protected Boolean fullObject = null;
     protected Boolean returnOnError = null;
     protected ArchiveContent archiveContent = null;
-    protected ArchiveBuilder.ArchiveType archiveType = null;
+    protected ArchiveBuilderBase.ArchiveType archiveType = null;
     protected TokenStatusEnum tokenStatusEnum = TokenStatusEnum.NotReady;
     protected List<String> filterList = null;
     
@@ -140,7 +140,7 @@ public class TokenStatus
             tokenStatus.setToken("245f46bf-0e37-4577-ba45-9ac8c71fa4bd");
             tokenStatus.setFullObject(true);
             tokenStatus.setReturnOnError(false);
-            tokenStatus.setArchiveType(ArchiveBuilder.ArchiveType.targz);
+            tokenStatus.setArchiveType(ArchiveBuilderBase.ArchiveType.targz);
             tokenStatus.setArchiveContent(ArchiveContent.producer);
             tokenStatus.currentBuildStart();
             ArrayList<String> filterList = new ArrayList();
@@ -418,11 +418,11 @@ public class TokenStatus
         this.archiveContent = archiveContent;
     }
 
-    public ArchiveBuilder.ArchiveType getArchiveType() {
+    public ArchiveBuilderBase.ArchiveType getArchiveType() {
         return archiveType;
     }
 
-    public void setArchiveType(ArchiveBuilder.ArchiveType archiveType) {
+    public void setArchiveType(ArchiveBuilderBase.ArchiveType archiveType) {
         this.archiveType = archiveType;
     }
 
@@ -430,7 +430,7 @@ public class TokenStatus
         if (archiveTypeS == null) {
             return;
         }
-        this.archiveType = ArchiveBuilder.ArchiveType.valueOf(archiveTypeS);
+        this.archiveType = ArchiveBuilderBase.ArchiveType.valueOf(archiveTypeS);
     }
 
     public void setTokenStatusEnum(String tokenStatusEnumS) {

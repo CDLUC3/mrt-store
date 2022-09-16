@@ -67,7 +67,6 @@ import org.cdlib.mrt.utility.TException;
 import org.cdlib.mrt.s3.service.CloudResponse;
 import org.cdlib.mrt.s3.service.CloudStoreInf;
 import org.cdlib.mrt.store.KeyFileInf;
-import org.cdlib.mrt.utility.ArchiveBuilder;
 import org.cdlib.mrt.utility.ArchiveBuilderBase;
 import org.cdlib.mrt.utility.DateUtil;
 import org.cdlib.mrt.utility.FixityTests;
