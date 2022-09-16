@@ -11,13 +11,13 @@ pipeline {
      */
     environment {      
       //Branch/tag names to incorporate into the build.  Create one var for each repo.
-      BRANCH_CORE = 'main'
+      BRANCH_CORE = 'zipdel'
       BRANCH_CLOUD = 'main'
       BRANCH_ZK = 'main'
 
       //working vars
       M2DIR = "${HOME}/.m2-store"
-      DEF_BRANCH = "main"
+      DEF_BRANCH = "zipdel"
     }
     agent any
 
