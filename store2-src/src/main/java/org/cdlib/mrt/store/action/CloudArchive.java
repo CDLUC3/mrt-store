@@ -497,7 +497,7 @@ public class CloudArchive
      * @return Archive file and state info of archive file
      * @throws TException process exception
      */
-    public FileContent buildArchive(
+    protected FileContent buildArchive(
             boolean includeBase,
             File archiveDir,
             String archiveName)
@@ -509,7 +509,7 @@ public class CloudArchive
             File containerFile = new File(workBase,containerName);
             //File containerFile = FileUtil.getTempFile("archive", "." + archiveType.getExtension());
             ArchiveBuilderBase archiveBuilder
-                    = ArchiveBuilderBase.getArchiveBuilderBase(archiveDir, containerFile, logger, archiveType).setDeleteFileAfterCopy(deleteFileAfterCopy);;
+                    = ArchiveBuilderBase.getArchiveBuilderBase(archiveDir, containerFile, logger, archiveType).setDeleteFileAfterCopy(deleteFileAfterCopy);
             archiveBuilder.buildArchive(includeBase);
             buildMs = archiveBuilder.getBuildTimeMs();
             FileContent archiveContent = setFileContent(containerFile);
@@ -525,7 +525,7 @@ public class CloudArchive
     }
     
 
-    public void buildArchive(
+    protected void buildArchive(
             boolean includeBase,
             File archiveDir,
             OutputStream outputStream)

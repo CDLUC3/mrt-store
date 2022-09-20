@@ -470,7 +470,8 @@ public class CANCloudService
                     + " - returnIfError=" + returnIfError
                     + " - archiveTypeS=" + archiveTypeS
                     , 10);
-            CloudArchive cloudArchive = new CloudArchive(s3service, bucket, objectID, buildTemp, archiveTypeS, logger);
+            CloudArchive cloudArchive = new CloudArchive(s3service, bucket, objectID, buildTemp, archiveTypeS, logger)
+                    .setDeleteFileAfterCopy(true);
             FileContent fileContent = cloudArchive.buildObject(archiveTypeS, returnFullVersion);
             return fileContent;
 
@@ -504,7 +505,8 @@ public class CANCloudService
                     + " - returnIfError=" + returnIfError
                     + " - archiveTypeS=" + archiveTypeS
                     , 10);
-            CloudArchive cloudArchive = new CloudArchive(s3service, bucket, objectID, buildTemp, archiveTypeS, logger);
+            CloudArchive cloudArchive = new CloudArchive(s3service, bucket, objectID, buildTemp, archiveTypeS, logger)
+                    .setDeleteFileAfterCopy(true);
             cloudArchive.buildObject(outputStream, returnFullVersion);
 
         } catch (Exception ex) {
@@ -581,7 +583,8 @@ public class CANCloudService
                     + " - archiveTypeS=" + archiveTypeS
                     , 10);
             
-            CloudArchive cloudArchive = new CloudArchive(s3service, bucket, objectID, buildTemp, archiveTypeS, logger);
+            CloudArchive cloudArchive = new CloudArchive(s3service, bucket, objectID, buildTemp, archiveTypeS, logger)
+                    .setDeleteFileAfterCopy(true);
             FileContent fileContent = cloudArchive.buildVersion(versionID, archiveTypeS);
             return fileContent;
 
@@ -641,7 +644,8 @@ public class CANCloudService
                     + " - archiveTypeS=" + archiveTypeS
                     , 10);
             
-            CloudArchive cloudArchive = new CloudArchive(s3service, bucket, objectID, buildTemp, archiveTypeS, logger);
+            CloudArchive cloudArchive = new CloudArchive(s3service, bucket, objectID, buildTemp, archiveTypeS, logger)
+                    .setDeleteFileAfterCopy(true);
             cloudArchive.buildVersion(versionID, outputStream);
 
         } catch (Exception ex) {
