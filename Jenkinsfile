@@ -17,7 +17,7 @@ pipeline {
 
       //working vars
       M2DIR = "${HOME}/.m2-store"
-      DEF_BRANCH = "zipdel"
+      DEF_BRANCH = "main"
     }
     agent any
 
