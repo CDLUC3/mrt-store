@@ -73,7 +73,7 @@ import org.cdlib.mrt.core.Identifier;
 import org.cdlib.mrt.s3.service.CloudResponse;
 import org.cdlib.mrt.s3.service.CloudStoreInf;
 import org.cdlib.mrt.s3.service.NodeIO;
-import org.cdlib.mrt.utility.ArchiveBuilder;
+import org.cdlib.mrt.utility.ArchiveBuilderBase;
 import org.cdlib.mrt.core.DateState;
 import org.cdlib.mrt.store.action.AsyncCloudArchive;
 import org.cdlib.mrt.store.action.TokenManager;
@@ -136,6 +136,7 @@ public class JerseyBase
         rdf("state", "xml", "application/rdf+xml", null),
         turtle("state", "ttl", "text/turtle", null),
         xhtml("state", "xhtml", "application/xhtml+xml", null),
+        zipunc("archive", "zip", "application/zip", null),
         zip("archive", "zip", "application/zip", null);
 
         protected final String form;
@@ -1569,11 +1570,11 @@ public class JerseyBase
         
         //validate archive type options before Jersey streaming
         String archiveTypeS = formatType.toLowerCase();
-        ArchiveBuilder.ArchiveType archiveType = null;
+        ArchiveBuilderBase.ArchiveType archiveType = null;
         try {
             if (DEBUG) System.out.println(MESSAGE + "getObjectStream before ArchiveBuilder");
             archiveType
-                    = ArchiveBuilder.ArchiveType.valueOf(archiveTypeS);
+                    = ArchiveBuilderBase.ArchiveType.valueOf(archiveTypeS);
         } catch (Exception ex) {
             throw new TException.REQUEST_INVALID(MESSAGE + "Archive form unsupported:" + archiveTypeS);
         }
@@ -1666,11 +1667,11 @@ public class JerseyBase
         
         //validate archive type options before Jersey streaming
         archiveTypeS = archiveTypeS.toLowerCase();
-        ArchiveBuilder.ArchiveType archiveType = null;
+        ArchiveBuilderBase.ArchiveType archiveType = null;
         try {
             if (DEBUG) System.out.println(MESSAGE + "getObjectStream before ArchiveBuilder");
             archiveType
-                    = ArchiveBuilder.ArchiveType.valueOf(archiveTypeS);
+                    = ArchiveBuilderBase.ArchiveType.valueOf(archiveTypeS);
         } catch (Exception ex) {
             throw new TException.REQUEST_INVALID(MESSAGE + "Archive form unsupported:" + archiveTypeS);
         }
@@ -1766,11 +1767,11 @@ public class JerseyBase
         
         //validate archive type options before Jersey streaming
         archiveTypeS = archiveTypeS.toLowerCase();
-        ArchiveBuilder.ArchiveType archiveType = null;
+        ArchiveBuilderBase.ArchiveType archiveType = null;
         try {
             if (DEBUG) System.out.println(MESSAGE + "getObjectStream before ArchiveBuilder");
             archiveType
-                    = ArchiveBuilder.ArchiveType.valueOf(archiveTypeS);
+                    = ArchiveBuilderBase.ArchiveType.valueOf(archiveTypeS);
         } catch (Exception ex) {
             throw new TException.REQUEST_INVALID(MESSAGE + "Archive form unsupported:" + archiveTypeS);
         }
@@ -2112,11 +2113,11 @@ public class JerseyBase
         
         //validate archive type options before Jersey streaming
         archiveTypeS = archiveTypeS.toLowerCase();
-        ArchiveBuilder.ArchiveType archiveType = null;
+        ArchiveBuilderBase.ArchiveType archiveType = null;
         try {
             if (DEBUG) System.out.println(MESSAGE + "getObjectStream before ArchiveBuilder");
             archiveType
-                    = ArchiveBuilder.ArchiveType.valueOf(archiveTypeS);
+                    = ArchiveBuilderBase.ArchiveType.valueOf(archiveTypeS);
         } catch (Exception ex) {
             throw new TException.REQUEST_INVALID(MESSAGE + "Archive form unsupported:" + archiveTypeS);
         }
@@ -2432,11 +2433,11 @@ public class JerseyBase
         
         //validate archive type options before Jersey streaming
         String archiveTypeS = formatType.toLowerCase();
-        ArchiveBuilder.ArchiveType archiveType = null;
+        ArchiveBuilderBase.ArchiveType archiveType = null;
         try {
             if (DEBUG) System.out.println(MESSAGE + "getObjectStream before ArchiveBuilder");
             archiveType
-                    = ArchiveBuilder.ArchiveType.valueOf(archiveTypeS);
+                    = ArchiveBuilderBase.ArchiveType.valueOf(archiveTypeS);
         } catch (Exception ex) {
             throw new TException.REQUEST_INVALID(MESSAGE + "Archive form unsupported:" + archiveTypeS);
         }

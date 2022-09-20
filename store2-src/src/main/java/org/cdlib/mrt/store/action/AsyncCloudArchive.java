@@ -227,7 +227,7 @@ public class AsyncCloudArchive
                     workBase,
                     archiveTypeS,
                     logger
-            );
+            ).setDeleteFileAfterCopy(true);
 
         } catch (Exception ex) {
             ex.printStackTrace();

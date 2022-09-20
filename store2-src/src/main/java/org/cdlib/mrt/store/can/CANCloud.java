@@ -32,22 +32,13 @@ package org.cdlib.mrt.store.can;
 
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.util.Vector;
 import java.util.List;
 
 import org.cdlib.mrt.store.NodeInf;
 //import org.cdlib.mrt.store.ObjectLocationInf;
-import org.cdlib.mrt.store.ObjectStoreInf;
-
-import java.io.FileInputStream;
-import java.io.InputStream;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Properties;
-import org.cdlib.mrt.cloud.ManifestSAX;
 
 import org.cdlib.mrt.cloud.object.StateHandler;
 import org.cdlib.mrt.cloud.VersionMap;
@@ -56,15 +47,9 @@ import org.cdlib.mrt.core.Identifier;
 import org.cdlib.mrt.core.FileContent;
 import org.cdlib.mrt.store.FileFixityState;
 import org.cdlib.mrt.core.FileComponent;
-import org.cdlib.mrt.cloud.action.FixityObject;
-import org.cdlib.mrt.store.action.ProducerComponentList;
-import org.cdlib.mrt.cloud.CloudList;
 import org.cdlib.mrt.cloud.action.ContentVersionLink;
-import org.cdlib.mrt.cloud.utility.CloudUtil;
-import org.cdlib.mrt.core.DateState;
 import org.cdlib.mrt.s3.service.CloudStoreInf;
 import org.cdlib.mrt.store.action.CloudArchive;
-import org.cdlib.mrt.store.LastActivity;
 import org.cdlib.mrt.store.NodeState;
 import org.cdlib.mrt.store.ObjectFixityState;
 import org.cdlib.mrt.store.ObjectState;
@@ -72,21 +57,12 @@ import org.cdlib.mrt.store.SpecScheme;
 import org.cdlib.mrt.store.VersionContent;
 import org.cdlib.mrt.store.VersionState;
 import org.cdlib.mrt.store.action.CopyNodeObject;
-import org.cdlib.mrt.store.action.CopyVirtualObject;
 import org.cdlib.mrt.store.KeyFileInf;
-import org.cdlib.mrt.store.PreSignedState;
-import org.cdlib.mrt.store.app.StorageServiceInit;
-import org.cdlib.mrt.utility.ArchiveBuilder;
 import org.cdlib.mrt.utility.FileUtil;
-import org.cdlib.mrt.utility.HTTPUtil;
 import org.cdlib.mrt.utility.TException;
-import org.cdlib.mrt.utility.TLockFile;
 import org.cdlib.mrt.utility.LoggerInf;
 import org.cdlib.mrt.utility.StringUtil;
-import org.cdlib.mrt.store.cloud.CloudObjectService;
 import org.cdlib.mrt.store.cloud.CANCloudService;
-import org.cdlib.mrt.store.storage.StorageServiceInf;
-import org.cdlib.mrt.utility.DateUtil;
 
 /**
  * Specific Node level service
