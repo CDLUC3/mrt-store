@@ -70,7 +70,7 @@ public class StorageConfig
     protected URL storeLink = null;
     protected Properties asyncArchivProp = null;
     protected String queueService = null;
-    protected String queueName = null;
+    protected String queueLockBase = null;
     protected String queueHoldFile = null;
     protected String queuePollingInterval = null;
     protected String queueNumThreadsSmall = null;
@@ -108,6 +108,7 @@ public class StorageConfig
             storageConfig.setVerifyOnRead(jStoreInfo.getBoolean("verifyOnRead"));
             storageConfig.setVerifyOnWrite(jStoreInfo.getBoolean("verifyOnWrite"));
             storageConfig.setQueueService(jStoreQueue.getString("QueueService"));
+            storageConfig.setQueueLockBase(jStoreQueue.getString("QueueLockBase"));
             storageConfig.setQueueHoldFile(jStoreQueue.getString("QueueHoldFile"));
             storageConfig.setQueuePollingInterval(jStoreQueue.getString("PollingInterval"));
             storageConfig.setQueueNumThreadsSmall(jStoreQueue.getString("NumThreadsSmall"));
@@ -290,8 +291,12 @@ public class StorageConfig
         this.queueService = queueService;
     }
 
-    public void setQueueName(String queueName) {
-        this.queueName = queueName;
+    public String getQueueLockBase() {
+        return queueLockBase;
+    }
+
+    public void setQueueLockBase(String queueLockBase) {
+        this.queueLockBase = queueLockBase;
     }
 
     public String getQueueHoldFile() {
@@ -320,10 +325,6 @@ public class StorageConfig
 
     public String getQueueService() {
         return queueService;
-    }
-
-    public String getQueueName() {
-        return queueName;
     }
 
     public void setSupportURI(String supportURI) {

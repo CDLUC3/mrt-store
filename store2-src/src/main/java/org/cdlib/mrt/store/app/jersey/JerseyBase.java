@@ -79,6 +79,9 @@ import org.cdlib.mrt.store.action.AsyncCloudArchive;
 import org.cdlib.mrt.store.action.TokenManager;
 import org.cdlib.mrt.store.consumer.utility.QueueUtil;
 import org.cdlib.mrt.store.tools.FileFromUrl;
+import org.cdlib.mrt.store.zoo.ZooFlagsEnum;
+import org.cdlib.mrt.store.zoo.ZooTokenHandler;
+import org.cdlib.mrt.store.zoo.ZooTokenState;
 import org.cdlib.mrt.utility.DateUtil;
 import org.cdlib.mrt.utility.StateInf;
 import org.cdlib.mrt.utility.SerializeUtil;
@@ -2810,6 +2813,54 @@ public class JerseyBase
             return Response.ok(typeFile.file, typeFile.formatType.getMimeType())
                     .header("Content-Disposition", "attachment; filename=" + fileName)
                     .build();
+        }
+    } 
+    
+   protected Response processFlag(
+            String flagName,
+            String operation,
+            String formatType,
+            CloseableService cs,
+            ServletConfig sc)
+        throws TException
+    { 
+        
+        System.out.println("processFlag"
+                + " - flagName:" + flagName
+                + " - operation:" + operation
+                + " - formatType:" + formatType
+        );
+        StorageServiceInit storageServiceInit = StorageServiceInit.getStorageServiceInit(sc);
+        StorageServiceInf storageService = storageServiceInit.getStorageService();
+        StorageConfig storageConfig = storageService.getStorageConfig();
+        LoggerInf logger = null;
+        try {
+            logger = storageConfig.getLogger();
+            String zooConnectionString = storageConfig.getQueueService();
+            String zooNodeBase = storageConfig.getQueueLockBase();
+            if (StringUtil.isAllBlank(flagName)) {
+                throw new TException.INVALID_OR_MISSING_PARM("flagName missing");
+            }
+            flagName = flagName.toLowerCase();
+            ZooFlagsEnum lock = ZooFlagsEnum.valueOfZooPath(flagName);
+            if (lock == null) {
+                throw new TException.INVALID_OR_MISSING_PARM("lock name not found");
+            }
+            ZooTokenHandler handler = ZooTokenHandler.getZooTokenHandler (
+                zooConnectionString, 
+                zooNodeBase,
+                lock,
+                storageConfig.getLogger());
+            
+            ZooTokenState zooState = handler.processFlag(operation);
+            return getStateResponse(zooState, formatType, logger, cs, sc);
+            
+        } catch (TException tex) {
+            return getExceptionResponse(cs, tex, formatType, logger);
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            throw new TException.GENERAL_EXCEPTION(MESSAGE + "Exception:" + ex);
         }
     }
     

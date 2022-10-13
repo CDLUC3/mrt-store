@@ -242,6 +242,30 @@ public class JerseyStorage
         return getFileState(nodeID, objectIDS, versionIDS, fileID, formatType, cs, sc);
     }
 
+    @POST
+    @Path("flag/{flagName}/{operation}")
+    public Response callSetFlag(
+            @PathParam("flagName") String flagName,
+            @PathParam("operation") String operation,
+            @DefaultValue("xml") @QueryParam("t") String formatType,
+            @Context CloseableService cs,
+            @Context ServletConfig sc)
+        throws TException
+    {
+        if (StringUtil.isEmpty(flagName)) {
+            throw new TException.REQUEST_INVALID("Setflag flagname required");
+        }
+        if (StringUtil.isEmpty(operation)) {
+            throw new TException.REQUEST_INVALID("Setflag flagOperation required");
+        }
+        System.out.println("callSetFlag"
+                + " - flagName:" + flagName
+                + " - operation:" + operation
+                + " - formatType:" + formatType
+        );
+        return processFlag(flagName, operation, formatType, cs, sc);
+    }
+
     @GET
     @Path("fixity/{nodeid}/{objectid}/{versionid}/{fileid}")
     public Response getFileFixityState(
