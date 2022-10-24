@@ -302,8 +302,8 @@ public class JerseyStorage
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     public Response callSetZooData(
             @PathParam("operation") String operation,
-            @DefaultValue("") @FormDataParam("service") String service,
-            @DefaultValue("") @FormDataParam("flagname") String flagname,
+            @PathParam("service") String service,
+            @PathParam("flagName") String flagName,
             @DefaultValue("") @FormDataParam("content") String payload,
             @DefaultValue("xhtml") @FormDataParam("responseForm") String formatType,
             @Context CloseableService cs,
@@ -316,7 +316,7 @@ public class JerseyStorage
         if (StringUtil.isEmpty(service)) {
             throw new TException.REQUEST_INVALID("callSetFlag service required");
         }
-        if (StringUtil.isEmpty(flagname)) {
+        if (StringUtil.isEmpty(flagName)) {
             throw new TException.REQUEST_INVALID("callSetFlag flagname required");
         }
         if (StringUtil.isEmpty(payload)) {
@@ -325,11 +325,11 @@ public class JerseyStorage
         System.out.println("callSetFlag"
                 + " - operation:" + operation
                 + " - service:" + service
-                + " - name:" + flagname
+                + " - name:" + flagName
                 + " - content:" + payload
                 + " - formatType:" + formatType
         ); 
-        return processFlag(service, flagname, operation, payload, formatType, cs, sc);
+        return processFlag(service, flagName, operation, payload, formatType, cs, sc);
     }
 
     @GET
