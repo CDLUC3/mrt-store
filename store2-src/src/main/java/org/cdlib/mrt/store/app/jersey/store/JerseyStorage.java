@@ -243,27 +243,93 @@ public class JerseyStorage
     }
 
     @POST
-    @Path("flag/{flagName}/{operation}")
+    @Path("flag/{operation}/{service}/{flagName}")
     public Response callSetFlag(
-            @PathParam("flagName") String flagName,
             @PathParam("operation") String operation,
+            @PathParam("service") String service,
+            @PathParam("flagName") String flagName,
             @DefaultValue("xml") @QueryParam("t") String formatType,
             @Context CloseableService cs,
             @Context ServletConfig sc)
         throws TException
     {
+        if (StringUtil.isEmpty(service)) {
+            throw new TException.REQUEST_INVALID("callSetFlag service required");
+        }
         if (StringUtil.isEmpty(flagName)) {
-            throw new TException.REQUEST_INVALID("Setflag flagname required");
+            throw new TException.REQUEST_INVALID("callSetFlag flagname required");
         }
         if (StringUtil.isEmpty(operation)) {
-            throw new TException.REQUEST_INVALID("Setflag flagOperation required");
+            throw new TException.REQUEST_INVALID("callSetFlag flagOperation required");
         }
         System.out.println("callSetFlag"
+                + " - service:" + service
                 + " - flagName:" + flagName
                 + " - operation:" + operation
                 + " - formatType:" + formatType
         );
-        return processFlag(flagName, operation, formatType, cs, sc);
+        return processFlag(service, flagName, operation, null, formatType, cs, sc);
+    }
+
+    @POST
+    @Path("flag/{operation}/{service}")
+    public Response callSetFlagSingle(
+            @PathParam("operation") String operation,
+            @PathParam("service") String service,
+            @DefaultValue("xml") @QueryParam("t") String formatType,
+            @Context CloseableService cs,
+            @Context ServletConfig sc)
+        throws TException
+    {
+        if (StringUtil.isEmpty(service)) {
+            throw new TException.REQUEST_INVALID("callSetFlag service required");
+        }
+        if (StringUtil.isEmpty(operation)) {
+            throw new TException.REQUEST_INVALID("callSetFlag flagOperation required");
+        }
+        System.out.println("callSetFlag"
+                + " - service:" + service
+                + " - operation:" + operation
+                + " - formatType:" + formatType
+        );
+        return processFlag(service, null, operation, null, formatType, cs, sc);
+    }
+
+
+
+    @POST
+    @Path("zoodata/{operation}/{service}/{flagName}")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    public Response callSetZooData(
+            @PathParam("operation") String operation,
+            @DefaultValue("") @FormDataParam("service") String service,
+            @DefaultValue("") @FormDataParam("flagname") String flagname,
+            @DefaultValue("") @FormDataParam("content") String payload,
+            @DefaultValue("xhtml") @FormDataParam("responseForm") String formatType,
+            @Context CloseableService cs,
+            @Context ServletConfig sc)
+        throws TException
+    {
+        if (StringUtil.isEmpty(operation)) {
+            throw new TException.REQUEST_INVALID("callSetFlag operation required");
+        }
+        if (StringUtil.isEmpty(service)) {
+            throw new TException.REQUEST_INVALID("callSetFlag service required");
+        }
+        if (StringUtil.isEmpty(flagname)) {
+            throw new TException.REQUEST_INVALID("callSetFlag flagname required");
+        }
+        if (StringUtil.isEmpty(payload)) {
+            throw new TException.REQUEST_INVALID("callSetFlag content required");
+        }
+        System.out.println("callSetFlag"
+                + " - operation:" + operation
+                + " - service:" + service
+                + " - name:" + flagname
+                + " - content:" + payload
+                + " - formatType:" + formatType
+        ); 
+        return processFlag(service, flagname, operation, payload, formatType, cs, sc);
     }
 
     @GET

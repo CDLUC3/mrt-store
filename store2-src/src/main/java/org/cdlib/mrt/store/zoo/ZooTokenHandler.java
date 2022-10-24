@@ -42,7 +42,7 @@ import org.cdlib.mrt.core.DateState;
 import org.cdlib.mrt.core.Identifier;
 import org.cdlib.mrt.core.MessageDigest;
 
-
+import org.cdlib.mrt.queue.ZooTokenManager;
 import org.cdlib.mrt.core.Identifier;
 import org.cdlib.mrt.core.MessageDigest;
 import org.cdlib.mrt.queue.LockItem;
@@ -59,23 +59,23 @@ public class ZooTokenHandler {
     
     protected String zooConnectionString = null;
     protected String zooNodeBase = null;
-    protected ZooFlagsEnum lock = null;
+    protected String zooFlagPath = null;
     
     //protected ZooTokenManager zooTokenManager = null;
     protected LoggerInf logger = null;
+ 
             
     public static ZooTokenHandler getZooTokenHandler (
             String zooConnectionString, 
             String zooNodeBase,
-            ZooFlagsEnum lock,
+            String zooFlagPath,
             LoggerInf logger)
         throws TException
     {
         if (DEBUG) System.out.println(MESSAGE
                 + " - zooConnectionString:" + zooConnectionString
                 + " - zooNodeBase:" + zooNodeBase
-                + " - lock.getHttpName:" + lock.getHttpName()
-                + " - lock.getZooPath:" + lock.getZooPath()
+                + " - zooFlagPath:" + zooFlagPath
         );
         if (StringUtil.isAllBlank(zooConnectionString)) {
             throw new TException.INVALID_OR_MISSING_PARM("zooConnectionString not found");
@@ -83,28 +83,28 @@ public class ZooTokenHandler {
         if (StringUtil.isAllBlank(zooNodeBase)) {
             throw new TException.INVALID_OR_MISSING_PARM("zooLockNode not found");
         }
-        if (lock == null) {
-            throw new TException.INVALID_OR_MISSING_PARM("ZooFlagsEnum not found");
+        if (zooFlagPath == null) {
+            throw new TException.INVALID_OR_MISSING_PARM("zooFlagPath not found");
         }
-        return new ZooTokenHandler(zooConnectionString, zooNodeBase, lock, logger);
+        //zooFlagPath = zooFlagPath.toLowerCase();
+        return new ZooTokenHandler(zooConnectionString, zooNodeBase, zooFlagPath, logger);
     }
     
     protected ZooTokenHandler(
             String zooConnectionString, 
             String zooNodeBase,
-            ZooFlagsEnum lock,
+            String zooFlagPath,
             LoggerInf logger)
         throws TException
     {
         this.zooConnectionString = zooConnectionString;
         this.zooNodeBase = zooNodeBase;
         this.logger = logger;
-        this.lock = lock;
+        this.zooFlagPath = zooFlagPath;
         System.out.println(MESSAGE
                 + " - zooConnectionString:" + zooConnectionString
                 + " - zooNodeBase:" + zooNodeBase
-                + " - lock.getHttpName:" + lock.getHttpName()
-                + " - lock.getZooPath:" + lock.getZooPath()
+                + " - zooFlagPath:" + zooFlagPath
         );
         //this.zooTokenManager = ZooTokenManager.getZooTokenManager(zooConnectString, zooNodeBase, logger);
     }
@@ -122,6 +122,12 @@ public class ZooTokenHandler {
     public ZooTokenState processFlag(String operation)
         throws TException
     {
+        return processFlag(operation, null);
+    }
+    
+    public ZooTokenState processFlag(String operation, String payload)
+        throws TException
+    {
         if (StringUtil.isAllBlank(operation)) {
             throw new TException.INVALID_OR_MISSING_PARM(MESSAGE + " set operation missing");
         }
@@ -131,10 +137,11 @@ public class ZooTokenHandler {
            
             operation = operation.toLowerCase();
             if (DEBUG) System.out.println("Operation:" + operation);
-            if (operation.equals("seton")) {
-                opStat = set();
+            
+            if (operation.equals("set")) {
+                opStat = set(payload);
 
-            } else if (operation.equals("setoff")) {
+            } else if (operation.equals("clear")) {
                 opStat = remove();
 
             } else if (operation.equals("status")) {
@@ -165,17 +172,19 @@ public class ZooTokenHandler {
         }
     }
     
-    public Boolean set()
+    public Boolean set(String payload)
         throws TException
     {
-        if (lock == null) {
-            throw new TException.INVALID_OR_MISSING_PARM("ZooFlagsEnum not found");
+        if (zooFlagPath == null) {
+            throw new TException.INVALID_OR_MISSING_PARM("zooFlagPath not found");
         }
         ZooTokenManager manager = null;
         try {
-            String lockPath = lock.getZooPath();
+            String lockPath = zooFlagPath;
             manager = ZooTokenManager.getZooTokenManager(zooConnectionString, zooNodeBase, logger);
-            String payload = "set " + lockPath;
+            if (payload == null) {
+                payload = "set " + lockPath;
+            }
             Boolean set = manager.addLock(lockPath, payload);
             return set;
             
@@ -200,9 +209,11 @@ public class ZooTokenHandler {
     {
         ZooTokenManager manager = null;
         try {
-            String lockPath = lock.getZooPath();
             manager = ZooTokenManager.getZooTokenManager(zooConnectionString, zooNodeBase, logger);
-            Boolean set = manager.removeLock(lockPath);
+            Boolean set = manager.removeLock(zooFlagPath);
+            if (set == null) {
+                return verify();
+            }
             return set;
             
         } catch (TException tex) {
@@ -226,7 +237,7 @@ public class ZooTokenHandler {
     {
         ZooTokenManager manager = null;
         try {
-            String lockPath = lock.getZooPath();
+            String lockPath = zooFlagPath;
             manager = ZooTokenManager.getZooTokenManager(zooConnectionString, zooNodeBase, logger);
             Boolean set = manager.verifyLock(lockPath);
             return set;
@@ -252,7 +263,7 @@ public class ZooTokenHandler {
     {
         ZooTokenManager manager = null;
         try {
-            String lockPath = lock.getZooPath();
+            String lockPath = zooFlagPath;
             manager = ZooTokenManager.getZooTokenManager(zooConnectionString, zooNodeBase, logger);
             LockItem lockItem = manager.getData(lockPath);
             return lockItem;
@@ -287,7 +298,7 @@ public class ZooTokenHandler {
                             zooConnectionString,
                             zooNodeBase,
                             process,
-                            lock,
+                            zooFlagPath,
                             set);
             
             if (item != null) {

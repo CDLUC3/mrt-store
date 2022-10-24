@@ -49,7 +49,7 @@ public class ZooTokenState
 {
     protected String zooConnectionString = null;
     protected String zooNodeBase= null;
-    protected ZooFlagsEnum zooFlagsEnum = null; 
+    protected String zooFlagPath = null; 
     protected String zooProcess = null;
     protected Boolean tokenStatus = null;
     protected DateState lockCreated = null;
@@ -60,13 +60,13 @@ public class ZooTokenState
             String zooConnectionString,
             String zooNodeBase,
             String zooProcess,
-            ZooFlagsEnum zooFlagsEnum,
+            String zooFlagPath,
             Boolean tokenStatus)
     {
         this.zooConnectionString = zooConnectionString;
         this.zooNodeBase = zooNodeBase;
-        this.zooFlagsEnum = zooFlagsEnum;
         this.zooProcess = zooProcess;
+        this.zooFlagPath = zooFlagPath;
         this.tokenStatus = tokenStatus;
     }
 
@@ -77,22 +77,8 @@ public class ZooTokenState
     public void setZooConnectionString(String zooConnectionString) {
         this.zooConnectionString = zooConnectionString;
     }
-
-    public ZooFlagsEnum retrieveZooFlagsEnum() {
-        return zooFlagsEnum;
-    }
-
-    public void setZooFlagsEnum(ZooFlagsEnum zooFlagsEnum) {
-        this.zooFlagsEnum = zooFlagsEnum;
-    }
-
-    public String getZooPath() {
-        return zooFlagsEnum.getZooPath();
-    }
-
-    public String getHttpName() {
-        return zooFlagsEnum.getHttpName();
-    }
+    
+    
 
     public Boolean getTokenStatus() {
         return tokenStatus;
@@ -126,6 +112,14 @@ public class ZooTokenState
         return data;
     }
 
+    public String getZooFlagPath() {
+        return zooFlagPath;
+    }
+
+    public void setZooFlagPath(String zooFlagPath) {
+        this.zooFlagPath = zooFlagPath;
+    }
+
     public void setData(String data) {
         this.data = data;
     }
@@ -155,10 +149,6 @@ public class ZooTokenState
     public String dump(String header)
     {
         String enumS = "";
-        if (zooFlagsEnum != null) {
-            enumS = " - zooFlagEnum: - httpName=" + zooFlagsEnum.httpName
-               + " - lockPath=" + zooFlagsEnum.zooPath + "\n" ;
-        }
         String lockCreatedS ="";
         if (lockCreatedS != null) {
             lockCreatedS = " - lockCreated=" + getIso(lockCreated) + "\n";
@@ -171,6 +161,7 @@ public class ZooTokenState
                 + " - zooConnectionString=" + zooConnectionString + "\n"
                 + " - zooNodeBase=" + zooConnectionString + "\n" 
                 + " - zooProcess=" + zooProcess + "\n"
+                + " - zooFlagPath=" + zooFlagPath + "\n"
                 + " - tokenStatus=" + tokenStatus + "\n"
                 + lockCreatedS
                 + runDateS

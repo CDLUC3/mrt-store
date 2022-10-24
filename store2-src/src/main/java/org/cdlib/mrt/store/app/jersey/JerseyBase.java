@@ -79,7 +79,6 @@ import org.cdlib.mrt.store.action.AsyncCloudArchive;
 import org.cdlib.mrt.store.action.TokenManager;
 import org.cdlib.mrt.store.consumer.utility.QueueUtil;
 import org.cdlib.mrt.store.tools.FileFromUrl;
-import org.cdlib.mrt.store.zoo.ZooFlagsEnum;
 import org.cdlib.mrt.store.zoo.ZooTokenHandler;
 import org.cdlib.mrt.store.zoo.ZooTokenState;
 import org.cdlib.mrt.utility.DateUtil;
@@ -2816,9 +2815,11 @@ public class JerseyBase
         }
     } 
     
-   protected Response processFlag(
+    protected Response processFlag(
+            String service,
             String flagName,
             String operation,
+            String payload,
             String formatType,
             CloseableService cs,
             ServletConfig sc)
@@ -2826,9 +2827,9 @@ public class JerseyBase
     { 
         
         System.out.println("processFlag"
-                + " - flagName:" + flagName
+                + " - service:" + service
                 + " - operation:" + operation
-                + " - formatType:" + formatType
+                + " - payload:" + payload
         );
         StorageServiceInit storageServiceInit = StorageServiceInit.getStorageServiceInit(sc);
         StorageServiceInf storageService = storageServiceInit.getStorageService();
@@ -2838,21 +2839,21 @@ public class JerseyBase
             logger = storageConfig.getLogger();
             String zooConnectionString = storageConfig.getQueueService();
             String zooNodeBase = storageConfig.getQueueLockBase();
-            if (StringUtil.isAllBlank(flagName)) {
-                throw new TException.INVALID_OR_MISSING_PARM("flagName missing");
+            if (StringUtil.isAllBlank(service)) {
+                throw new TException.INVALID_OR_MISSING_PARM("service missing");
             }
-            flagName = flagName.toLowerCase();
-            ZooFlagsEnum lock = ZooFlagsEnum.valueOfZooPath(flagName);
-            if (lock == null) {
-                throw new TException.INVALID_OR_MISSING_PARM("lock name not found");
+            //String zooFlagPath = service.toLowerCase() + "/" + flagName.toLowerCase();
+            String zooFlagPath = service;
+            if (flagName != null) {
+                zooFlagPath = service + "/" + flagName;
             }
             ZooTokenHandler handler = ZooTokenHandler.getZooTokenHandler (
                 zooConnectionString, 
                 zooNodeBase,
-                lock,
+                zooFlagPath,
                 storageConfig.getLogger());
             
-            ZooTokenState zooState = handler.processFlag(operation);
+            ZooTokenState zooState = handler.processFlag(operation, payload);
             return getStateResponse(zooState, formatType, logger, cs, sc);
             
         } catch (TException tex) {

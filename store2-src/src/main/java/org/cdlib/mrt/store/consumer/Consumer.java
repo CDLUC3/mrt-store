@@ -49,6 +49,7 @@ import org.cdlib.mrt.queue.Item;
 import org.cdlib.mrt.utility.StateInf;
 import org.cdlib.mrt.utility.StringUtil;
 import org.cdlib.mrt.store.consumer.utility.QueueUtil;
+import org.cdlib.mrt.store.StorageConfig;
 import org.cdlib.mrt.store.action.TokenRun;
 import org.json.JSONObject;
 
@@ -73,7 +74,9 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Properties;
 import java.net.InetAddress;  
-import java.net.UnknownHostException;  
+import java.net.UnknownHostException; 
+import org.cdlib.mrt.queue.ZooTokenManager;
+import org.cdlib.mrt.utility.LoggerInf;
 
 /**
  * Consume queue data and submit to store service
@@ -304,8 +307,10 @@ class ConsumerDaemon implements Runnable
     boolean smallQueueBool = false;
 
     private ZooKeeper zooKeeper = null;
+    private ZooTokenManager lockManager = null;
     private DistributedQueue distributedQueue = null;
     private DistributedQueue distributedSmallQueue = null;
+    private String queueHoldLock = null;
 
     // session data
     private long sessionID;
@@ -333,6 +338,16 @@ class ConsumerDaemon implements Runnable
 	    if (largeWorker) {
                 distributedSmallQueue = new DistributedQueue(zooKeeper, queueNodeSmall, null);    // process if no work avail on large queue
 	    }
+            StorageConfig storageConfig = storageService.getStorageConfig();
+            String zooNodeBase = storageConfig.getQueueLockBase();
+            queueHoldLock = storageConfig.getQueueHoldLock();
+	    LoggerInf mrtLogger = storageService.getLogger();
+            System.out.println("[info] " + MESSAGE + "Setting queue zooNodeBase string: " + zooNodeBase);
+            lockManager = ZooTokenManager.getZooTokenManager(
+                queueConnectionString, 
+                zooNodeBase,
+                mrtLogger);
+	    
 	} catch (Exception e) {
 	    e.printStackTrace(System.err);
 	}
@@ -491,9 +506,8 @@ class ConsumerDaemon implements Runnable
     private boolean onHold()
     {
         try {
-	    File holdFile = new File(storageService.getStorageConfig().getQueueHoldFile());
-	    if (holdFile.exists()) {
-	        System.out.println("[info]" + NAME + ": hold file exists, not processing queue: " + holdFile.getAbsolutePath());
+	    if (lockManager.verifyLock(queueHoldLock)) {
+	        System.out.println("[info]" + NAME + ": hold lock exists, not processing queue");
 	        return true;
 	    }
         } catch (Exception e) {
