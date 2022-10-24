@@ -79,6 +79,8 @@ import org.cdlib.mrt.store.action.AsyncCloudArchive;
 import org.cdlib.mrt.store.action.TokenManager;
 import org.cdlib.mrt.store.consumer.utility.QueueUtil;
 import org.cdlib.mrt.store.tools.FileFromUrl;
+import org.cdlib.mrt.store.zoo.ZooTokenHandler;
+import org.cdlib.mrt.store.zoo.ZooTokenState;
 import org.cdlib.mrt.utility.DateUtil;
 import org.cdlib.mrt.utility.StateInf;
 import org.cdlib.mrt.utility.SerializeUtil;
@@ -2810,6 +2812,56 @@ public class JerseyBase
             return Response.ok(typeFile.file, typeFile.formatType.getMimeType())
                     .header("Content-Disposition", "attachment; filename=" + fileName)
                     .build();
+        }
+    } 
+    
+    protected Response processFlag(
+            String service,
+            String flagName,
+            String operation,
+            String payload,
+            String formatType,
+            CloseableService cs,
+            ServletConfig sc)
+        throws TException
+    { 
+        
+        System.out.println("processFlag"
+                + " - service:" + service
+                + " - operation:" + operation
+                + " - payload:" + payload
+        );
+        StorageServiceInit storageServiceInit = StorageServiceInit.getStorageServiceInit(sc);
+        StorageServiceInf storageService = storageServiceInit.getStorageService();
+        StorageConfig storageConfig = storageService.getStorageConfig();
+        LoggerInf logger = null;
+        try {
+            logger = storageConfig.getLogger();
+            String zooConnectionString = storageConfig.getQueueService();
+            String zooNodeBase = storageConfig.getQueueLockBase();
+            if (StringUtil.isAllBlank(service)) {
+                throw new TException.INVALID_OR_MISSING_PARM("service missing");
+            }
+            //String zooFlagPath = service.toLowerCase() + "/" + flagName.toLowerCase();
+            String zooFlagPath = service;
+            if (flagName != null) {
+                zooFlagPath = service + "/" + flagName;
+            }
+            ZooTokenHandler handler = ZooTokenHandler.getZooTokenHandler (
+                zooConnectionString, 
+                zooNodeBase,
+                zooFlagPath,
+                storageConfig.getLogger());
+            
+            ZooTokenState zooState = handler.processFlag(operation, payload);
+            return getStateResponse(zooState, formatType, logger, cs, sc);
+            
+        } catch (TException tex) {
+            return getExceptionResponse(cs, tex, formatType, logger);
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            throw new TException.GENERAL_EXCEPTION(MESSAGE + "Exception:" + ex);
         }
     }
     

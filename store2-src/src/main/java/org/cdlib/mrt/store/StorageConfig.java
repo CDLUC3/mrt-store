@@ -70,8 +70,8 @@ public class StorageConfig
     protected URL storeLink = null;
     protected Properties asyncArchivProp = null;
     protected String queueService = null;
-    protected String queueName = null;
-    protected String queueHoldFile = null;
+    protected String queueLockBase = null;
+    protected String queueHoldLock = null;
     protected String queuePollingInterval = null;
     protected String queueNumThreadsSmall = null;
     protected String queueNumThreadsLarge = null;
@@ -108,7 +108,8 @@ public class StorageConfig
             storageConfig.setVerifyOnRead(jStoreInfo.getBoolean("verifyOnRead"));
             storageConfig.setVerifyOnWrite(jStoreInfo.getBoolean("verifyOnWrite"));
             storageConfig.setQueueService(jStoreQueue.getString("QueueService"));
-            storageConfig.setQueueHoldFile(jStoreQueue.getString("QueueHoldFile"));
+            storageConfig.setQueueLockBase(jStoreQueue.getString("QueueLockBase"));
+            storageConfig.setQueueHoldLock(jStoreQueue.getString("QueueHoldLock"));
             storageConfig.setQueuePollingInterval(jStoreQueue.getString("PollingInterval"));
             storageConfig.setQueueNumThreadsSmall(jStoreQueue.getString("NumThreadsSmall"));
             storageConfig.setQueueNumThreadsLarge(jStoreQueue.getString("NumThreadsLarge"));
@@ -262,10 +263,6 @@ public class StorageConfig
         return supportURI;
     }
 
-    public void setQueueHoldFile(String queueHoldFile) {
-        this.queueHoldFile = queueHoldFile;
-    }
-
     public void setQueuePollingInterval(String queuePollingInterval) {
         this.queuePollingInterval = queuePollingInterval;
     }
@@ -290,12 +287,20 @@ public class StorageConfig
         this.queueService = queueService;
     }
 
-    public void setQueueName(String queueName) {
-        this.queueName = queueName;
+    public String getQueueLockBase() {
+        return queueLockBase;
     }
 
-    public String getQueueHoldFile() {
-        return queueHoldFile;
+    public void setQueueLockBase(String queueLockBase) {
+        this.queueLockBase = queueLockBase;
+    }
+
+    public String getQueueHoldLock() {
+        return queueHoldLock;
+    }
+
+    public void setQueueHoldLock(String queueHoldLock) {
+        this.queueHoldLock = queueHoldLock;
     }
 
     public String getQueuePollingInterval() {
@@ -320,10 +325,6 @@ public class StorageConfig
 
     public String getQueueService() {
         return queueService;
-    }
-
-    public String getQueueName() {
-        return queueName;
     }
 
     public void setSupportURI(String supportURI) {

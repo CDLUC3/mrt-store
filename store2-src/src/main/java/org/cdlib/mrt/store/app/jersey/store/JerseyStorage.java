@@ -242,6 +242,96 @@ public class JerseyStorage
         return getFileState(nodeID, objectIDS, versionIDS, fileID, formatType, cs, sc);
     }
 
+    @POST
+    @Path("flag/{operation}/{service}/{flagName}")
+    public Response callSetFlag(
+            @PathParam("operation") String operation,
+            @PathParam("service") String service,
+            @PathParam("flagName") String flagName,
+            @DefaultValue("xml") @QueryParam("t") String formatType,
+            @Context CloseableService cs,
+            @Context ServletConfig sc)
+        throws TException
+    {
+        if (StringUtil.isEmpty(service)) {
+            throw new TException.REQUEST_INVALID("callSetFlag service required");
+        }
+        if (StringUtil.isEmpty(flagName)) {
+            throw new TException.REQUEST_INVALID("callSetFlag flagname required");
+        }
+        if (StringUtil.isEmpty(operation)) {
+            throw new TException.REQUEST_INVALID("callSetFlag flagOperation required");
+        }
+        System.out.println("callSetFlag"
+                + " - service:" + service
+                + " - flagName:" + flagName
+                + " - operation:" + operation
+                + " - formatType:" + formatType
+        );
+        return processFlag(service, flagName, operation, null, formatType, cs, sc);
+    }
+
+    @POST
+    @Path("flag/{operation}/{service}")
+    public Response callSetFlagSingle(
+            @PathParam("operation") String operation,
+            @PathParam("service") String service,
+            @DefaultValue("xml") @QueryParam("t") String formatType,
+            @Context CloseableService cs,
+            @Context ServletConfig sc)
+        throws TException
+    {
+        if (StringUtil.isEmpty(service)) {
+            throw new TException.REQUEST_INVALID("callSetFlag service required");
+        }
+        if (StringUtil.isEmpty(operation)) {
+            throw new TException.REQUEST_INVALID("callSetFlag flagOperation required");
+        }
+        System.out.println("callSetFlag"
+                + " - service:" + service
+                + " - operation:" + operation
+                + " - formatType:" + formatType
+        );
+        return processFlag(service, null, operation, null, formatType, cs, sc);
+    }
+
+
+
+    @POST
+    @Path("zoodata/{operation}/{service}/{flagName}")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    public Response callSetZooData(
+            @PathParam("operation") String operation,
+            @PathParam("service") String service,
+            @PathParam("flagName") String flagName,
+            @DefaultValue("") @FormDataParam("content") String payload,
+            @DefaultValue("xhtml") @FormDataParam("responseForm") String formatType,
+            @Context CloseableService cs,
+            @Context ServletConfig sc)
+        throws TException
+    {
+        if (StringUtil.isEmpty(operation)) {
+            throw new TException.REQUEST_INVALID("callSetFlag operation required");
+        }
+        if (StringUtil.isEmpty(service)) {
+            throw new TException.REQUEST_INVALID("callSetFlag service required");
+        }
+        if (StringUtil.isEmpty(flagName)) {
+            throw new TException.REQUEST_INVALID("callSetFlag flagname required");
+        }
+        if (StringUtil.isEmpty(payload)) {
+            throw new TException.REQUEST_INVALID("callSetFlag content required");
+        }
+        System.out.println("callSetFlag"
+                + " - operation:" + operation
+                + " - service:" + service
+                + " - name:" + flagName
+                + " - content:" + payload
+                + " - formatType:" + formatType
+        ); 
+        return processFlag(service, flagName, operation, payload, formatType, cs, sc);
+    }
+
     @GET
     @Path("fixity/{nodeid}/{objectid}/{versionid}/{fileid}")
     public Response getFileFixityState(
