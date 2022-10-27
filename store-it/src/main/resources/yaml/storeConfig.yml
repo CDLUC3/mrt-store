@@ -29,7 +29,7 @@ store-info:
   queueInfo:
     QueueService: "zoo-it:2181"
     QueueLargeWorker: "store"
-    QueueSizeLimit: "100"
+    QueueSizeLimit: "1000"
     QueueLockBase: "/mrt.lock"
     QueueHoldLock: "access/LargeAccessHold"
     QueueHoldFile: "/tmp/AccessHold"
