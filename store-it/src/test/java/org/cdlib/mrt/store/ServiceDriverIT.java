@@ -295,6 +295,34 @@ public class ServiceDriverIT {
                 );
         }
 
+        public String accessUrl() throws UnsupportedEncodingException {
+                return String.format(
+                        "http://localhost:%d/%s/flag/set/access?t=json", 
+                        port, 
+                        cp, 
+                        node
+                );
+        }
+
+        public String lockUrl() throws UnsupportedEncodingException {
+                return String.format(
+                        "http://localhost:%d/%s/flag/set/access/LargeAccessHold?t=json", 
+                        port, 
+                        cp, 
+                        node
+                );
+        }
+
+        public String unlockUrl() throws UnsupportedEncodingException {
+                return String.format(
+                        "http://localhost:%d/%s/flag/clear/access/LargeAccessHold?t=json", 
+                        port, 
+                        cp, 
+                        node
+                );
+        }
+
+
         public String deleteUrl(String ark) throws UnsupportedEncodingException {
                 return deleteUrl(node, ark);
         }
@@ -795,6 +823,82 @@ public class ServiceDriverIT {
                 } finally {
                         deleteObject(deleteUrl(ark));
                         getContent(stateUrl(ark), 404);        
+                }
+        }
+
+        public void manageLock(String url, boolean val) throws IOException, JSONException {
+                try (CloseableHttpClient client = HttpClients.createDefault()) {
+                        HttpPost post = new HttpPost(url);
+
+                        System.out.println(url);
+
+                        HttpResponse response = client.execute(post);
+                        assertEquals(200, response.getStatusLine().getStatusCode());
+    
+                        String s = new BasicResponseHandler().handleResponse(response).trim();
+                        JSONObject json =  new JSONObject(s);
+
+                        System.out.println(json.toString(2));
+
+                        JSONObject v = json.getJSONObject("tok:zooTokenState");
+                        assertEquals(val, v.getBoolean("tok:tokenStatus"));
+                }
+        }
+
+        @Test
+        public void AddObjectAndAssembleWithQueueLock() throws Exception {
+                String ark = "ark:/1111/5555";
+                String checkm = "src/test/resources/object1.checkm";
+                String checkmv2 = "src/test/resources/object1v2.checkm";
+
+                //manageLock(accessUrl(), true);
+                manageLock(lockUrl(), true);
+                try  {                        
+                        JSONObject json = addObjectByManifest(addUrl(ark), checkm);
+                        //version 1 has 7 files
+                        verifyVersion(json, ark, 1, 7);
+        
+                        json = addObjectByManifest(updateUrl(ark), checkmv2);
+                        //version 2 has 8 files (7+1)
+                        verifyVersion(json, ark, 2, 8);
+
+                        json = assembleObject(assembleObjectUrl(ark));
+                        assertEquals(200, json.getInt("status"));
+                        assertEquals("Request queued, use token to check status", json.get("message"));                        
+
+                        String token = json.getString("token");
+                        int attempt = 0;
+                        json = getJsonContent(tokenRetrieveUrl(token), 0);
+                        while(json.getInt("status") == 202 && attempt < 10) {
+                                attempt++;
+                                Thread.sleep(1500);
+                                json = getJsonContent(tokenRetrieveUrl(token), 0);
+                        }
+
+                        assertEquals(202, json.getInt("status"));
+
+                        manageLock(unlockUrl(), true);
+
+                        json = getJsonContent(tokenRetrieveUrl(token), 0);
+                        while(json.getInt("status") == 202 && attempt < 10) {
+                                attempt++;
+                                Thread.sleep(1500);
+                                json = getJsonContent(tokenRetrieveUrl(token), 0);
+                        }
+                        assertEquals(200, json.getInt("status"));
+
+                        assertTrue(json.has("url"));
+                        assertEquals("Payload contains token info", json.get("message"));                        
+                } catch(Exception e) {
+                        e.printStackTrace();
+                        throw e;
+                } catch(AssertionError e) {
+                        e.printStackTrace();
+                        throw e;
+                } finally {
+                        deleteObject(deleteUrl(ark));
+                        getContent(stateUrl(ark), 404);
+                        manageLock(unlockUrl(), true);        
                 }
         }
 
