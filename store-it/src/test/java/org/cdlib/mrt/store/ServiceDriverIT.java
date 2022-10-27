@@ -807,7 +807,7 @@ public class ServiceDriverIT {
                         json = getJsonContent(tokenRetrieveUrl(token), 0);
                         while(json.getInt("status") == 202 && attempt < 10) {
                                 attempt++;
-                                Thread.sleep(1500);
+                                Thread.sleep(2500);
                                 json = getJsonContent(tokenRetrieveUrl(token), 0);
                         }
 
@@ -851,7 +851,6 @@ public class ServiceDriverIT {
                 String checkm = "src/test/resources/object1.checkm";
                 String checkmv2 = "src/test/resources/object1v2.checkm";
 
-                //manageLock(accessUrl(), true);
                 manageLock(lockUrl(), true);
                 try  {                        
                         JSONObject json = addObjectByManifest(addUrl(ark), checkm);
@@ -871,18 +870,18 @@ public class ServiceDriverIT {
                         json = getJsonContent(tokenRetrieveUrl(token), 0);
                         while(json.getInt("status") == 202 && attempt < 10) {
                                 attempt++;
-                                Thread.sleep(1500);
+                                Thread.sleep(2500);
                                 json = getJsonContent(tokenRetrieveUrl(token), 0);
                         }
 
                         assertEquals(202, json.getInt("status"));
 
-                        manageLock(unlockUrl(), true);
+                        manageLock(unlockUrl(), false);
 
                         json = getJsonContent(tokenRetrieveUrl(token), 0);
                         while(json.getInt("status") == 202 && attempt < 10) {
                                 attempt++;
-                                Thread.sleep(1500);
+                                Thread.sleep(2500);
                                 json = getJsonContent(tokenRetrieveUrl(token), 0);
                         }
                         assertEquals(200, json.getInt("status"));
@@ -898,7 +897,7 @@ public class ServiceDriverIT {
                 } finally {
                         deleteObject(deleteUrl(ark));
                         getContent(stateUrl(ark), 404);
-                        manageLock(unlockUrl(), true);        
+                        manageLock(unlockUrl(), false);        
                 }
         }
 
