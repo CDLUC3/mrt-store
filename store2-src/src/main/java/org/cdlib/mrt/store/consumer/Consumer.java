@@ -506,6 +506,7 @@ class ConsumerDaemon implements Runnable
     private boolean onHold()
     {
         try {
+            if (!largeWorker) return false;
 	    if (lockManager.verifyLock(queueHoldLock)) {
 	        System.out.println("[info]" + NAME + ": hold lock exists, not processing queue");
 	        return true;
