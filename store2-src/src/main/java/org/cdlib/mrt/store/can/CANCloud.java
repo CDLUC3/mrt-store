@@ -804,12 +804,17 @@ public class CANCloud
 
     protected TException makeGeneralTException(String header, Exception ex)
     {
-        ex.printStackTrace();
         TException tex = null;
-        if (ex instanceof TException) {
+        if (ex instanceof TException.REQUESTED_ITEM_NOT_FOUND) {
             tex = (TException)ex;
+            
+        } else if (ex instanceof TException) {
+            tex = (TException)ex;
+            ex.printStackTrace();
+            
         } else {
             tex = new TException.GENERAL_EXCEPTION(ex);
+            ex.printStackTrace();
         }
         logger.logError(tex.toString(), 0);
         logger.logError(tex.dump(header), 10);
