@@ -139,6 +139,7 @@
                       <name>network</name>
                       <alias>it-server</alias>
                     </network>
+                    <hostname>it-server</hostname>
                     <ports>
                       <port>it-server.port:8080</port>
                     </ports>
