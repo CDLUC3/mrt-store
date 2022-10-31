@@ -49,6 +49,8 @@ import static org.junit.Assert.*;
 public class ServiceDriverIT {
         private int port = 8080;
         private int node = 7777;
+        private int ASSM_WAIT = 1500;
+        private int ASSM_TRIES = 10;
         private String cp = "store";
         private DocumentBuilder db;
         private XPathFactory xpathfactory;
@@ -805,9 +807,9 @@ public class ServiceDriverIT {
                         String token = json.getString("token");
                         int attempt = 0;
                         json = getJsonContent(tokenRetrieveUrl(token), 0);
-                        while(json.getInt("status") == 202 && attempt < 10) {
+                        while(json.getInt("status") == 202 && attempt < ASSM_TRIES) {
                                 attempt++;
-                                Thread.sleep(1500);
+                                Thread.sleep(ASSM_WAIT);
                                 json = getJsonContent(tokenRetrieveUrl(token), 0);
                         }
 
@@ -868,9 +870,9 @@ public class ServiceDriverIT {
                         String token = json.getString("token");
                         int attempt = 0;
                         json = getJsonContent(tokenRetrieveUrl(token), 0);
-                        while(json.getInt("status") == 202 && attempt < 10) {
+                        while(json.getInt("status") == 202 && attempt < ASSM_TRIES) {
                                 attempt++;
-                                Thread.sleep(1500);
+                                Thread.sleep(ASSM_WAIT);
                                 json = getJsonContent(tokenRetrieveUrl(token), 0);
                         }
 
@@ -880,9 +882,9 @@ public class ServiceDriverIT {
 
                         json = getJsonContent(tokenRetrieveUrl(token), 0);
                         attempt = 0;
-                        while(json.getInt("status") == 202 && attempt < 10) {
+                        while(json.getInt("status") == 202 && attempt < ASSM_TRIES) {
                                 attempt++;
-                                Thread.sleep(1500);
+                                Thread.sleep(ASSM_WAIT);
                                 json = getJsonContent(tokenRetrieveUrl(token), 0);
                         }
                         assertEquals(200, json.getInt("status"));
