@@ -71,7 +71,8 @@ public class StorageConfig
     protected Properties asyncArchivProp = null;
     protected String queueService = null;
     protected String queueLockBase = null;
-    protected String queueHoldLock = null;
+    protected String largeAccessHold = null;
+    protected String smallAccessHold = null;
     protected String queuePollingInterval = null;
     protected String queueNumThreadsSmall = null;
     protected String queueNumThreadsLarge = null;
@@ -109,7 +110,8 @@ public class StorageConfig
             storageConfig.setVerifyOnWrite(jStoreInfo.getBoolean("verifyOnWrite"));
             storageConfig.setQueueService(jStoreQueue.getString("QueueService"));
             storageConfig.setQueueLockBase(jStoreQueue.getString("QueueLockBase"));
-            storageConfig.setQueueHoldLock(jStoreQueue.getString("QueueHoldLock"));
+            storageConfig.setLargeAccessHold(jStoreQueue.getString("LargeAccessHold"));
+            storageConfig.setSmallAccessHold(jStoreQueue.getString("SmallAccessHold"));
             storageConfig.setQueuePollingInterval(jStoreQueue.getString("PollingInterval"));
             storageConfig.setQueueNumThreadsSmall(jStoreQueue.getString("NumThreadsSmall"));
             storageConfig.setQueueNumThreadsLarge(jStoreQueue.getString("NumThreadsLarge"));
@@ -295,12 +297,20 @@ public class StorageConfig
         this.queueLockBase = queueLockBase;
     }
 
-    public String getQueueHoldLock() {
-        return queueHoldLock;
+    public String getSmallAccessHold() {
+        return smallAccessHold;
     }
 
-    public void setQueueHoldLock(String queueHoldLock) {
-        this.queueHoldLock = queueHoldLock;
+    public void setSmallAccessHold(String smallAccessHold) {
+        this.smallAccessHold = smallAccessHold;
+    }
+
+    public String getLargeAccessHold() {
+        return largeAccessHold;
+    }
+
+    public void setLargeAccessHold(String largeAccessHold) {
+        this.largeAccessHold = largeAccessHold;
     }
 
     public String getQueuePollingInterval() {
