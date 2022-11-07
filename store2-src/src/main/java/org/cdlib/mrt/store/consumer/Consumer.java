@@ -310,7 +310,8 @@ class ConsumerDaemon implements Runnable
     private ZooTokenManager lockManager = null;
     private DistributedQueue distributedQueue = null;
     private DistributedQueue distributedSmallQueue = null;
-    private String queueHoldLock = null;
+    private String largeAccessHold = null;
+    private String smallAccessHold = null;
 
     // session data
     private long sessionID;
@@ -340,7 +341,8 @@ class ConsumerDaemon implements Runnable
 	    }
             StorageConfig storageConfig = storageService.getStorageConfig();
             String zooNodeBase = storageConfig.getQueueLockBase();
-            queueHoldLock = storageConfig.getQueueHoldLock();
+            largeAccessHold = storageConfig.getLargeAccessHold();
+            smallAccessHold = storageConfig.getSmallAccessHold();
 	    LoggerInf mrtLogger = storageService.getLogger();
             System.out.println("[info] " + MESSAGE + "Setting queue zooNodeBase string: " + zooNodeBase);
             lockManager = ZooTokenManager.getZooTokenManager(
@@ -506,11 +508,18 @@ class ConsumerDaemon implements Runnable
     private boolean onHold()
     {
         try {
-            if (!largeWorker) return false;
-	    if (lockManager.verifyLock(queueHoldLock)) {
-	        System.out.println("[info]" + NAME + ": hold lock exists, not processing queue");
-	        return true;
-	    }
+            if (largeWorker) {
+                if (lockManager.verifyLock(largeAccessHold)) {
+                    System.out.println("[info]" + NAME + ": largeAccessHold lock exists, not processing queue");
+                    return true;
+                }
+                
+            } else {
+                if (lockManager.verifyLock(smallAccessHold)) {
+                    System.out.println("[info]" + NAME + ": smallAccessHold lock exists, not processing queue");
+                    return true;
+                }
+            }
         } catch (Exception e) {
             return false;
         }

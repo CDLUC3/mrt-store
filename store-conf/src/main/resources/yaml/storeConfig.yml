@@ -33,7 +33,9 @@ store-info:
     QueueLockBase: "{!SSM: store/zoo/QueueLockBase !DEFAULT: /mrt.lock}"
     QueueHoldLock: "{!SSM: store/zoo/QueueHoldFile !DEFAULT: access/LargeAccessHold}"
     QueueSizeLimit: "{!SSM: store/zoo/AccessQSize !DEFAULT: 500000000}"
-    QueueHoldFile: "{!SSM: store/config/QueueHoldFile !DEFAULT: /apps/dpr2store/mrtHomes/AccessHold}"
+    LargeAccessHold: "{!SSM: store/zoo/LargeAccessHold !DEFAULT: access/LargeAccessHold}"
+    SmallAccessHold: "{!SSM: store/zoo/SmallAccessHold !DEFAULT: access/SmallAccessHold}" 
+    
     PollingInterval: "{!SSM: store/config/PollingInterval !DEFAULT: 15}"
     NumThreadsSmall: "{!SSM: store/config/numThreadsSmall !DEFAULT: 5}"
     NumThreadsLarge: "{!SSM: store/config/numThreadsLarge !DEFAULT: 3}"
