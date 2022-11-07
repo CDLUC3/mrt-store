@@ -28,11 +28,11 @@ store-info:
     trace: 5
   queueInfo:
     QueueService: "zoo-it:2181"
-    QueueLargeWorker: "store"
-    QueueSizeLimit: "600000000"
+    QueueLargeWorker: "it-server"
+    QueueSizeLimit: "1"
     QueueLockBase: "/mrt.lock"
     LargeAccessHold: "access/LargeAccessHold"
     SmallAccessHold: "access/SmallAccessHold"
-    PollingInterval: "15"
-    NumThreadsSmall: "5"
-    NumThreadsLarge: "3"
+    PollingInterval: "3"
+    NumThreadsSmall: "0"
+    NumThreadsLarge: "1"
