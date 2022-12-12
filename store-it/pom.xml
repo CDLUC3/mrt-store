@@ -157,7 +157,7 @@
                   </run>
                 </image>
                 <image>
-                  <name>zookeeper:3.4</name>
+                  <name>zookeeper</name>
                   <alias>zoo-it</alias>
                   <run>
                     <network>
