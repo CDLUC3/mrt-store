@@ -44,7 +44,7 @@ services:
     entrypoint: ["catalina.sh", "jpda", "run"]
   zoo-it:
     container_name: zoo-it
-    image: zookeeper:3.4
+    image: zookeeper
     networks:
       merrittnet:
     restart: unless-stopped
