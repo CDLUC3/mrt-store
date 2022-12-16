@@ -74,6 +74,8 @@ store-info-docker: &docker
     QueueLockBase: "/mrt.lock"
     QueueHoldLock: "access/LargeAccessHold"
     QueueHoldFile: "/dpr2store/mrtHomes/AccessHold"
+    LargeAccessHold: "access/LargeAccessHold"
+    SmallAccessHold: "access/SmallAccessHold" 
     PollingInterval: "15"
     NumThreadsSmall: "5"
     NumThreadsLarge: "3"
