@@ -20,7 +20,7 @@ mvn install -Ddocker.skip -DskipITs -Dmaven.test.skip=true
 
 If running on a desktop
 ```
-ECR_REGISTRY=it-docker-registry
+export ECR_REGISTRY=it-docker-registry
 ```
 
 Launch Containers
