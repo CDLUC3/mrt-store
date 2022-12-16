@@ -50,7 +50,7 @@ public class ServiceDriverIT {
         private int port = 8080;
         private int node = 7777;
         private int ASSM_WAIT = 1500;
-        private int ASSM_TRIES = 10;
+        private int ASSM_TRIES = 16;
         private String cp = "store";
         private DocumentBuilder db;
         private XPathFactory xpathfactory;
