@@ -132,6 +132,19 @@
                   </run>
                 </image>
                 <image>
+                  <name>zookeeper</name>
+                  <alias>zoo-it</alias>
+                  <run>
+                    <network>
+                      <name>network</name>
+                      <alias>zoo-it</alias>
+                    </network>
+                    <wait>
+                      <time>2000</time>
+                    </wait>
+                  </run>
+                </image>
+                <image>
                   <name>tomcat:8-jre8</name>
                   <alias>it-server</alias>
                   <run>
@@ -155,16 +168,6 @@
                       <CATALINA_OPTS>-Dfile.encoding=UTF8 -Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true</CATALINA_OPTS>
                       <SSM_SKIP_RESOLUTION>Y</SSM_SKIP_RESOLUTION>
                     </env>
-                  </run>
-                </image>
-                <image>
-                  <name>zookeeper</name>
-                  <alias>zoo-it</alias>
-                  <run>
-                    <network>
-                      <name>network</name>
-                      <alias>zoo-it</alias>
-                    </network>
                   </run>
                 </image>
               </images>
@@ -260,14 +263,15 @@
       <version>4.13.1</version>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-      <scope>runtime</scope>
-      <version>1.5.6</version>
-    </dependency>
-  
-    <dependency>
+        <!--
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <scope>runtime</scope>
+            <version>1.5.6</version>
+          </dependency>
+        -->
+        <dependency>
       <groupId>org.cdlib.mrt</groupId>
       <artifactId>mrt-json</artifactId>
       <scope>runtime</scope>
@@ -284,6 +288,12 @@
     <artifactId>xml-apis</artifactId>
     <version>1.4.01</version>
   </dependency> 
+  <dependency>
+    <groupId>xerces</groupId>
+    <artifactId>xmlParserAPIs</artifactId>
+    <version>2.6.2</version>
+    <scope>runtime</scope>
+  </dependency>
 
   </dependencies>
 </project>
