@@ -1,4 +1,6 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.cdlib.mrt</groupId>
   <artifactId>mrt-store-it</artifactId>
@@ -49,7 +51,8 @@
         <artifactId>maven-war-plugin</artifactId>
         <version>3.3.2</version>
         <configuration>
-          <packagingExcludes>WEB-INF/lib/slf4j-log4j12-1.5.6.jar,WEB-INF/lib/mrt-jena-2.0-SNAPSHOT.jar</packagingExcludes>
+          <packagingExcludes>
+            WEB-INF/lib/slf4j-log4j12-1.5.6.jar,WEB-INF/lib/mrt-jena-2.0-SNAPSHOT.jar</packagingExcludes>
         </configuration>
       </plugin>
       <plugin>
@@ -161,11 +164,13 @@
                     </wait>
                     <volumes>
                       <bind>
-                        <volume>${project.basedir}/target/mrt-store-it-1.0-SNAPSHOT.war:/usr/local/tomcat/webapps/store.war</volume>
+                        <volume>
+                          ${project.basedir}/target/mrt-store-it-1.0-SNAPSHOT.war:/usr/local/tomcat/webapps/store.war</volume>
                       </bind>
                     </volumes>
                     <env>
-                      <CATALINA_OPTS>-Dfile.encoding=UTF8 -Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true</CATALINA_OPTS>
+                      <CATALINA_OPTS>-Dfile.encoding=UTF8
+                        -Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true</CATALINA_OPTS>
                       <SSM_SKIP_RESOLUTION>Y</SSM_SKIP_RESOLUTION>
                     </env>
                   </run>
@@ -211,7 +216,8 @@
         <configuration>
           <!-- Includes Test* and *Test by default -->
           <!-- skips surefire tests without skipping failsafe tests.
-                     Property value seems to magically default to false -->
+                     Property
+          value seems to magically default to false -->
           <skipTests>${skip.surefire.tests}</skipTests>
         </configuration>
       </plugin>
@@ -263,15 +269,7 @@
       <version>4.13.1</version>
       <scope>test</scope>
     </dependency>
-        <!--
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <scope>runtime</scope>
-            <version>1.5.6</version>
-          </dependency>
-        -->
-        <dependency>
+    <dependency>
       <groupId>org.cdlib.mrt</groupId>
       <artifactId>mrt-json</artifactId>
       <scope>runtime</scope>
@@ -282,18 +280,18 @@
       <artifactId>xalan</artifactId>
       <scope>runtime</scope>
       <version>2.7.2</version>
-  </dependency>
-  <dependency>
-    <groupId>xml-apis</groupId>
-    <artifactId>xml-apis</artifactId>
-    <version>1.4.01</version>
-  </dependency> 
-  <dependency>
-    <groupId>xerces</groupId>
-    <artifactId>xmlParserAPIs</artifactId>
-    <version>2.6.2</version>
-    <scope>runtime</scope>
-  </dependency>
+    </dependency>
+    <dependency>
+      <groupId>xml-apis</groupId>
+      <artifactId>xml-apis</artifactId>
+      <version>1.4.01</version>
+    </dependency>
+    <dependency>
+      <groupId>xerces</groupId>
+      <artifactId>xmlParserAPIs</artifactId>
+      <version>2.6.2</version>
+      <scope>runtime</scope>
+    </dependency>
 
   </dependencies>
 </project>
