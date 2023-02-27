@@ -246,6 +246,7 @@
       <groupId>org.cdlib.mrt</groupId>
       <artifactId>mrt-store2pub-src</artifactId>
       <version>1.0-SNAPSHOT</version>
+      <scope>runtime</scope>
     </dependency>
 
     <dependency>
@@ -272,6 +273,12 @@
     <dependency>
         <groupId>xalan</groupId>
         <artifactId>xalan</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>xerces</groupId>
+      <artifactId>xmlParserAPIs</artifactId>
+      <scope>runtime</scope>
     </dependency>
 
     <dependency>
