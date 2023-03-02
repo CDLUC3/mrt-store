@@ -7,6 +7,18 @@
   <version>1.0-SNAPSHOT</version>
   <name>UC3-mrtStore2Pub-src</name>
   <url>http://uc3.cdlib.org</url>
+  
+    <dependencyManagement>
+        <dependencies>
+          <dependency>
+            <groupId>org.cdlib.mrt</groupId>
+            <artifactId>mrt-reflectoring-bom</artifactId>
+            <version>1.0.0</version>
+            <type>pom</type>
+            <scope>import</scope>
+          </dependency>
+        </dependencies>
+      </dependencyManagement>
 
   <repositories>
     <repository>
@@ -28,143 +40,158 @@
   </properties>
 
   <build>
-  <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.0</version>
-        <configuration>
-          <source>${java.compiler}</source>
-          <target>${java.compiler}</target>
-          <compilerArgument>${compilerArgument}</compilerArgument>
-          <!--compilerArgument>-Xlint:unchecked</compilerArgument-->
-          <!--showDeprecation>true</showDeprecation-->
-        </configuration>
-      </plugin>
+    <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>3.0</version>
+          <configuration>
+            <source>${java.compiler}</source>
+            <target>${java.compiler}</target>
+            <compilerArgument>${compilerArgument}</compilerArgument>
+            <!--compilerArgument>-Xlint:unchecked</compilerArgument-->
+            <!--showDeprecation>true</showDeprecation-->
+          </configuration>
+        </plugin>
   </plugins>
   </build>
 
   <dependencies>
       
-    <dependency>
-        <groupId>org.glassfish.jersey.containers</groupId>
-        <artifactId>jersey-container-servlet</artifactId>
-        <version>2.25.1</version>
-    </dependency>
-    
-    <dependency>
-        <groupId>org.glassfish.jersey.media</groupId>
-        <artifactId>jersey-media-multipart</artifactId>
-        <version>2.25.1</version>
-    </dependency>
-    
+        <dependency>
+            <groupId>org.cdlib.mrt</groupId>
+            <artifactId>mrt-core</artifactId>
+            <version>2.0-SNAPSHOT</version>
+        </dependency>
+      
+        <dependency>
+            <groupId>org.cdlib.mrt</groupId>
+            <artifactId>mrt-json</artifactId>
+            <version>2.0-SNAPSHOT</version>
+        </dependency>
 
-    <dependency>
-        <groupId>org.glassfish.jersey.core</groupId>
-        <artifactId>jersey-client</artifactId>
-        <version>2.25.1</version>
-    </dependency>
+        <dependency>
+            <groupId>org.cdlib.mrt</groupId>
+            <artifactId>mrt-s3srcpub</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
 
-    
-      <dependency>
-          <groupId>org.cdlib.mrt</groupId>
-          <artifactId>mrt-core</artifactId>
-          <version>2.0-SNAPSHOT</version>
-      </dependency>
+        <dependency>
+            <groupId>org.cdlib.mrt</groupId>
+            <artifactId>mrt-cloudconf</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <scope>runtime</scope>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.cdlib.mrt</groupId>
+            <artifactId>mrt-storeconf</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <scope>runtime</scope>
+        </dependency>
 
-      <!--dependency>
-          <groupId>org.cdlib.mrt</groupId>
-          <artifactId>mrt-jena</artifactId>
-          <version>2.0-SNAPSHOT</version>
-      </dependency-->
+        <dependency>
+            <groupId>org.cdlib.mrt</groupId>
+            <artifactId>mrt-tools</artifactId>
+            <version>2.0-SNAPSHOT</version>
+        </dependency>
 
-      <dependency>
-          <groupId>org.cdlib.mrt</groupId>
-        <artifactId>mrt-s3srcpub</artifactId>
-          <version>1.0-SNAPSHOT</version>
-      </dependency>
+        <dependency>
+            <groupId>org.cdlib.mrt</groupId>
+            <artifactId>cdl-zk-queue</artifactId>
+            <version>0.2-SNAPSHOT</version>
+        </dependency>
 
-      <dependency>
-          <groupId>org.cdlib.mrt</groupId>
-        <artifactId>mrt-storeconf</artifactId>
-          <version>1.0-SNAPSHOT</version>
-      </dependency>
+    <!--******************************************************-->
+        <dependency>
+            <groupId>com.hp.hpl.jena</groupId>
+            <artifactId>jena</artifactId>
+        </dependency>
 
-      <dependency>
-          <groupId>org.cdlib.mrt</groupId>
-        <artifactId>mrt-cloudconf</artifactId>
-          <version>1.0-SNAPSHOT</version>
-      </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+        </dependency>
 
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>4.5</version>
-      <scope>test</scope>
-    </dependency>
+        <dependency>
+            <groupId>javax.ws.rs</groupId>
+            <artifactId>javax.ws.rs-api</artifactId>
+        </dependency>
 
-    <!--dependency>
-        <groupId>net.sf</groupId>
-        <artifactId>jargs</artifactId>
-        <version>1.0</version>
-    </dependency-->
 
-    <dependency>
-        <groupId>javax.servlet</groupId>
-        <artifactId>servlet-api</artifactId>
-        <version>2.5</version>
-    </dependency>
-    
-    <dependency>
-	<groupId>javax.ws.rs</groupId>
-	<artifactId>javax.ws.rs-api</artifactId>
-	<version>2.0.1</version>
-    </dependency>
-
-    
         <dependency>
             <groupId>jaxen</groupId>
             <artifactId>jaxen</artifactId>
-            <version>1.1.1</version>
+            <scope>runtime</scope>
         </dependency>
 
-    <dependency>
-        <groupId>javax.mail</groupId>
-        <artifactId>mail</artifactId>
-        <version>1.4.1</version>
-    </dependency>
+        <dependency>
+            <groupId>javax.mail</groupId>
+            <artifactId>mail</artifactId>
+        </dependency>
 
-      <dependency>
-        <groupId>log4j</groupId>
-        <artifactId>log4j</artifactId>
-        <version>1.2.17</version>
-      </dependency>
-      
+        <dependency>
+            <groupId>jdom</groupId>
+            <artifactId>jdom</artifactId>
+            <!-- ignore mvn dependency errors -->
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+          <groupId>junit</groupId>
+          <artifactId>junit</artifactId>
+          <scope>test</scope>
+        </dependency>
+
+        <dependency>
+          <groupId>log4j</groupId>
+          <artifactId>log4j</artifactId>
+          <scope>runtime</scope>
+        </dependency>
+
         <dependency>
           <groupId>org.apache.zookeeper</groupId>
           <artifactId>zookeeper</artifactId>
-          <version>3.7.1</version>
-          <!--
-          <version>3.4.5</version> works but warn
-          <version>3.4.14</version> works but warn
-          <version>3.5.5</version> fail
-          <version>3.5.9</version>  java.lang.NoClassDefFoundError: Could not initialize class org.apache.zookeeper.common.ClientX509Util
-          <version>3.6.3</version> java.lang.NoSuchMethodError: org.slf4j.helpers.MessageFormatter.arrayFormat(Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/String;
-          <version>3.7.0</version> works
-          <version>3.7.1</version> works
-                    -->
-      </dependency>
+        </dependency>
 
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
-            <version>4.5.13</version>
         </dependency>
-      <dependency>
-          <groupId>org.cdlib.mrt</groupId>
-          <artifactId>cdl-zk-queue</artifactId>
-          <version>0.2-SNAPSHOT</version>
-      </dependency>
+            
+        <dependency>
+            <groupId>org.apache.zookeeper</groupId>
+            <artifactId>zookeeper-jute</artifactId>
+            <!-- ignore mvn dep warn -->
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.glassfish.jersey.core</groupId>
+            <artifactId>jersey-client</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.glassfish.jersey.core</groupId>
+            <artifactId>jersey-server</artifactId>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.glassfish.jersey.containers</groupId>
+            <artifactId>jersey-container-servlet</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.glassfish.jersey.media</groupId>
+            <artifactId>jersey-media-multipart</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jdom</groupId>
+            <artifactId>jdom</artifactId>
+        </dependency>
 
 
   </dependencies>

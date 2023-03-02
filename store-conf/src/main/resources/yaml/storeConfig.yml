@@ -69,7 +69,7 @@ store-info-docker: &docker
     trace: 5
   queueInfo:
     QueueService: "zoo:2181"
-    QueueLargeWorker: "store"
+    QueueLargeWorker: "xxxxstore"
     QueueSizeLimit: "600000000"
     QueueLockBase: "/mrt.lock"
     QueueHoldLock: "access/LargeAccessHold"

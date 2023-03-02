@@ -35,6 +35,7 @@ services:
       CATALINA_OPTS: "-Dfile.encoding=UTF8 -Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true"
       JPDA_ADDRESS: 8099
       JPDA_TRANSPORT: dt_socket
+      SSM_SKIP_RESOLUTION: Y
     networks:
       merrittnet:
     depends_on:
