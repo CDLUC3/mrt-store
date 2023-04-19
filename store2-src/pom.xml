@@ -103,10 +103,10 @@
         </dependency>
 
     <!--******************************************************-->
-        <dependency>
+        <!--dependency>
             <groupId>com.hp.hpl.jena</groupId>
             <artifactId>jena</artifactId>
-        </dependency>
+        </dependency-->
 
         <dependency>
             <groupId>javax.servlet</groupId>
