@@ -36,7 +36,8 @@ import java.util.Properties;
 import javax.ws.rs.core.Response;
 
 import org.cdlib.mrt.store.cloud.CloudObjectService;
-
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.ThreadContext;
 import org.cdlib.mrt.cloud.ManInfo;
 import org.cdlib.mrt.core.Identifier;
 import org.cdlib.mrt.utility.StringUtil;
@@ -274,11 +275,17 @@ public class CloudUtil
             LoggerInf logger)
         throws TException
     {
+        ThreadContext.put("nodeID", Integer.toString(nodeID));
+        ThreadContext.put("key", key);
+        ThreadContext.put("contentType", contentType);
+        ThreadContext.put("contentDisp", contentDisp);
+
         PreSignedState state = PreSignedState.getPreSignedState();
         if (presignTimeoutMinutes == null) {
             presignTimeoutMinutes = 240L;
         }
         try {
+            LogManager.getLogger().info("getPreSigned entered");
             if (DEBUG) System.out.println("getPreSigned entered:"
                     + " - nodeID=" + nodeID
                     + " - key=" + key

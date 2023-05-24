@@ -35,6 +35,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 import org.cdlib.mrt.s3.service.CloudResponse;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.ThreadContext;
 import org.cdlib.mrt.cloud.utility.CloudUtil;
 import org.cdlib.mrt.core.FileContent;
 import org.cdlib.mrt.core.FileComponent;
@@ -293,6 +295,10 @@ public class ContentVersionLink
         throws TException
     {
         try {
+            ThreadContext.put("LocalID", component.getLocalID());
+            ThreadContext.put("PrimaryID", component.getPrimaryID());
+            ThreadContext.put("URL", component.getURL().toString());
+            ThreadContext.put("path", component.getIdentifier());
             String key = component.getLocalID();
             String newFilePath = component.getIdentifier();
             System.out.println("setComponent:"
@@ -328,6 +334,7 @@ public class ContentVersionLink
             FileComponent saveComponent = component;
             saveComponent.setURL(fileLink);
             System.out.print(saveComponent.dump("contentIngestLink"));
+            LogManager.getLogger().info("contentIngestLink");
             saveComponent.setIdentifier(newFilePath);
             return saveComponent;
             
