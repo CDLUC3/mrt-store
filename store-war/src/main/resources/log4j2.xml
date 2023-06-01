@@ -8,10 +8,11 @@
         name="ECS-File"
         fileName="logs/log4j-ecs-json.log"
         filePattern="logs/log4j-ecs-json-%d{yyyy-MM-dd}-%i.log">
+      <!-- https://logging.apache.org/log4j/2.x/manual/lookups.html -->
       <EcsLayout
-          serviceName="store"
-          serviceNodeName="${env:HOSTNAME}"
-          eventDataset="tomcat.store"
+          serviceName="${env:SERVICE:-service}"
+          serviceNodeName="${env:HOSTNAME:-${env:SERVICE:-service}}"
+          eventDataset="tomcat"
           includeMarkers="true"
           stackTraceAsArray="true"
           includeOrigin="true"/>
@@ -33,7 +34,7 @@
   </Appenders>
 
   <Loggers>
-    <Root level="info">
+    <Root level="${env:LOGLEVEL:-info}">
       <AppenderRef ref="Text-Console"/>
       <AppenderRef ref="ECS-File"/>
       <AppenderRef ref="Text-File"/>
