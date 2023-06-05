@@ -267,7 +267,6 @@ public class ContentIngestLink
         try {
             ThreadContext.put("LocalID", component.getLocalID());
             ThreadContext.put("PrimaryID", component.getPrimaryID());
-            ThreadContext.put("URL", component.getURL().toString());
             ThreadContext.put("path", component.getIdentifier());
             String key = component.getLocalID();
             if (key.contains("|system/")) return null;

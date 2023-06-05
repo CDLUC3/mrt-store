@@ -295,10 +295,6 @@ public class ContentVersionLink
         throws TException
     {
         try {
-            ThreadContext.put("LocalID", component.getLocalID());
-            ThreadContext.put("PrimaryID", component.getPrimaryID());
-            ThreadContext.put("URL", component.getURL().toString());
-            ThreadContext.put("path", component.getIdentifier());
             String key = component.getLocalID();
             String newFilePath = component.getIdentifier();
             System.out.println("setComponent:"
@@ -307,6 +303,9 @@ public class ContentVersionLink
                     + " - path=" + newFilePath
                     
             );
+            ThreadContext.put("LocalID", component.getLocalID());
+            ThreadContext.put("PrimaryID", component.getPrimaryID());
+            ThreadContext.put("path", newFilePath);
             switch(filter) {
                 case producer: 
                     ArrayList <String> producerFilter = StorageConfig.getProducerFilter();
