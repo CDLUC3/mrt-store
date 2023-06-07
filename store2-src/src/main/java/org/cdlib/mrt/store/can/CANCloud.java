@@ -39,6 +39,9 @@ import java.util.List;
 import org.cdlib.mrt.store.NodeInf;
 //import org.cdlib.mrt.store.ObjectLocationInf;
 import java.net.URL;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.ThreadContext;
 
 import org.cdlib.mrt.cloud.object.StateHandler;
 import org.cdlib.mrt.cloud.VersionMap;
@@ -63,6 +66,7 @@ import org.cdlib.mrt.utility.TException;
 import org.cdlib.mrt.utility.LoggerInf;
 import org.cdlib.mrt.utility.StringUtil;
 import org.cdlib.mrt.store.cloud.CANCloudService;
+import org.cdlib.mrt.store.storage.StorageService;
 
 /**
  * Specific Node level service
@@ -72,6 +76,7 @@ public class CANCloud
         extends CANAbs
         implements NodeInf, KeyFileInf
 {
+    private static final Logger log4j = LogManager.getLogger(StorageService.class.getName());
     
     public static CANCloud getCANCloud(
             LoggerInf logger,
@@ -135,6 +140,8 @@ public class CANCloud
             log(MESSAGE + "addVersion complete"
                 + " - objectID=" + objectID
                 , 10);
+            
+            ThreadContext.put("versionID", "" + versionState.getIdentifier());
             return versionState;
 
         } catch (Exception ex) {
@@ -177,6 +184,7 @@ public class CANCloud
             log(MESSAGE + "addVersion complete"
                 + " - objectID=" + objectID
                 , 10);
+            ThreadContext.put("versionID", "" + versionState.getIdentifier());
             return versionState;
 
         } catch (Exception ex) {
