@@ -20,6 +20,12 @@
         </dependencies>
       </dependencyManagement>
 
+    <parent>
+        <groupId>org.cdlib.mrt</groupId>
+        <artifactId>mrt-parent-properties</artifactId>
+        <version>1.0.0</version>
+    </parent>
+
   <repositories>
     <repository>
       <id>central</id>
@@ -44,11 +50,11 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-compiler-plugin</artifactId>
-          <version>3.9.0</version>
+                <version>${maven.compiler.plugin.version}</version>
           <configuration>
-            <source>${java.compiler}</source>
-            <target>${java.compiler}</target>
-            <compilerArgument>${compilerArgument}</compilerArgument>
+                    <source>${maven.compiler.plugin.java}</source>
+                    <target>${maven.compiler.plugin.java}</target>
+                <compilerArgument></compilerArgument>
             <!--compilerArgument>-Xlint:unchecked</compilerArgument-->
             <!--showDeprecation>true</showDeprecation-->
           </configuration>
@@ -218,16 +224,5 @@
         </dependency>
  
   </dependencies>
-
-    <reporting>
-        <outputDirectory>/uc3qa/nexus34211/tomcat/webapps/report/mrt/core</outputDirectory>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-project-info-reports-plugin</artifactId>
-                <version>2.0.1</version>
-            </plugin>
-        </plugins>
-   </reporting>
 
 </project>

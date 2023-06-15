@@ -9,25 +9,27 @@
     <version>1.0-SNAPSHOT</version>
     <name>UC3-mrtStoreConf</name>
     <url>http://uc3.cdlib.org</url>
-
-    <!-- force UTF-8 -->
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
+    
+    <parent>
+        <groupId>org.cdlib.mrt</groupId>
+        <artifactId>mrt-parent-properties</artifactId>
+        <version>1.0.0</version>
+    </parent>
+    
     <build>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.9.0</version>
+                <version>${maven.compiler.plugin.version}</version>
                 <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
+                    <source>${maven.compiler.plugin.java}</source>
+                    <target>${maven.compiler.plugin.java}</target>
                 </configuration>
             </plugin>
         </plugins>
     </build>
-
+            
     <dependencies>
 
 
