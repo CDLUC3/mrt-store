@@ -24,6 +24,7 @@
         <groupId>org.cdlib.mrt</groupId>
         <artifactId>mrt-parent-properties</artifactId>
         <version>1.0.0</version>
+        <relativePath/>
     </parent>
 
   <repositories>
@@ -38,12 +39,6 @@
     </snapshots>
     </repository>
   </repositories>
-
-  <!-- force UTF-8 -->
-  <properties>
-      <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-      <java.compiler>1.8</java.compiler>
-  </properties>
 
   <build>
     <plugins>
@@ -114,6 +109,20 @@
             <artifactId>jena</artifactId>
         </dependency-->
 
+        <!-- Include the following as a runtime dependency when logging in ECS format for open
+        search-->
+        <dependency>
+            <groupId>co.elastic.logging</groupId>
+            <artifactId>ecs-logging-core</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        
+        <dependency>
+            <groupId>co.elastic.logging</groupId>
+            <artifactId>log4j2-ecs-layout</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
@@ -147,6 +156,11 @@
           <groupId>junit</groupId>
           <artifactId>junit</artifactId>
           <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-api</artifactId>
         </dependency>
         
         <dependency>
@@ -197,30 +211,6 @@
         <dependency>
             <groupId>org.jdom</groupId>
             <artifactId>jdom</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-core</artifactId>
-            <scope>runtime</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-api</artifactId>
-        </dependency>
-
-        <!-- Include the following as a runtime dependency when logging in ECS format for open
-        search-->
-        <dependency>
-            <groupId>co.elastic.logging</groupId>
-            <artifactId>ecs-logging-core</artifactId>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>co.elastic.logging</groupId>
-            <artifactId>log4j2-ecs-layout</artifactId>
-            <scope>runtime</scope>
         </dependency>
  
   </dependencies>
