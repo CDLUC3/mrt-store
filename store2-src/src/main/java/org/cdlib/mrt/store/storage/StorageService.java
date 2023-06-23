@@ -38,6 +38,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.ThreadContext;
 import org.cdlib.mrt.cloud.action.ContentVersionLink;
 
 import org.cdlib.mrt.core.Identifier;
@@ -69,6 +72,8 @@ public class StorageService
         extends StorageServiceAbs
         implements StorageServiceInf
 {
+    private static final Logger log4j = LogManager.getLogger(StorageService.class.getName());
+    
     protected static final String NAME = "StorageService";
     protected static final String MESSAGE = NAME + ": ";
 
@@ -93,15 +98,26 @@ public class StorageService
             File manifestFile)
     throws TException
     {
-        long startTime = DateUtil.getEpochUTCDate();
-        StoreNode node = nodeManager.getStoreNode(nodeID);
-        NodeInf can = node.getCan();
-        VersionState versionState = can.addVersion(objectID, context, localID, manifestFile);
-        URL storeURL = nodeManager.getStoreLink();
-        versionState.setAccess( getAccessNodeID(nodeID), storeURL, objectID);
-        bump("addVersion", startTime);
-        return versionState;
-    }
+        try {
+            ThreadContext.put("store.function", "add");
+            ThreadContext.put("LocalID", localID);
+            ThreadContext.put("PrimaryID", objectID.getValue());
+            ThreadContext.put("node", "" + nodeID);
+            long startTime = DateUtil.getEpochUTCDate();
+            StoreNode node = nodeManager.getStoreNode(nodeID);
+            NodeInf can = node.getCan();
+            log4j.info("Start addVersion");
+            VersionState versionState = can.addVersion(objectID, context, localID, manifestFile);
+            log4j.info("End addVersion");
+            URL storeURL = nodeManager.getStoreLink();
+            versionState.setAccess( getAccessNodeID(nodeID), storeURL, objectID);
+            bump("addVersion", startTime);
+            return versionState;
+            
+        } finally {
+            ThreadContext.clearMap();
+        }
+    } 
 
     @Override
     public VersionState updateVersion (
@@ -113,14 +129,25 @@ public class StorageService
             String [] deleteList)
     throws TException
     {
-        long startTime = DateUtil.getEpochUTCDate();
-        StoreNode node = nodeManager.getStoreNode(nodeID);
-        NodeInf can = node.getCan();
-        VersionState versionState = can.updateVersion(objectID, context, localID, manifestFile, deleteList);
-        URL storeURL = nodeManager.getStoreLink();
-        versionState.setAccess( getAccessNodeID(nodeID), storeURL, objectID);
-        bump("updateVersion", startTime);
-        return versionState;
+        try {
+            ThreadContext.put("store.function", "update");
+            ThreadContext.put("LocalID", localID);
+            ThreadContext.put("PrimaryID", objectID.getValue());
+            ThreadContext.put("node", "" + nodeID);
+            long startTime = DateUtil.getEpochUTCDate();
+            StoreNode node = nodeManager.getStoreNode(nodeID);
+            NodeInf can = node.getCan();
+            log4j.info("Start updateVersion");
+            VersionState versionState = can.updateVersion(objectID, context, localID, manifestFile, deleteList);
+            log4j.info("End updateVersion");
+            URL storeURL = nodeManager.getStoreLink();
+            versionState.setAccess( getAccessNodeID(nodeID), storeURL, objectID);
+            bump("updateVersion", startTime);
+            return versionState;
+            
+        } finally {
+            ThreadContext.clearMap();
+        }
     }
 
 

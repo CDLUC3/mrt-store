@@ -36,6 +36,8 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 
 
@@ -43,6 +45,7 @@ import org.cdlib.mrt.store.can.CANAbs;
 import org.cdlib.mrt.core.PingState;
 import org.cdlib.mrt.tools.YamlParser;
 import org.cdlib.mrt.s3.service.NodeIO;
+import org.cdlib.mrt.store.storage.StorageService;
 import org.cdlib.mrt.utility.FileUtil;
 import org.cdlib.mrt.utility.LoggerAbs;
 import org.cdlib.mrt.utility.LoggerInf;
@@ -64,6 +67,8 @@ import org.json.JSONObject;
 public class StoreNodeManager
 {
 
+    private static final Logger log4j = LogManager.getLogger(StoreNodeManager.class.getName());
+    
     protected static final String NAME = "StoreNodeManager";
     protected static final String MESSAGE = NAME + ": ";
     protected final static boolean DEBUG = false ;
@@ -291,6 +296,10 @@ public class StoreNodeManager
                             + " - nodeID=" + nodeID
                             );
             
+            log4j.info("setNode processing"
+                            + " - getBaseURI=" + accessURLS
+                            + " - nodeID=" + nodeID
+                            );
 
             return nodeState;
             

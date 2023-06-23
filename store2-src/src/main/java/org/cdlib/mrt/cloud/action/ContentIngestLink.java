@@ -50,6 +50,10 @@ import org.cdlib.mrt.store.tools.StoreUtil;
 import org.cdlib.mrt.utility.FileUtil;
 //import org.cdlib.mrt.utility.FileUtil;
 import org.cdlib.mrt.utility.StringUtil;
+
+import org.apache.logging.log4j.ThreadContext;
+import org.apache.logging.log4j.LogManager;
+
 /**
  * Run fixity
  * @author dloy
@@ -261,6 +265,9 @@ public class ContentIngestLink
         throws TException
     {
         try {
+            ThreadContext.put("LocalID", component.getLocalID());
+            ThreadContext.put("PrimaryID", component.getPrimaryID());
+            ThreadContext.put("path", component.getIdentifier());
             String key = component.getLocalID();
             if (key.contains("|system/")) return null;
             if ((this.update) && (!key.contains("|" + versionID + "|"))) {
@@ -268,6 +275,7 @@ public class ContentIngestLink
             }
             FileComponent saveComponent = component;
             System.out.print(saveComponent.dump("contentIngestLink"));
+            LogManager.getLogger().info("contentIngestLink");
             String newFilePath = component.getIdentifier();
             if (newFilePath.startsWith("producer/")) {
                 newFilePath = component.getIdentifier().substring(9);
