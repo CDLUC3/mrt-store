@@ -35,6 +35,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import org.cdlib.mrt.log.utility.Log4j2Util;
 
 
 import org.cdlib.mrt.utility.LoggerInf;
@@ -105,6 +106,7 @@ public class StorageConfig
             JSONObject jStoreQueue = jStoreInfo.getJSONObject("queueInfo");
             LoggerInf logger = storageConfig.setLogger(jStoreLogger);
             storageConfig.setLogger(logger);
+            storageConfig.setLog4j(jStoreLogger);
             storageConfig.setBaseURI(jStoreInfo.getString("baseURI"));
             storageConfig.setVerifyOnRead(jStoreInfo.getBoolean("verifyOnRead"));
             storageConfig.setVerifyOnWrite(jStoreInfo.getBoolean("verifyOnWrite"));
@@ -444,6 +446,25 @@ public class StorageConfig
         );
         LoggerInf logger = LoggerAbs.getTFileLogger(name, log.getCanonicalPath() + '/', logprop);
         return logger;
+    }
+    /**
+     * set local logger to node/log/...
+     * @param path String path to node
+     * @return Node logger
+     * @throws Exception process exception
+     */
+    protected void setLog4j(JSONObject fileLogger)
+        throws Exception
+    {
+        String log4jlevel = null;
+        try {
+            log4jlevel = fileLogger.getString("log4jlevel");
+            Log4j2Util.setRootLevel(log4jlevel);
+        } catch (Exception ex) {
+            System.out.println("log4jlevel not found");
+        }
+        Log4j2Util.whichLog4j2("STORAGECONFIG");
+        System.out.println("log4j level:" + Log4j2Util.getRootLevel());
     }
     
     public static void main(String[] argv) {

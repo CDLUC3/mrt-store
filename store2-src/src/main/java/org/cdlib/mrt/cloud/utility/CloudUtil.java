@@ -275,18 +275,17 @@ public class CloudUtil
             LoggerInf logger)
         throws TException
     {
-        ThreadContext.put("nodeID", Integer.toString(nodeID));
-        ThreadContext.put("key", key);
-        ThreadContext.put("contentType", contentType);
-        ThreadContext.put("contentDisp", contentDisp);
 
         PreSignedState state = PreSignedState.getPreSignedState();
         if (presignTimeoutMinutes == null) {
             presignTimeoutMinutes = 240L;
         }
         try {
-            LogManager.getLogger().info("getPreSigned entered");
-            if (DEBUG) System.out.println("getPreSigned entered:"
+            ThreadContext.put("nodeID", Integer.toString(nodeID));
+            ThreadContext.put("key", key);
+            ThreadContext.put("contentType", contentType);
+            ThreadContext.put("contentDisp", contentDisp);
+            LogManager.getLogger().debug("getPreSigned entered:"
                     + " - nodeID=" + nodeID
                     + " - key=" + key
                     + " - expireMinutes=" + presignTimeoutMinutes
@@ -362,14 +361,20 @@ public class CloudUtil
             return state;
             
         } catch (TException tex) {
+            LogManager.getLogger().debug("presign TException", tex);
             state.setStatusEnum(PreSignedState.StatusEnum.SERVICE_EXCEPTION);
             state.setEx(tex);
+            
             return state;
 
         } catch (Exception ex) {
+            LogManager.getLogger().debug("presign exception", ex);
             state.setStatusEnum(PreSignedState.StatusEnum.SERVICE_EXCEPTION);
             state.setEx(ex);
             return state;
+            
+        } finally {
+            ThreadContext.clearAll();
         }
     }
         
