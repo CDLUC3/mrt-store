@@ -7,7 +7,7 @@
     
     <RollingFile
         name="ECS-File"
-        fileName="${env:CATALINA_BASE:-.}/logs/${env:FQSN:-testserv}-log4j-ecs-json.log"
+        fileName="${env:CATALINA_BASE:-.}/logs/log4j-ecs-json.log"
         filePattern="logs/log4j-ecs-json-%d{yyyy-MM-dd}-%i.log">
       <!-- https://logging.apache.org/log4j/2.x/manual/lookups.html -->
       <EcsLayout
@@ -27,7 +27,7 @@
     
     <RollingFile
         name="Text-File"
-        fileName="${env:CATALINA_BASE:-.}/logs/${env:FQSN:-testserv}-log4j-text.log"
+        fileName="${env:CATALINA_BASE:-.}/logs/log4j-text.log"
         filePattern="logs/log4j-text-json-%d{yyyy-MM-dd}-%i.log">
       <Policies>
         <SizeBasedTriggeringPolicy size="19500KB" />
