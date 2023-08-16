@@ -32,7 +32,7 @@ package org.cdlib.mrt.store.logging;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.util.List;
+import java.util.Properties;
 import java.util.concurrent.Callable;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -40,7 +40,7 @@ import org.apache.logging.log4j.Logger;
 import org.cdlib.mrt.cloud.VersionMap;
 import org.cdlib.mrt.core.Identifier;
 
-import org.cdlib.mrt.log.utility.AddStateEntry;
+import org.cdlib.mrt.log.utility.AddStateEntryGen;
 
 
 import org.cdlib.mrt.cloud.ManifestSAX;
@@ -66,7 +66,7 @@ public class LogEntryTokenStatus
     
     protected String serviceProcess = "AsyncToken";
     protected TokenStatus tokenStatus = null;
-    protected AddStateEntry entry = null;
+    protected AddStateEntryGen entry = null;
     
     public static LogEntryTokenStatus getLogEntryTokenStatus(
             TokenStatus tokenStatus)
@@ -86,7 +86,7 @@ public class LogEntryTokenStatus
         }
         this.serviceProcess = serviceProcess;
         this.tokenStatus = tokenStatus;
-        entry = AddStateEntry.getAddStateEntry("storage", serviceProcess);
+        entry = AddStateEntryGen.getAddStateEntryGen("token", "storage", serviceProcess);
         log4j.debug("LogEntryTokenStatus constructor");
         setEntry();
     }
@@ -102,12 +102,24 @@ public class LogEntryTokenStatus
         if ((buildEnd != null) && (buildStart != null)) {
             entry.setDurationMs(buildEnd - buildStart);
         }
-        entry.setAddVersions(1);
-        entry.setAddBytes(tokenStatus.getCloudContentBytes());
+        entry.setVersions(1);
+        entry.setBytes(tokenStatus.getCloudContentBytes());
         entry.setKey(tokenStatus.getToken());
+        setProperties();
         
         log4j.debug("LogEntryTokenStatus entry built");
     }
+    private void setProperties()
+        throws TException
+    {
+        Properties prop = new Properties();
+        prop.setProperty("archiveType", tokenStatus.getArchiveType().toString());
+        prop.setProperty("archiveContent", tokenStatus.getArchiveContent().toString());
+        entry.setProperties(prop);
+        log4j.debug("LogEntryTokenStatus properties added");
+    }
+    
+    
     
     public void addEntry()
         throws TException

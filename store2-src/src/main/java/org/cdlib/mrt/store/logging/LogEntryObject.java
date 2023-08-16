@@ -40,7 +40,7 @@ import org.apache.logging.log4j.Logger;
 import org.cdlib.mrt.cloud.VersionMap;
 import org.cdlib.mrt.core.Identifier;
 
-import org.cdlib.mrt.log.utility.AddStateEntry;
+import org.cdlib.mrt.log.utility.AddStateEntryGen;
 
 
 import org.cdlib.mrt.cloud.ManifestSAX;
@@ -70,21 +70,26 @@ public class LogEntryObject
     protected ObjectState objectState = null;
     protected Long addBytes = null;
     protected Long addFiles = null;
-    protected AddStateEntry entry = null;
+    protected AddStateEntryGen entry = null;
+    protected String keyPrefix = null;
     
     public static LogEntryObject getLogEntryObject(
+            String keyPrefix,
             String serviceProcess, 
             Long node, 
             Long duration, 
             ObjectState objectState)
         throws TException
     {
-        return new LogEntryObject(serviceProcess, node, duration, objectState);
+        return new LogEntryObject(keyPrefix, serviceProcess, node, duration, objectState);
     }
     
-    public LogEntryObject(String serviceProcess, Long node, Long duration, ObjectState objectState)
+    public LogEntryObject(String keyPrefix, String serviceProcess, Long node, Long duration, ObjectState objectState)
         throws TException
     {
+        if (StringUtil.isAllBlank(keyPrefix)) {
+            throw new TException.INVALID_OR_MISSING_PARM(MESSAGE + "keyPrefix missing");
+        }
         if (StringUtil.isAllBlank(serviceProcess)) {
             throw new TException.INVALID_OR_MISSING_PARM(MESSAGE + "serviceProcess missing");
         }
@@ -97,11 +102,12 @@ public class LogEntryObject
         if (objectState == null) {
             throw new TException.INVALID_OR_MISSING_PARM(MESSAGE + "objectState missing");
         }
+        this.keyPrefix = keyPrefix;
         this.serviceProcess = serviceProcess;
         this.node = node;
         this.duration = duration;
         this.objectState = objectState;
-        entry = AddStateEntry.getAddStateEntry("storage", serviceProcess);
+        entry = AddStateEntryGen.getAddStateEntryGen(keyPrefix, "storage", serviceProcess);
         log4j.debug("LogEntryVersion constructor");
         setEntry();
     }
@@ -114,10 +120,10 @@ public class LogEntryObject
         entry.setVersion(null);
         entry.setTargetNode(node);
         entry.setDurationMs(duration);
-        entry.setDeleteBytes(objectState.getTotalActualSize());
+        entry.setBytes(objectState.getTotalActualSize());
         long numFilesL = objectState.getNumFiles();
-        entry.setDeleteFiles(numFilesL);
-        entry.setDeleteVersions(objectState.getNumVersions());
+        entry.setFiles(numFilesL);
+        entry.setVersions(objectState.getNumVersions());
         entry.setCurrentVersion(0);
         log4j.debug("LogEntryObject entry built");
     }

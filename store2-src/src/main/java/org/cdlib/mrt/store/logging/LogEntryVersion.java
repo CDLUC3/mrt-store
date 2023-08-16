@@ -40,7 +40,7 @@ import org.apache.logging.log4j.Logger;
 import org.cdlib.mrt.cloud.VersionMap;
 import org.cdlib.mrt.core.Identifier;
 
-import org.cdlib.mrt.log.utility.AddStateEntry;
+import org.cdlib.mrt.log.utility.AddStateEntryGen;
 
 
 import org.cdlib.mrt.cloud.ManifestSAX;
@@ -70,21 +70,27 @@ public class LogEntryVersion
     protected VersionState versionState = null;
     protected Long addBytes = null;
     protected Long addFiles = null;
-    protected AddStateEntry entry = null;
+    protected AddStateEntryGen entry = null;
     
     public static LogEntryVersion getLogEntryVersion(
-            String serviceProcess, 
-            Long node, 
-            Long duration, 
+            String keyPrefix,
+            String serviceProcess,
+            Long node,
+            Long duration,
             VersionState versionState)
+    
         throws TException
     {
-        return new LogEntryVersion(serviceProcess, node, duration, versionState);
+        return new LogEntryVersion(keyPrefix, serviceProcess, node, duration, versionState);
     }
     
-    public LogEntryVersion(String serviceProcess, Long node, Long duration, VersionState versionState)
+    public LogEntryVersion(
+            String keyPrefix, String serviceProcess, Long node, Long duration, VersionState versionState)
         throws TException
     {
+        if (StringUtil.isAllBlank(keyPrefix)) {
+            throw new TException.INVALID_OR_MISSING_PARM(MESSAGE + "keyPrefix missing");
+        }
         if (StringUtil.isAllBlank(serviceProcess)) {
             throw new TException.INVALID_OR_MISSING_PARM(MESSAGE + "serviceProcess missing");
         }
@@ -101,8 +107,7 @@ public class LogEntryVersion
         this.node = node;
         this.duration = duration;
         this.versionState = versionState;
-        entry = AddStateEntry.getAddStateEntry("storage", serviceProcess);
-        log4j.debug("LogEntryVersion constructor");
+        entry = AddStateEntryGen.getAddStateEntryGen(keyPrefix, "storage", serviceProcess);
         setEntry();
     }
     
@@ -113,9 +118,9 @@ public class LogEntryVersion
         entry.setVersion(versionState.getIdentifier());
         entry.setTargetNode(node);
         entry.setDurationMs(duration);
-        entry.setAddBytes(versionState.getDeltaSize());
-        entry.setAddFiles(versionState.getDeltaNumFiles());
-        entry.setAddVersions(1);
+        entry.setBytes(versionState.getDeltaSize());
+        entry.setFiles(versionState.getDeltaNumFiles());
+        entry.setVersions(1);
         entry.setCurrentVersion(versionState.getIdentifier());
         log4j.debug("LogEntryVersion entry built");
     }

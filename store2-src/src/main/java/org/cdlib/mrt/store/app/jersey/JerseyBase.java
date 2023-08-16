@@ -79,7 +79,7 @@ import org.cdlib.mrt.s3.service.CloudStoreInf;
 import org.cdlib.mrt.s3.service.NodeIO;
 import org.cdlib.mrt.utility.ArchiveBuilderBase;
 import org.cdlib.mrt.core.DateState;
-import org.cdlib.mrt.log.utility.AddStateEntry;
+import org.cdlib.mrt.log.utility.AddStateEntryGen;
 import org.cdlib.mrt.store.logging.LogEntryObject;
 import org.cdlib.mrt.store.logging.LogEntryVersion;
 import org.cdlib.mrt.store.action.AsyncCloudArchive;
@@ -1062,7 +1062,7 @@ public class JerseyBase
             long startTime = System.currentTimeMillis();
             VersionState responseState = addVersion(nodeID, objectID, localContext, localID, manifest, storageService, logger);
             long nodeL = nodeID;
-            LogEntryVersion logEntry = LogEntryVersion.getLogEntryVersion("StoreAdd",
+            LogEntryVersion logEntry = LogEntryVersion.getLogEntryVersion("add", "StoreAdd",
                     nodeL,
                     System.currentTimeMillis() - startTime, 
                     responseState);
@@ -1231,7 +1231,7 @@ public class JerseyBase
             long startTime = System.currentTimeMillis();
             VersionState responseState = updateVersion(nodeID, objectID, localContext, localID, manifest, deleteList, storageService, logger);
             long nodeL = nodeID;
-            LogEntryVersion logEntry = LogEntryVersion.getLogEntryVersion("StoreUpdate",
+            LogEntryVersion logEntry = LogEntryVersion.getLogEntryVersion("update", "StoreUpdate",
                     nodeL,
                     System.currentTimeMillis() - startTime, 
                     responseState);
@@ -1430,7 +1430,7 @@ public class JerseyBase
             long startTime = System.currentTimeMillis();
             long nodeL = nodeID;
             ObjectState responseState = deleteObject(nodeID, objectID, storageService, logger);
-            LogEntryObject logEntry = LogEntryObject.getLogEntryObject("StoreDelete",
+            LogEntryObject logEntry = LogEntryObject.getLogEntryObject("delete", "StoreDelete",
                     nodeL,
                     System.currentTimeMillis() - startTime, 
                     responseState);
@@ -1540,7 +1540,7 @@ public class JerseyBase
             StorageServiceInit storageServiceInit = StorageServiceInit.getStorageServiceInit(sc);
             StorageServiceInf storageService = storageServiceInit.getStorageService();
             logger = getNodeLogger(nodeID, storageService);
-            AddStateEntry logEntry = AddStateEntry.getAddStateEntry("store", "getObjectArchive")
+            AddStateEntryGen logEntry = AddStateEntryGen.getAddStateEntryGen("archive", "store", "getObjectArchive")
                     .setObjectID(objectID)
                     .setSourceNode(nodeID);
             FileContent content = storageService.getObjectArchive(
