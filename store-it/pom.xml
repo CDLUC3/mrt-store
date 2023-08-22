@@ -162,7 +162,7 @@
                   </run>
                 </image>
                 <image>
-                  <name>tomcat:8-jre8</name>
+                  <name>public.ecr.aws/docker/library/tomcat:9-jdk8-corretto</name>
                   <alias>it-server</alias>
                   <run>
                     <network>
