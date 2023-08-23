@@ -76,8 +76,6 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <version>${maven.compiler.plugin.version}</version>
         <configuration>
-            <source>${maven.compiler.plugin.java}</source>
-            <target>${maven.compiler.plugin.java}</target>
         </configuration>
       </plugin>
       
@@ -162,7 +160,7 @@
                   </run>
                 </image>
                 <image>
-                  <name>public.ecr.aws/docker/library/tomcat:9-jdk8-corretto</name>
+                  <name>public.ecr.aws/docker/library/tomcat:9-jdk11-corretto</name>
                   <alias>it-server</alias>
                   <run>
                     <network>
