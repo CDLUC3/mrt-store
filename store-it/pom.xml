@@ -160,7 +160,7 @@
                   </run>
                 </image>
                 <image>
-                  <name>public.ecr.aws/docker/library/tomcat:9-jdk11-corretto</name>
+                  <name>${itDockerRegistry}/merritt-tomcat:dev</name>
                   <alias>it-server</alias>
                   <run>
                     <network>
