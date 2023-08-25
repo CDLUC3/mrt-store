@@ -54,6 +54,7 @@ import org.cdlib.mrt.core.Identifier;
 
 import org.cdlib.mrt.formatter.FormatterInf;
 import org.cdlib.mrt.cloud.utility.CloudUtil;
+import org.cdlib.mrt.log.utility.Log4j2Util;
 import org.cdlib.mrt.store.StoreNodeManager;
 import org.cdlib.mrt.store.storage.StorageService;
 import org.cdlib.mrt.store.storage.StorageServiceInf;
@@ -116,6 +117,7 @@ public class JerseyStorage
     @POST
     @Path("/reset")
     public Response getResetState(
+            @DefaultValue("-none-") @QueryParam("log4jlevel") String log4jlevel,
             @DefaultValue("xhtml") @QueryParam(KeyNameHttpInf.RESPONSEFORM) String formatType,
             @Context CloseableService cs,
             @Context ServletConfig sc)
@@ -123,13 +125,17 @@ public class JerseyStorage
     {
         LoggerInf logger = null;
         try {
-            log("getResetState entered:"
+            log4j.info("getResetState entered:"
                     + " - formatType=" + formatType
+                    + " - log4jlevel=" + log4jlevel
                     );
             StorageServiceInit storageServiceInit = StorageServiceInit.resetStorageServiceInit(sc);
             StorageServiceInf storageService = storageServiceInit.getStorageService();
             logger = storageService.getLogger();
             StateInf responseState = storageService.getServiceState();
+            if (!log4jlevel.equals("-none-")) {
+                Log4j2Util.setRootLevel(log4jlevel);
+            }
             return getStateResponse(responseState, formatType, logger, cs, sc);
 
         } catch (TException.REQUESTED_ITEM_NOT_FOUND renf) {

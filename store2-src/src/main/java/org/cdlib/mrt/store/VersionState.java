@@ -134,6 +134,10 @@ public class VersionState
         return versionRef;
     }
 
+    public Identifier getObjectID() {
+        return objectID;
+    }
+
     /**
      * Set object identifier
      * @param objectID object identifier

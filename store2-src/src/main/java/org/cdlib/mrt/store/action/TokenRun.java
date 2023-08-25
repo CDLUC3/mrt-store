@@ -34,6 +34,7 @@ import org.cdlib.mrt.store.StorageConfig;
 import org.cdlib.mrt.store.TokenGetState;
 import org.cdlib.mrt.store.TokenStatus;
 import org.cdlib.mrt.s3.service.NodeIO;
+import org.cdlib.mrt.store.logging.LogEntryTokenStatus;
 import org.cdlib.mrt.utility.TException;
 import org.cdlib.mrt.utility.LoggerInf;
 import org.cdlib.mrt.utility.StringUtil;
@@ -104,6 +105,8 @@ public class TokenRun
     protected Exception exception = null;
     protected TokenGetState getState = null;
     protected Long processTimeMs = null;
+    protected long buildMs = 0;
+    protected long buildFileCnt = 0;
         
     
     protected NodeIO nodeIO = null;
@@ -280,7 +283,11 @@ public class TokenRun
             endTokenStatus = getCloudTokenStatus();
             TokenStatus.TokenStatusEnum endStatusEnum = endTokenStatus.getTokenStatusEnum();
             if (endStatusEnum == TokenStatus.TokenStatusEnum.OK) {
-                setRunStatus(TokenRunStatus.OK);
+                setRunStatus(TokenRunStatus.OK);            // Add log state
+                processTokenStatus.setBuildFileCnt(buildFileCnt);
+                processTokenStatus.setBuildTimeMs(buildMs);
+                LogEntryTokenStatus entry = LogEntryTokenStatus.getLogEntryTokenStatus(processTokenStatus);
+                entry.addEntry();
                 return;
             }
             
@@ -304,6 +311,8 @@ public class TokenRun
                 logger);
             asyncCloudArchive.run();
             processTimeMs = System.currentTimeMillis() - startTime;
+            buildMs = asyncCloudArchive.getBuildMs();
+            buildFileCnt = asyncCloudArchive.getBuildFileCnt();
             if (asyncCloudArchive.ex != null) {
                 System.out.println("buildTokenSynch Exception:" + asyncCloudArchive.ex);
                 asyncCloudArchive.ex.printStackTrace();
@@ -419,8 +428,15 @@ public class TokenRun
         main_run(args);
         
     }
-    
 
+    public long getBuildMs() {
+        return buildMs;
+    }
+
+    public long getBuildFileCnt() {
+        return buildFileCnt;
+    }
+    
     public static void main_testGet(String[] args) 
         throws TException
     {

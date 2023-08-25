@@ -53,6 +53,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.cdlib.mrt.cloud.utility.CloudUtil;
 
 import org.cdlib.mrt.cloud.action.ContentVersionLink;
@@ -68,6 +70,8 @@ import org.cdlib.mrt.store.StorageConfig;
 import org.cdlib.mrt.store.TokenGetState;
 import org.cdlib.mrt.store.TokenPostState;
 import org.cdlib.mrt.store.TokenStatus;
+import org.cdlib.mrt.store.ObjectState;
+import org.cdlib.mrt.store.VersionState;
 import org.cdlib.mrt.store.tools.JSONTools;
 import org.cdlib.mrt.core.Identifier;
 import org.cdlib.mrt.s3.service.CloudResponse;
@@ -75,9 +79,13 @@ import org.cdlib.mrt.s3.service.CloudStoreInf;
 import org.cdlib.mrt.s3.service.NodeIO;
 import org.cdlib.mrt.utility.ArchiveBuilderBase;
 import org.cdlib.mrt.core.DateState;
+import org.cdlib.mrt.log.utility.AddStateEntryGen;
+import org.cdlib.mrt.store.logging.LogEntryObject;
+import org.cdlib.mrt.store.logging.LogEntryVersion;
 import org.cdlib.mrt.store.action.AsyncCloudArchive;
 import org.cdlib.mrt.store.action.TokenManager;
 import org.cdlib.mrt.store.consumer.utility.QueueUtil;
+import org.cdlib.mrt.store.logging.LogEntryTokenStatus;
 import org.cdlib.mrt.store.tools.FileFromUrl;
 import org.cdlib.mrt.store.zoo.ZooTokenHandler;
 import org.cdlib.mrt.store.zoo.ZooTokenState;
@@ -119,6 +127,8 @@ public class JerseyBase
 
     protected LoggerInf defaultLogger = new TFileLogger("Jersey", 10, 10);
     protected JerseyCleanup jerseyCleanup = new JerseyCleanup();
+    
+    protected static final Logger log4j = LogManager.getLogger();
 
 
 
@@ -660,7 +670,7 @@ public class JerseyBase
             int versionID = getVersionID(versionIDS);
             Identifier objectID = getObjectID(objectIDS);
             fileID = getFileID(fileID);
-            log("getFileFixityState entered:"
+            log4j.debug("getFileFixityState entered:"
                     + " - formatType=" + formatType
                     + " - nodeId=" + nodeID
                     + " - objectID=" + objectID
@@ -701,7 +711,7 @@ public class JerseyBase
         LoggerInf logger = defaultLogger;
         try {
             Identifier objectID = getObjectID(objectIDS);
-            log("getObjectFixityState entered:"
+            log4j.debug("getObjectFixityState entered:"
                     + " - formatType=" + formatType
                     + " - nodeId=" + nodeID
                     + " - objectID=" + objectID
@@ -751,7 +761,7 @@ public class JerseyBase
             int versionID = getVersionID(versionIDS);
             Identifier objectID = getObjectID(objectIDS);
             fileID = getFileID(fileID);
-            log("getFileFixityState entered:"
+            log4j.debug("getFileFixityState entered:"
                     + " - nodeId=" + nodeID
                     + " - objectID=" + objectID
                     + " - fileID=" + fileID
@@ -1017,8 +1027,9 @@ public class JerseyBase
     {
         LoggerInf logger = defaultLogger;
         File manifest = null;
+        
         try {
-            log("addVersion entered:"
+            log4j.debug("addVersion entered:"
                     + " - formatType=" + formatType
                     + " - nodeId=" + nodeID
                     + " - objectIDS=" + objectIDS
@@ -1046,8 +1057,16 @@ public class JerseyBase
             logger = getNodeLogger(nodeID, storageService);
             manifest = getManifest(manifestRequest, url, logger);
             validateManifest(manifest, sizeS, digestType, digestValue);
+            
             //jerseyCleanup.addTempFile(manifest);
-            StateInf responseState = addVersion(nodeID, objectID, localContext, localID, manifest, storageService, logger);
+            long startTime = System.currentTimeMillis();
+            VersionState responseState = addVersion(nodeID, objectID, localContext, localID, manifest, storageService, logger);
+            long nodeL = nodeID;
+            LogEntryVersion logEntry = LogEntryVersion.getLogEntryVersion("add", "StoreAdd",
+                    nodeL,
+                    System.currentTimeMillis() - startTime, 
+                    responseState);
+            logEntry.addEntry();
             return getStateResponse(responseState, formatType, logger, cs, sc);
 
         } catch (TException tex) {
@@ -1071,7 +1090,7 @@ public class JerseyBase
         throws TException
     {        LoggerInf logger = defaultLogger;
         try {
-            log("copyObject entered:"
+            log4j.debug("copyObject entered:"
                     + " - formatType=" + formatType
                     + " - node=" + node
                     + " - objectIDS=" + objectIDS
@@ -1107,7 +1126,7 @@ public class JerseyBase
         throws TException
     {        LoggerInf logger = defaultLogger;
         try {
-            log("copyObject entered:"
+            log4j.debug("copyObject entered:"
                     + " - formatType=" + formatType
                     + " - sourceNode=" + sourceNode
                     + " - targetNode=" + targetNode
@@ -1170,7 +1189,7 @@ public class JerseyBase
         LoggerInf logger = defaultLogger;
         File manifest = null;
         try {
-            log("updateVersion entered:"
+            log4j.debug("updateVersion entered:"
                     + " - formatType=" + formatType
                     + " - nodeId=" + nodeID
                     + " - objectIDS=" + objectIDS
@@ -1208,7 +1227,15 @@ public class JerseyBase
                 delete = delete.trim();
                 deleteList = delete.split("\\r?\\n");
             }
-            StateInf responseState = updateVersion(nodeID, objectID, localContext, localID, manifest, deleteList, storageService, logger);
+            
+            long startTime = System.currentTimeMillis();
+            VersionState responseState = updateVersion(nodeID, objectID, localContext, localID, manifest, deleteList, storageService, logger);
+            long nodeL = nodeID;
+            LogEntryVersion logEntry = LogEntryVersion.getLogEntryVersion("update", "StoreUpdate",
+                    nodeL,
+                    System.currentTimeMillis() - startTime, 
+                    responseState);
+            logEntry.addEntry();
             return getStateResponse(responseState, formatType, logger, cs, sc);
 
         } catch (TException tex) {
@@ -1270,7 +1297,7 @@ public class JerseyBase
      * @return version state information for added item
      * @throws TException processing exception
      */
-    protected StateInf addVersion(
+    protected VersionState addVersion(
             int nodeID,
             Identifier objectID,
             String localContext,
@@ -1281,7 +1308,7 @@ public class JerseyBase
         throws TException
     {
         try {
-            StateInf responseState = storageService.addVersion(nodeID, objectID, localContext, localID, manifestFile);
+            VersionState responseState = storageService.addVersion(nodeID, objectID, localContext, localID, manifestFile);
             return responseState;
 
         } catch (TException tex) {
@@ -1302,7 +1329,7 @@ public class JerseyBase
      * @return version state information for added item
      * @throws TException processing exception
      */
-    protected StateInf updateVersion(
+    protected VersionState updateVersion(
             int nodeID,
             Identifier objectID,
             String localContext,
@@ -1314,7 +1341,7 @@ public class JerseyBase
         throws TException
     {
         try {
-            StateInf responseState = storageService.updateVersion(nodeID, objectID, localContext, localID, manifestFile, deleteList);
+            VersionState responseState = storageService.updateVersion(nodeID, objectID, localContext, localID, manifestFile, deleteList);
             return responseState;
 
         } catch (TException tex) {
@@ -1390,7 +1417,7 @@ public class JerseyBase
     {
         LoggerInf logger = defaultLogger;
         try {
-            log("deleteObject entered:"
+            log4j.debug("deleteObject entered:"
                     + " - formatType=" + formatType
                     + " - nodeId=" + nodeID
                     + " - objectIDS=" + objectIDS
@@ -1400,7 +1427,14 @@ public class JerseyBase
             StorageServiceInit storageServiceInit = StorageServiceInit.getStorageServiceInit(sc);
             StorageServiceInf storageService = storageServiceInit.getStorageService();
             logger = getNodeLogger(nodeID, storageService);
-            StateInf responseState = deleteObject(nodeID, objectID, storageService, logger);
+            long startTime = System.currentTimeMillis();
+            long nodeL = nodeID;
+            ObjectState responseState = deleteObject(nodeID, objectID, storageService, logger);
+            LogEntryObject logEntry = LogEntryObject.getLogEntryObject("delete", "StoreDelete",
+                    nodeL,
+                    System.currentTimeMillis() - startTime, 
+                    responseState);
+            logEntry.addEntry();
             return getStateResponse(responseState, formatType, logger, cs, sc);
 
         } catch (TException tex) {
@@ -1451,7 +1485,7 @@ public class JerseyBase
      * @return version state information for added item
      * @throws TException processing exception
      */
-    protected StateInf deleteObject(
+    protected ObjectState deleteObject(
             int nodeID,
             Identifier objectID,
             StorageServiceInf storageService,
@@ -1459,7 +1493,7 @@ public class JerseyBase
         throws TException
     {
         try {
-            StateInf responseState = storageService.deleteObject(nodeID, objectID);
+            ObjectState responseState = storageService.deleteObject(nodeID, objectID);
             return responseState;
 
         } catch (TException tex) {
@@ -1506,8 +1540,17 @@ public class JerseyBase
             StorageServiceInit storageServiceInit = StorageServiceInit.getStorageServiceInit(sc);
             StorageServiceInf storageService = storageServiceInit.getStorageService();
             logger = getNodeLogger(nodeID, storageService);
+            AddStateEntryGen logEntry = AddStateEntryGen.getAddStateEntryGen("archive", "store", "getObjectArchive")
+                    .setObjectID(objectID)
+                    .setSourceNode(nodeID);
             FileContent content = storageService.getObjectArchive(
                     nodeID, objectID, returnFullVersion, returnIfError, formatType);
+            File containFile = content.getFile();
+            if (containFile != null) {
+                long fileSize = containFile.length();
+                logEntry = logEntry.setBytes(fileSize);
+            }
+            logEntry.addLog("info", "storeJSON");
             FormatType formatTypeE = FormatType.valueOf(formatType);
             String fileResponseName = getResponseFileName(objectIDS, formatTypeE.getExtension());
             return getFileResponse(content, formatType, fileResponseName, cs, logger);
@@ -2058,6 +2101,8 @@ public class JerseyBase
             return Response 
                 .status(status).entity(json)
                 .build();
+            
+        } finally {
         }
     }
     /**
@@ -3470,6 +3515,7 @@ public class JerseyBase
     protected void log(String msg)
     {
         if (DEBUG) System.out.println("[JerseyStorage]>" + msg);
+        log4j.trace("[JerseyStorage]>" + msg);
         //logger.logMessage(msg, 0, true);
     }
 
@@ -3623,6 +3669,7 @@ public class JerseyBase
             {
                 if (DEBUG) System.out.println("[JerseyStorage]>" + msg);
                 //logger.logMessage(msg, 0, true);
+                log4j.debug("[JerseyStorage]>" + msg);
             }
     }
     
@@ -3652,7 +3699,7 @@ public class JerseyBase
                 this.storageService = storageService;
                 this.returnIfError = returnIfError;
                 this.formatType = formatType;
-                log("VersionStreamingOutput entered:"
+                log4j.debug("VersionStreamingOutput entered:"
                     + " - nodeId=" + nodeID
                     + " - objectID=" + objectID
                     + " - versionID=" + versionID
@@ -3706,7 +3753,7 @@ public class JerseyBase
                 this.storageService = storageService;
                 this.returnIfError = returnIfError;
                 this.formatType = formatType;
-                log("ProducerStreamingOutput entered:"
+                log4j.debug("ProducerStreamingOutput entered:"
                     + " - nodeId=" + nodeID
                     + " - objectID=" + objectID
                     + " - versionID=" + versionID
@@ -3757,7 +3804,7 @@ public class JerseyBase
                 this.versionID = versionID;
                 this.fileName = fileName;
                 this.storageService = storageService;
-                log("ComponentStreamingOutput entered:"
+                log4j.debug("ComponentStreamingOutput entered:"
                     + " - nodeId=" + nodeID
                     + " - objectID=" + objectID
                     + " - versionID=" + versionID);

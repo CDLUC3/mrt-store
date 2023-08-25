@@ -68,6 +68,8 @@ public class AsyncCloudArchive
     protected FileContent archiveContent = null;
     protected NodeIO.AccessNode extractAccessNode = null;
     protected NodeIO.AccessNode deliveryAccessNode = null;
+    protected long buildMs = 0;
+    protected long buildFileCnt = 0;
     
     // JSONOUT2:{"nodeIOName":"nodes-stage","extractNode":9502,"deliveryNode":7001,"objectIDS":"ark:/99999/fk4806c36f","versionID":16,"token":"0eb93d89-8df4-48cb-b26d-2bb3915d2f1f","approximateCompletionSeconds":1587634079897,"cloudContentBytes":228268282,"archiveContent":"producer","archiveType":"targz","tokenStatusEnum":"NotReady","returnOnError":true,"filterList":["mrt-erc.txt","mrt-oaidc.xml","stash-wrapper.xml"]}
     public static void main(String[] args) 
@@ -260,6 +262,10 @@ public class AsyncCloudArchive
                     break;
             }
             
+            
+            buildMs = cloudArchive.getBuildMs();
+            buildFileCnt = cloudArchive.buildFileCnt;
+    
             File outputFile = archiveContent.getFile();
             if (!outputFile.exists() || (outputFile.length() <= 0)) {
                 throw new TException.GENERAL_EXCEPTION(MESSAGE + "Async file does not exist:"
@@ -359,5 +365,14 @@ public class AsyncCloudArchive
         run();
         throwEx();
     }
+
+    public long getBuildMs() {
+        return buildMs;
+    }
+
+    public long getBuildFileCnt() {
+        return buildFileCnt;
+    }
+    
 }
 

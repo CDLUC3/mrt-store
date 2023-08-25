@@ -93,6 +93,7 @@ public class CloudArchive
     protected boolean deleteFileAfterCopy = false;
     protected long addListMs = 0;
     protected long buildMs = 0;
+    protected long buildFileCnt = 0;
 
     public CloudArchive(
             CloudStoreInf s3service, 
@@ -512,6 +513,7 @@ public class CloudArchive
                     = ArchiveBuilderBase.getArchiveBuilderBase(archiveDir, containerFile, logger, archiveType).setDeleteFileAfterCopy(deleteFileAfterCopy);
             archiveBuilder.buildArchive(includeBase);
             buildMs = archiveBuilder.getBuildTimeMs();
+            buildFileCnt = archiveBuilder.getBuildFileCnt();
             FileContent archiveContent = setFileContent(containerFile);
             return archiveContent;
 
@@ -735,4 +737,9 @@ public class CloudArchive
     public long getAddListMs() {
         return addListMs;
     }
+
+    public long getBuildFileCnt() {
+        return buildFileCnt;
+    }
+    
 }

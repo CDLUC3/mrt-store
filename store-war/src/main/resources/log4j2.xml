@@ -4,9 +4,10 @@
     <Console name="Text-Console" target="SYSTEM_OUT">
         <PatternLayout pattern="%d{dd-MMM-yyyy HH:mm:ss.SSS} %-5level [%t] %c{1} - %msg%n"/>
     </Console>
+    
     <RollingFile
         name="ECS-File"
-        fileName="logs/log4j-ecs-json.log"
+        fileName="${env:CATALINA_BASE:-.}/logs/log4j-ecs-json.log"
         filePattern="logs/log4j-ecs-json-%d{yyyy-MM-dd}-%i.log">
       <!-- https://logging.apache.org/log4j/2.x/manual/lookups.html -->
       <EcsLayout
@@ -15,15 +16,18 @@
           eventDataset="tomcat"
           includeMarkers="true"
           stackTraceAsArray="true"
-          includeOrigin="true"/>
+          includeOrigin="true">
+      </EcsLayout>
+      
       <Policies>
         <SizeBasedTriggeringPolicy size="19500KB" />
       </Policies>
       <DefaultRolloverStrategy max="10"/>
     </RollingFile>
+    
     <RollingFile
         name="Text-File"
-        fileName="logs/log4j-text.log"
+        fileName="${env:CATALINA_BASE:-.}/logs/log4j-text.log"
         filePattern="logs/log4j-text-json-%d{yyyy-MM-dd}-%i.log">
       <Policies>
         <SizeBasedTriggeringPolicy size="19500KB" />
@@ -31,13 +35,28 @@
       <DefaultRolloverStrategy max="10"/>
       <PatternLayout pattern="%d{dd-MMM-yyyy HH:mm:ss.SSS} %-5level [%t] %c{1} - %msg%n"/>
     </RollingFile>
+    
   </Appenders>
 
   <Loggers>
+    
     <Root level="${env:LOGLEVEL:-info}">
-      <AppenderRef ref="Text-Console"/>
-      <AppenderRef ref="ECS-File"/>
-      <AppenderRef ref="Text-File"/>
+        <AppenderRef ref="Text-Console" level="TRACE"/>
+        <AppenderRef ref="Text-File" level="TRACE"/>
+        <AppenderRef ref="ECS-File" level="INFO"/>
     </Root>
+    
+    <Logger name="FileLog" level="DEBUG" additivity="false">
+        <AppenderRef ref="Text-File" />
+    </Logger>
+    
+    <Logger name="ConsoleLog" level="DEBUG" additivity="false">
+        <AppenderRef ref="Text-Console" />
+    </Logger>
+    
+    <Logger name="JSONLog" level="INFO" additivity="false">
+        <AppenderRef ref="ECS-File" />
+    </Logger>
+    
   </Loggers>
 </Configuration>
