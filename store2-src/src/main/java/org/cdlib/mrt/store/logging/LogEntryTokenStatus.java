@@ -105,6 +105,7 @@ public class LogEntryTokenStatus
         entry.setVersions(1);
         entry.setBytes(tokenStatus.getCloudContentBytes());
         entry.setKey(tokenStatus.getToken());
+        entry.setFiles(tokenStatus.getBuildFileCnt());
         setProperties();
         
         log4j.debug("LogEntryTokenStatus entry built");

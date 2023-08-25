@@ -105,6 +105,8 @@ public class TokenRun
     protected Exception exception = null;
     protected TokenGetState getState = null;
     protected Long processTimeMs = null;
+    protected long buildMs = 0;
+    protected long buildFileCnt = 0;
         
     
     protected NodeIO nodeIO = null;
@@ -282,6 +284,8 @@ public class TokenRun
             TokenStatus.TokenStatusEnum endStatusEnum = endTokenStatus.getTokenStatusEnum();
             if (endStatusEnum == TokenStatus.TokenStatusEnum.OK) {
                 setRunStatus(TokenRunStatus.OK);            // Add log state
+                processTokenStatus.setBuildFileCnt(buildFileCnt);
+                processTokenStatus.setBuildTimeMs(buildMs);
                 LogEntryTokenStatus entry = LogEntryTokenStatus.getLogEntryTokenStatus(processTokenStatus);
                 entry.addEntry();
                 return;
@@ -307,6 +311,8 @@ public class TokenRun
                 logger);
             asyncCloudArchive.run();
             processTimeMs = System.currentTimeMillis() - startTime;
+            buildMs = asyncCloudArchive.getBuildMs();
+            buildFileCnt = asyncCloudArchive.getBuildFileCnt();
             if (asyncCloudArchive.ex != null) {
                 System.out.println("buildTokenSynch Exception:" + asyncCloudArchive.ex);
                 asyncCloudArchive.ex.printStackTrace();
@@ -422,8 +428,15 @@ public class TokenRun
         main_run(args);
         
     }
-    
 
+    public long getBuildMs() {
+        return buildMs;
+    }
+
+    public long getBuildFileCnt() {
+        return buildFileCnt;
+    }
+    
     public static void main_testGet(String[] args) 
         throws TException
     {

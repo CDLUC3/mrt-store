@@ -121,6 +121,8 @@ public class TokenStatus
     protected ArchiveBuilderBase.ArchiveType archiveType = null;
     protected TokenStatusEnum tokenStatusEnum = TokenStatusEnum.NotReady;
     protected List<String> filterList = null;
+    protected long buildTimeMs = 0;
+    protected long buildFileCnt = 0;
     
     public static void main(String[] args) 
         throws TException
@@ -502,6 +504,22 @@ public class TokenStatus
 
     public void currentBuildEnd() {
         this.buildEnd = DateUtil.getCurrentDate();
+    }
+
+    public long getBuildTimeMs() {
+        return buildTimeMs;
+    }
+
+    public void setBuildTimeMs(long buildTimeMs) {
+        this.buildTimeMs = buildTimeMs;
+    }
+
+    public long getBuildFileCnt() {
+        return buildFileCnt;
+    }
+
+    public void setBuildFileCnt(long buildFileCnt) {
+        this.buildFileCnt = buildFileCnt;
     }
 
     /**
