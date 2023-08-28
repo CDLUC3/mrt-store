@@ -45,13 +45,9 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-compiler-plugin</artifactId>
-                <version>${maven.compiler.plugin.version}</version>
+          <version>${maven.compiler.plugin.version}</version>
           <configuration>
-                    <source>${maven.compiler.plugin.java}</source>
-                    <target>${maven.compiler.plugin.java}</target>
-                <compilerArgument></compilerArgument>
-            <!--compilerArgument>-Xlint:unchecked</compilerArgument-->
-            <!--showDeprecation>true</showDeprecation-->
+               <compilerArgument></compilerArgument>
           </configuration>
         </plugin>
   </plugins>
@@ -212,6 +208,11 @@
         <dependency>
             <groupId>org.glassfish.jersey.containers</groupId>
             <artifactId>jersey-container-servlet</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jersey.inject</groupId>
+            <artifactId>jersey-hk2</artifactId>
             <scope>runtime</scope>
         </dependency>
 
