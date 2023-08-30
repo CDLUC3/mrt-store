@@ -96,7 +96,7 @@ public class LogEntryTokenStatus
     {
         entry.setObjectID(tokenStatus.getObjectID());
         entry.setVersion(tokenStatus.getVersionID());
-        entry.setSourceNode(tokenStatus.getExtractNode());
+        entry.setProcessNode(tokenStatus.getExtractNode());
         Long buildStart = tokenStatus.getBuildStartMil();
         Long buildEnd  = tokenStatus.getBuildEndMil();
         if ((buildEnd != null) && (buildStart != null)) {

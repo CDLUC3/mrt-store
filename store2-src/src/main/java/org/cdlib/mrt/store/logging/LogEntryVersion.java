@@ -116,7 +116,7 @@ public class LogEntryVersion
     {
         entry.setObjectID(versionState.getObjectID());
         entry.setVersion(versionState.getIdentifier());
-        entry.setTargetNode(node);
+        entry.setProcessNode(node);
         entry.setDurationMs(duration);
         entry.setBytes(versionState.getDeltaSize());
         entry.setFiles(versionState.getDeltaNumFiles());

@@ -118,7 +118,7 @@ public class LogEntryObject
         
         entry.setObjectID(objectState.getIdentifier());
         entry.setVersion(null);
-        entry.setTargetNode(node);
+        entry.setProcessNode(node);
         entry.setDurationMs(duration);
         entry.setBytes(objectState.getTotalActualSize());
         long numFilesL = objectState.getNumFiles();
