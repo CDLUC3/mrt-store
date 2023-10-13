@@ -56,13 +56,18 @@ import org.cdlib.mrt.formatter.FormatterInf;
 import org.cdlib.mrt.cloud.utility.CloudUtil;
 import org.cdlib.mrt.log.utility.Log4j2Util;
 import org.cdlib.mrt.store.StoreNodeManager;
+import org.cdlib.mrt.store.StorageConfig;
 import org.cdlib.mrt.store.storage.StorageService;
 import org.cdlib.mrt.store.storage.StorageServiceInf;
 import org.cdlib.mrt.store.app.jersey.KeyNameHttpInf;
 import org.cdlib.mrt.utility.StateInf;
+import org.cdlib.mrt.s3.service.NodeIO;
+import org.cdlib.mrt.s3.service.NodeIOState;
 import org.cdlib.mrt.utility.TException;
 import org.cdlib.mrt.utility.LoggerInf;
 import org.cdlib.mrt.utility.StringUtil;
+import org.json.JSONObject;
+import org.json.JSONArray;
 
 /**
  * Thin Jersey layer for Storage servlet
@@ -105,6 +110,33 @@ public class JerseyStorage
         } catch (TException.REQUESTED_ITEM_NOT_FOUND renf) {
             return getStateResponse(renf, formatType, logger, cs, sc);
 
+        } catch (TException tex) {
+            throw tex;
+
+        } catch (Exception ex) {
+            System.out.println("TRACE:" + StringUtil.stackTrace(ex));
+            throw new TException.GENERAL_EXCEPTION(MESSAGE + "Exception:" + ex);
+        }
+    }
+    
+    @GET
+    @Path("/jsonstate")
+    public Response getJsonState(
+            @Context CloseableService cs,
+            @Context ServletConfig sc)
+        throws TException
+    {
+        LoggerInf logger = null;
+        try {
+            StorageServiceInit storageServiceInit = StorageServiceInit.getStorageServiceInit(sc);
+            StorageServiceInf storageService = storageServiceInit.getStorageService();
+            StorageConfig storageConfig = storageService.getStorageConfig();
+            NodeIO nodeIO = storageConfig.getNodeIO();
+            JSONObject state = NodeIOState.runState(nodeIO);
+              return Response 
+                .status(200).entity(state.toString())
+                    .build();
+              
         } catch (TException tex) {
             throw tex;
 

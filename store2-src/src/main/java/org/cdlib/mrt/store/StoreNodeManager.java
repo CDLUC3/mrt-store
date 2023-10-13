@@ -296,7 +296,7 @@ public class StoreNodeManager
                             + " - nodeID=" + nodeID
                             );
             
-            log4j.info("setNode processing"
+            log4j.debug("setNode processing"
                             + " - getBaseURI=" + accessURLS
                             + " - nodeID=" + nodeID
                             );
