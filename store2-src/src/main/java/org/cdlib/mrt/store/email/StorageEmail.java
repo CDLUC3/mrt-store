@@ -29,9 +29,7 @@ OF THE POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 package org.cdlib.mrt.store.email;
 
-import org.cdlib.mrt.store.email.*;
 import java.util.*;
-import java.io.*;
 //import javax.mail.*;
 import javax.mail.Message;
 import javax.mail.Session;
@@ -41,30 +39,8 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMultipart;
 import javax.mail.internet.MimeMessage;
 import org.cdlib.mrt.formatter.FormatInfo;
-import org.cdlib.mrt.utility.TException;
-import org.jdom.Document;
-import org.jdom.input.SAXBuilder;
-
-import org.jdom.Attribute;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.input.SAXBuilder;
-import org.jdom.output.XMLOutputter;
-import org.jdom.xpath.XPath;
-
-import org.cdlib.mrt.cloud.ManInfo;
-import org.cdlib.mrt.cloud.VersionMap;
-import org.cdlib.mrt.core.ComponentContent;
-import org.cdlib.mrt.core.DateState;
-import org.cdlib.mrt.core.FileComponent;
-import org.cdlib.mrt.core.Identifier;
-import org.cdlib.mrt.core.MessageDigest;
-import org.cdlib.mrt.utility.LoggerInf;
 import org.cdlib.mrt.utility.StringUtil;
 import org.cdlib.mrt.utility.TException;
-import org.cdlib.mrt.utility.TFileLogger;
-import org.jdom.Namespace;
-import org.jdom.output.Format;
 /**
 * Simple demonstration of using the javax.mail API.
 *

@@ -154,13 +154,6 @@
         </dependency>
 
         <dependency>
-            <groupId>jdom</groupId>
-            <artifactId>jdom</artifactId>
-            <!-- ignore mvn dependency errors -->
-            <scope>compile</scope>
-        </dependency>
-
-        <dependency>
           <groupId>junit</groupId>
           <artifactId>junit</artifactId>
           <scope>test</scope>
