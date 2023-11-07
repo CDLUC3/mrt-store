@@ -63,6 +63,7 @@ import org.cdlib.mrt.store.app.jersey.KeyNameHttpInf;
 import org.cdlib.mrt.utility.StateInf;
 import org.cdlib.mrt.s3.service.NodeIO;
 import org.cdlib.mrt.s3.service.NodeIOState;
+import org.cdlib.mrt.s3.service.NodeIOStatus;
 import org.cdlib.mrt.utility.TException;
 import org.cdlib.mrt.utility.LoggerInf;
 import org.cdlib.mrt.utility.StringUtil;
@@ -133,6 +134,33 @@ public class JerseyStorage
             StorageConfig storageConfig = storageService.getStorageConfig();
             NodeIO nodeIO = storageConfig.getNodeIO();
             JSONObject state = NodeIOState.runState(nodeIO);
+              return Response 
+                .status(200).entity(state.toString())
+                    .build();
+              
+        } catch (TException tex) {
+            throw tex;
+
+        } catch (Exception ex) {
+            System.out.println("TRACE:" + StringUtil.stackTrace(ex));
+            throw new TException.GENERAL_EXCEPTION(MESSAGE + "Exception:" + ex);
+        }
+    }
+    
+    @GET
+    @Path("/jsonstatus")
+    public Response getJsonStatus(
+            @Context CloseableService cs,
+            @Context ServletConfig sc)
+        throws TException
+    {
+        LoggerInf logger = null;
+        try {
+            StorageServiceInit storageServiceInit = StorageServiceInit.getStorageServiceInit(sc);
+            StorageServiceInf storageService = storageServiceInit.getStorageService();
+            StorageConfig storageConfig = storageService.getStorageConfig();
+            NodeIO nodeIO = storageConfig.getNodeIO();
+            JSONObject state = NodeIOStatus.runStatus(nodeIO);
               return Response 
                 .status(200).entity(state.toString())
                     .build();

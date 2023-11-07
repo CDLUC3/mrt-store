@@ -307,6 +307,7 @@ public class TokenRun
         try {
             long startTime = System.currentTimeMillis();
             AsyncCloudArchive asyncCloudArchive = AsyncCloudArchive.getAsyncCloudArchive(
+                storageConfig.getNodeIO(),
                 processTokenStatus,
                 logger);
             asyncCloudArchive.run();
@@ -418,7 +419,9 @@ public class TokenRun
     protected String saveCloudTokenStatus(TokenStatus saveTokenStatus)
         throws TException
     {
-        return tokenManager.saveCloudToken(saveTokenStatus, logger);
+        NodeIO nodeIO = storageConfig.getNodeIO();
+        NodeIO.AccessNode deliveryAccessNode = nodeIO.getNode(processTokenStatus.getDeliveryNode());
+        return tokenManager.saveCloudToken(deliveryAccessNode, saveTokenStatus, logger);
     }
 
 

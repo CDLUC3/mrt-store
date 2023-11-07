@@ -199,6 +199,30 @@ public class AsyncCloudArchive
         validate();
         getCloudArchive();
     }
+    
+    public static AsyncCloudArchive getAsyncCloudArchive(
+            NodeIO nodeIO,
+            TokenStatus tokenStatus,
+            LoggerInf logger)
+        throws TException
+    {
+        return new AsyncCloudArchive(nodeIO, tokenStatus, logger);
+    }
+    
+    protected AsyncCloudArchive(
+            NodeIO nodeIO,
+            TokenStatus tokenStatus,
+            LoggerInf logger)
+        throws TException
+    {
+        super(logger);
+        extractAccessNode = nodeIO.getNode(tokenStatus.getExtractNode());
+        deliveryAccessNode = nodeIO.getNode(tokenStatus.getDeliveryNode());
+        this.tokenStatus = tokenStatus;
+        validate();
+        getCloudArchive();
+    }
+    
     private void validate()
         throws TException
     {
@@ -211,13 +235,17 @@ public class AsyncCloudArchive
         
         try {
             String nodeIOName = this.tokenStatus.getNodeIOName();
-            Long extractNode = this.tokenStatus.getExtractNode();
-            extractAccessNode = NodeIO.getCloudNode(nodeIOName, extractNode, logger);
+            if (extractAccessNode == null) {
+                Long extractNode = this.tokenStatus.getExtractNode();
+                extractAccessNode = NodeIO.getCloudNode(nodeIOName, extractNode, logger);
+            }
             CloudStoreInf extractService = extractAccessNode.service;
             String extractBucket = extractAccessNode.container;
             
-            Long deliveryNode = this.tokenStatus.getDeliveryNode();
-            deliveryAccessNode = NodeIO.getCloudNode(nodeIOName, deliveryNode, logger);
+            if (deliveryAccessNode == null) {
+                Long deliveryNode = this.tokenStatus.getDeliveryNode();
+                deliveryAccessNode = NodeIO.getCloudNode(nodeIOName, deliveryNode, logger);
+            }
             
             String archiveTypeS = this.tokenStatus.getArchiveType().toString();
             workBase = FileUtil.getTempDir("archive");
@@ -342,10 +370,7 @@ public class AsyncCloudArchive
             String nodeIOName = tokenStatus.getNodeIOName();
             String tokenID = tokenStatus.getToken();
             
-            // delete for replace
-            CloudResponse response = TokenManager.deleteCloudToken(nodeIOName, deliveryNode, tokenID, logger);
-            
-            TokenManager.saveCloudToken(nodeIOName, deliveryNode, tokenStatus, logger);
+            TokenManager.saveCloudToken(deliveryAccessNode, tokenStatus, logger);
             
         } catch (Exception ex) {
             if (ex.toString().contains("REQUESTED_ITEM_NOT_FOUND") 
