@@ -123,6 +123,26 @@ public class ServiceDriverIT {
                 assertTrue(json.has("nod:nodeState"));
         }
 
+        @Test
+        public void testJsonState() throws HttpResponseException, IOException, JSONException {
+                String url = String.format("http://localhost:%d/%s/jsonstate", port, cp);
+                testNodeStatus(getJsonContent(url, 200), "NodesState");
+        }
+
+        @Test
+        public void testJsonStatus() throws HttpResponseException, IOException, JSONException {
+                String url = String.format("http://localhost:%d/%s/jsonstatus", port, cp);
+                testNodeStatus(getJsonContent(url, 200), "NodesStatus");
+        }
+
+        public void testNodeStatus(JSONObject json, String key) throws HttpResponseException, IOException, JSONException {
+                JSONArray jarr = json.getJSONArray(key);
+                assertTrue(jarr.length() > 0);
+                for(int i=0; i < jarr.length(); i++){
+                        assertTrue(jarr.getJSONObject(i).getBoolean("running"));
+                }
+        }
+
         public JSONObject addObjectByManifest(String url, String checkm) throws IOException, JSONException {
                 try (CloseableHttpClient client = HttpClients.createDefault()) {
                         HttpPost post = new HttpPost(url);
