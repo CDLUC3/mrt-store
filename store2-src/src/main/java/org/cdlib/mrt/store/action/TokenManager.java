@@ -623,7 +623,7 @@ public class TokenManager
     public String saveCloudToken()
         throws TException
     {
-        return saveCloudToken(token.getNodeIOName(), token.getDeliveryNode(), getTokenStatus(), logger);
+        return saveCloudToken(deliveryAccessNode, getTokenStatus(), logger);
     }
     
     public static String saveCloudToken(TokenStatus tokenStatus, LoggerInf logger)
@@ -652,15 +652,43 @@ public class TokenManager
                 throw new TException.INVALID_OR_MISSING_PARM(MESSAGE + "deliveryNode required and missing");
             }
             NodeIO.AccessNode deliveryAccessNode = NodeIO.getCloudNode(nodeIOName, deliveryNode, logger);
+            return saveCloudToken(deliveryAccessNode, tokenStatus, logger);
+            
+        } catch (TException me) {
+            throw me;
+            
+        } catch (Exception ex) {
+            throw makeGeneralTException(logger, "getVersionMap", ex);
+            
+        } finally {
+            try {
+                createFile.delete();
+            } catch (Exception ex) { }
+            return tokenStatusJSON;
+        }
+    }
+    
+    public static String saveCloudToken(
+            NodeIO.AccessNode deliveryAccessNode,
+            TokenStatus tokenStatus,
+            LoggerInf logger)
+        throws TException
+    {
+        File createFile = null;
+        String tokenStatusJSON = "{ }";
+        try {
+            if (deliveryAccessNode == null) {
+                throw new TException.INVALID_OR_MISSING_PARM(MESSAGE + "deliveryAccessNode required and missing");
+            }
+            if (tokenStatus == null) {
+                throw new TException.INVALID_OR_MISSING_PARM(MESSAGE + "deliveryNode required and missing");
+            }
             CloudStoreInf cloudService = deliveryAccessNode.service;
             String bucket = deliveryAccessNode.container;
             String key = tokenStatus.getToken() + "/status";
             
-            try {
-                cloudService.deleteObject(bucket, key);
-            } catch (Exception ex) { }
-            
             tokenStatusJSON = tokenStatus.getJson();
+            
             createFile = FileUtil.getTempFile("token.", ".txt");
             FileUtil.string2File(createFile, tokenStatusJSON);
             CloudResponse response = cloudService.putObject(bucket, key, createFile);

@@ -29,28 +29,19 @@ OF THE POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************/
 package org.cdlib.mrt.cloud.action;
 import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
 import java.io.PrintStream;
-import java.sql.Connection;
-import java.util.Properties;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
-import java.util.Properties;
-import java.util.concurrent.Callable;
 
 import org.cdlib.mrt.utility.FixityTests;
 import org.cdlib.mrt.cloud.ManifestStr;
-import org.cdlib.mrt.cloud.ManifestXML;
 import org.cdlib.mrt.cloud.ManInfo;
 import org.cdlib.mrt.cloud.ManifestSAX;
 import org.cdlib.mrt.cloud.VersionMap;
 import org.cdlib.mrt.core.ComponentContent;
 import org.cdlib.mrt.core.FileComponent;
-import org.cdlib.mrt.core.FixityStatusType;
 import org.cdlib.mrt.core.Identifier;
 import org.cdlib.mrt.core.MessageDigest;
 import org.cdlib.mrt.s3.service.CloudResponse;
@@ -60,7 +51,6 @@ import org.cdlib.mrt.s3.service.CloudUtil;
 
 import org.cdlib.mrt.formatter.FormatterAbs;
 import org.cdlib.mrt.formatter.FormatterInf;
-import org.cdlib.mrt.s3.service.NodeIO;
 import org.cdlib.mrt.s3.tools.CloudChecksum;
 import org.cdlib.mrt.utility.FileUtil;
 import org.cdlib.mrt.utility.LoggerInf;

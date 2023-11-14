@@ -63,6 +63,7 @@ import org.cdlib.mrt.store.app.jersey.KeyNameHttpInf;
 import org.cdlib.mrt.utility.StateInf;
 import org.cdlib.mrt.s3.service.NodeIO;
 import org.cdlib.mrt.s3.service.NodeIOState;
+import org.cdlib.mrt.s3.service.NodeIOStatus;
 import org.cdlib.mrt.utility.TException;
 import org.cdlib.mrt.utility.LoggerInf;
 import org.cdlib.mrt.utility.StringUtil;
@@ -133,6 +134,33 @@ public class JerseyStorage
             StorageConfig storageConfig = storageService.getStorageConfig();
             NodeIO nodeIO = storageConfig.getNodeIO();
             JSONObject state = NodeIOState.runState(nodeIO);
+              return Response 
+                .status(200).entity(state.toString())
+                    .build();
+              
+        } catch (TException tex) {
+            throw tex;
+
+        } catch (Exception ex) {
+            System.out.println("TRACE:" + StringUtil.stackTrace(ex));
+            throw new TException.GENERAL_EXCEPTION(MESSAGE + "Exception:" + ex);
+        }
+    }
+    
+    @GET
+    @Path("/jsonstatus")
+    public Response getJsonStatus(
+            @Context CloseableService cs,
+            @Context ServletConfig sc)
+        throws TException
+    {
+        LoggerInf logger = null;
+        try {
+            StorageServiceInit storageServiceInit = StorageServiceInit.getStorageServiceInit(sc);
+            StorageServiceInf storageService = storageServiceInit.getStorageService();
+            StorageConfig storageConfig = storageService.getStorageConfig();
+            NodeIO nodeIO = storageConfig.getNodeIO();
+            JSONObject state = NodeIOStatus.runStatus(nodeIO);
               return Response 
                 .status(200).entity(state.toString())
                     .build();
@@ -1034,74 +1062,6 @@ public class JerseyStorage
                     sc);
     }
     
-
-    @POST
-    @Path("async/{nodeid}/{objectid}")
-    @Consumes(MediaType.MULTIPART_FORM_DATA)
-    //Deprecated per David
-    @Deprecated
-    public Response setObjectAsync(
-            @PathParam("nodeid") String nodeIDS,
-            @PathParam("objectid") String objectIDS,
-            @DefaultValue("") @FormDataParam("X") String returnFullVersionS,
-            @DefaultValue("") @FormDataParam("f") String returnIfErrorS,
-            @DefaultValue("") @FormDataParam("name") String name,
-            @DefaultValue("") @FormDataParam("email") String email,
-            @DefaultValue("tar") @FormDataParam("containerForm") String archiveType,
-            @DefaultValue("xhtml") @FormDataParam("responseForm") String formatType,
-            @Context CloseableService cs,
-            @Context ServletConfig sc)
-        throws TException
-    {
-        int nodeID = getNodeID(nodeIDS);
-        return setObjectAsyncArchive(
-            nodeID,
-            objectIDS,
-            returnFullVersionS,
-            returnIfErrorS,
-            name,
-            email,
-            archiveType,
-            formatType,
-            cs,
-            sc);
-    }
-
-    @POST
-    @Path("async/{nodeid}/{objectid}/{versionid}")
-    @Consumes(MediaType.MULTIPART_FORM_DATA)
-    //Deprecated per David
-    @Deprecated
-    public Response setVersionAsync(
-            @PathParam("nodeid") String nodeIDS,
-            @PathParam("objectid") String objectIDS,
-            @PathParam("versionid") String versionIDS,
-            @DefaultValue("") @FormDataParam("X") String returnFullVersionS,
-            @DefaultValue("") @FormDataParam("f") String returnIfErrorS,
-            @DefaultValue("") @FormDataParam("name") String name,
-            @DefaultValue("") @FormDataParam("email") String email,
-            @DefaultValue("tar") @FormDataParam("containerForm") String archiveType,
-            @DefaultValue("xhtml") @FormDataParam("responseForm") String formatType,
-            @Context CloseableService cs,
-            @Context ServletConfig sc)
-        throws TException
-    {
-        int nodeID = getNodeID(nodeIDS);
-        return setVersionAsyncArchive(
-            nodeID,
-            objectIDS,
-            versionIDS,
-            returnIfErrorS,
-            name,
-            email,
-            archiveType,
-            formatType,
-            cs,
-            sc);
-    }
-    
-       
-    
     @POST
     @Path("assemble-obj/{nodeid}/{objectid}")
     public Response setAssembleObject(
@@ -1186,69 +1146,6 @@ public class JerseyStorage
         throws TException
     {
         return getHostnameServ(
-            cs,
-            sc);
-    }
-    
-    @POST
-    @Path("producerasync/{nodeid}/{objectid}/{versionid}")
-    @Consumes(MediaType.MULTIPART_FORM_DATA)
-    //Deprecated per David
-    @Deprecated
-    public Response setProducerAsync(
-            @PathParam("nodeid") String nodeIDS,
-            @PathParam("objectid") String objectIDS,
-            @PathParam("versionid") String versionIDS,
-            @DefaultValue("") @FormDataParam("f") String returnIfErrorS,
-            @DefaultValue("") @FormDataParam("name") String name,
-            @DefaultValue("") @FormDataParam("email") String email,
-            @DefaultValue("tar") @FormDataParam("containerForm") String archiveType,
-            @DefaultValue("xhtml") @FormDataParam("responseForm") String formatType,
-            @Context CloseableService cs,
-            @Context ServletConfig sc)
-        throws TException
-    {
-        int nodeID = getNodeID(nodeIDS);
-        return setProducerAsync(
-            nodeID,
-            objectIDS,
-            versionIDS,
-            returnIfErrorS,
-            name,
-            email,
-            archiveType,
-            formatType,
-            cs,
-            sc);
-    }
-    
-    @POST
-    @Path("producerasync/{nodeid}/{objectid}")
-    @Consumes(MediaType.MULTIPART_FORM_DATA)
-    //Deprecated per David
-    @Deprecated
-    public Response setProducerAsyncCurrent(
-            @PathParam("nodeid") String nodeIDS,
-            @PathParam("objectid") String objectIDS,
-            @DefaultValue("") @FormDataParam("f") String returnIfErrorS,
-            @DefaultValue("") @FormDataParam("name") String name,
-            @DefaultValue("") @FormDataParam("email") String email,
-            @DefaultValue("tar") @FormDataParam("containerForm") String archiveType,
-            @DefaultValue("xhtml") @FormDataParam("responseForm") String formatType,
-            @Context CloseableService cs,
-            @Context ServletConfig sc)
-        throws TException
-    {
-        int nodeID = getNodeID(nodeIDS);
-        return setProducerAsync(
-            nodeID,
-            objectIDS,
-            "0",
-            returnIfErrorS,
-            name,
-            email,
-            archiveType,
-            formatType,
             cs,
             sc);
     }
