@@ -150,18 +150,25 @@ public class JerseyStorage
     @GET
     @Path("/jsonstatus")
     public Response getJsonStatus(
+            @DefaultValue("5") @QueryParam("timeout") String timeoutSecS,
             @Context CloseableService cs,
             @Context ServletConfig sc)
         throws TException
     {
-        LoggerInf logger = null;
+        
         try {
             StorageServiceInit storageServiceInit = StorageServiceInit.getStorageServiceInit(sc);
             StorageServiceInf storageService = storageServiceInit.getStorageService();
             StorageConfig storageConfig = storageService.getStorageConfig();
             NodeIO nodeIO = storageConfig.getNodeIO();
-            JSONObject state = NodeIOStatus.runStatus(nodeIO);
-              return Response 
+            int timeoutSec = 5;
+            try {
+                timeoutSec = Integer.parseInt(timeoutSecS);;
+            } catch (Exception ex) { 
+                log4j.debug("Invalid value sent jsonstatus - process continues - timeoutSecS:" + timeoutSecS);
+            }
+            JSONObject state = NodeIOStatus.runStatus(nodeIO, timeoutSec);
+            return Response 
                 .status(200).entity(state.toString())
                     .build();
               
