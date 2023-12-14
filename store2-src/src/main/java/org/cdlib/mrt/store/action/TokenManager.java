@@ -40,6 +40,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 import java.util.UUID;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import org.cdlib.mrt.store.TokenStatus;
 import org.cdlib.mrt.cloud.ManInfo;
@@ -102,6 +104,8 @@ public class TokenManager
     protected VersionMap versionMap = null;
     protected NodeIO nodeIO = null;
     protected LoggerInf logger = null;
+    
+    protected static final Logger log4j = LogManager.getLogger();
     
     
     public static void main(String[] args) 
@@ -769,7 +773,7 @@ public class TokenManager
                 throw new TException.INVALID_OR_MISSING_PARM(MESSAGE + "deliveryNode required and missing");
             }
             NodeIO.AccessNode deliveryAccessNode = nodeIO.getAccessNode(deliveryNode);
-            return getCloudToken(deliveryAccessNode, token, logger);
+            return getCloudTokenRetry(3, deliveryAccessNode, token, logger);
             
         } catch (TException me) {
             throw me;
@@ -778,6 +782,39 @@ public class TokenManager
             throw makeGeneralTException(logger, "getVersionMap", ex);
             
         }
+    }
+    
+    public static TokenStatus getCloudTokenRetry(
+            int retryCnt,
+            NodeIO.AccessNode deliveryAccessNode,
+            String token,
+            LoggerInf logger)
+        throws TException
+    {
+        TException locTEx = null;
+        if (retryCnt <= 0) {
+            throw new TException.INVALID_OR_MISSING_PARM("getCloudTokenRetry retryCnt invalid");
+        }
+        for (int cnt=1; cnt <= retryCnt; cnt++) {
+            try {
+                TokenStatus tokenStatus = getCloudToken(deliveryAccessNode, token, logger);
+                return tokenStatus;
+                
+            } catch (TException ex) {
+                locTEx = ex;
+                if (cnt == retryCnt) break;
+                int sleepTime = 2000 + (cnt * 1000);
+                log4j.debug("TokenManager.getCloudTokenRetry(" + cnt + "):"
+                        + " - token status exception:" + locTEx
+                        + " - sleep:" + sleepTime,
+                        locTEx);
+                try {
+                    Thread.sleep(sleepTime);
+                } catch (Exception tex) { }
+            }
+        }
+        log4j.warn("TokenManager - getCloudToken exception:" + locTEx, locTEx);
+        throw locTEx;
     }
     
     public static TokenStatus getCloudToken(
