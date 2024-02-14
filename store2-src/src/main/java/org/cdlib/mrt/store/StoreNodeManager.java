@@ -425,9 +425,10 @@ public class StoreNodeManager
                     if ((ok != null) && !ok) {
                         String msg = "Test state fails:" + nodeID;
                         System.out.println(msg);
+                        storageState.addNodeState(nodeState, false);
                         throw new TException.EXTERNAL_SERVICE_UNAVAILABLE(msg);
                     }
-                    storageState.addNodeState(nodeState);
+                    storageState.addNodeState(nodeState, true);
                     nodeCnt++;
                 } catch (TException.EXTERNAL_SERVICE_UNAVAILABLE esu) {
                     System.out.println("Node not found:" + nodeID);

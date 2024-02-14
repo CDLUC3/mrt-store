@@ -60,6 +60,7 @@ public class StorageServiceState
     protected SpecScheme serviceScheme = null;
     protected LinkedHashList<String, String> nodesRef = new LinkedHashList<String, String>(5);
     protected Vector<NodeState> nodeStates = new Vector<NodeState>(10);
+    protected Vector<NodeState> failNodes = new Vector<NodeState>(10);
     protected DateState accessDateTime = null;
     protected DateState creationDateTime = null;
     protected DateState updateDateTime = null;
@@ -188,6 +189,28 @@ public class StorageServiceState
         creationDateTime = null;
         updateDateTime = null;
     }
+    
+    /**
+     * Add a NodeState to local node list
+     * @param node NodeState to be added
+     */
+    public void addNodeState(NodeState node, boolean ok)
+    {
+        if (node == null) return;
+        if (ok) {
+            nodeStates.add(node);
+            addNodeRef(node);
+        } else {
+            failNodes.add(node);
+            System.out.println("***Add fail node"
+            );
+        }
+
+        accessDateTime = null;
+        creationDateTime = null;
+        updateDateTime = null;
+    }
+
 
     public void addNodeRef(NodeState node)
     {
@@ -297,6 +320,16 @@ public class StorageServiceState
     public String getServiceScheme() {
         if (serviceScheme == null) return null;
         return serviceScheme.getFormatSpec();
+    }
+    
+    public Vector<NodeState> getFailNodes()
+    {
+        return this.failNodes;
+    }
+    
+    public int getFailNodesCnt()
+    {
+        return this.failNodes.size();
     }
 
     /**
