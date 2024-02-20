@@ -121,33 +121,6 @@ public class JerseyStorage
     }
     
     @GET
-    @Path("/jsonstate")
-    public Response getJsonState(
-            @Context CloseableService cs,
-            @Context ServletConfig sc)
-        throws TException
-    {
-        LoggerInf logger = null;
-        try {
-            StorageServiceInit storageServiceInit = StorageServiceInit.getStorageServiceInit(sc);
-            StorageServiceInf storageService = storageServiceInit.getStorageService();
-            StorageConfig storageConfig = storageService.getStorageConfig();
-            NodeIO nodeIO = storageConfig.getNodeIO();
-            JSONObject state = NodeIOState.runState(nodeIO);
-              return Response 
-                .status(200).entity(state.toString())
-                    .build();
-              
-        } catch (TException tex) {
-            throw tex;
-
-        } catch (Exception ex) {
-            System.out.println("TRACE:" + StringUtil.stackTrace(ex));
-            throw new TException.GENERAL_EXCEPTION(MESSAGE + "Exception:" + ex);
-        }
-    }
-    
-    @GET
     @Path("/jsonstatus")
     public Response getJsonStatus(
             @DefaultValue("5") @QueryParam("timeout") String timeoutSecS,

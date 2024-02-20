@@ -373,29 +373,7 @@ public class CANCloud
 
         } catch (Exception ex) {
             throw makeGeneralTException("getObjectState", ex);
-        }
-    }
-    
-    public ObjectState getObjectStateTimeout (
-                Identifier objectID)
-        throws TException
-    {
-        ObjectState objectState = null;
-        try {
-            if (objectID == null) {
-                throw new TException.INVALID_OR_MISSING_PARM(
-                        MESSAGE + "getObjectState - objectID required");
-            }
             
-
-            objectState = objectCloudStore.getObjectState(objectID);
-            log(MESSAGE + "getObjectState entered"
-                + " - objectID=" + objectID
-                , 10);
-            return objectState;
-
-        } catch (Exception ex) {
-            throw makeGeneralTException("getObjectState", ex);
         }
     }
 
