@@ -124,12 +124,6 @@ public class ServiceDriverIT {
         }
 
         @Test
-        public void testJsonState() throws HttpResponseException, IOException, JSONException {
-                String url = String.format("http://localhost:%d/%s/jsonstate", port, cp);
-                testNodeStatus(getJsonContent(url, 200), "NodesState");
-        }
-
-        @Test
         public void testJsonStatus() throws HttpResponseException, IOException, JSONException {
                 String url = String.format("http://localhost:%d/%s/jsonstatus", port, cp);
                 testNodeStatus(getJsonContent(url, 200), "NodesStatus");

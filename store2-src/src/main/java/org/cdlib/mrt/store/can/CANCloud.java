@@ -51,6 +51,7 @@ import org.cdlib.mrt.core.FileContent;
 import org.cdlib.mrt.store.FileFixityState;
 import org.cdlib.mrt.core.FileComponent;
 import org.cdlib.mrt.cloud.action.ContentVersionLink;
+import org.cdlib.mrt.s3.service.NodeIOStatus;
 import org.cdlib.mrt.s3.service.CloudStoreInf;
 import org.cdlib.mrt.store.action.CloudArchive;
 import org.cdlib.mrt.store.NodeState;
@@ -372,6 +373,7 @@ public class CANCloud
 
         } catch (Exception ex) {
             throw makeGeneralTException("getObjectState", ex);
+            
         }
     }
 
@@ -554,8 +556,7 @@ public class CANCloud
         }
     }
 
-    @Override
-    public NodeState getNodeState()
+    public NodeState getNodeState_Original()
         throws TException
     {
         if (nodeForm == null) {
@@ -577,6 +578,41 @@ public class CANCloud
                 currentNodeState.setOk(returnCloudState.getOk());
                 currentNodeState.setError(returnCloudState.getError());
             }
+        }
+        
+        return currentNodeState;
+    }
+
+    @Override
+    public NodeState getNodeState()
+        throws TException
+    {
+        if (nodeForm == null) {
+            throw new TException.INVALID_OR_MISSING_PARM (
+                    MESSAGE + "getNodeState - missing nodeForm");
+        }
+        NodeState currentNodeState = nodeForm.getNodeState();
+        if ((currentNodeState.getTestOk() == null) || currentNodeState.getTestOk()) {
+            if (DEBUG) System.out.println("***Peforming nodeStateTest:" + currentNodeState.getIdentifier());
+            String bucket = objectCloudStore.getCloudBucket();
+            CloudStoreInf cloudService = objectCloudStore.getCloudService();
+            StateHandler.RetState returnCloudState = null;
+            long nodeNumber = currentNodeState.getIdentifier();
+            try {
+                returnCloudState = NodeIOStatus.getStatusTimeout(cloudService, bucket, nodeNumber, 5);
+            } catch(Exception ex) {
+                returnCloudState = new StateHandler.RetState(bucket, null, ex.toString());
+            }
+            if (returnCloudState != null) {
+                currentNodeState.setOk(returnCloudState.getOk());
+                currentNodeState.setError(returnCloudState.getError());
+            }
+            System.out.println(">>>CANCloud.getNodeState:"
+                    + " - nodeNumber=" + nodeNumber
+                    + " - bucket=" + bucket
+                    + " - current OK=" + currentNodeState.getOk()
+                    + " - return  OK=" + returnCloudState.getOk()
+            );
         }
         
         return currentNodeState;
