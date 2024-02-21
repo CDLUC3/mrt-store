@@ -607,7 +607,7 @@ public class CANCloud
                 currentNodeState.setOk(returnCloudState.getOk());
                 currentNodeState.setError(returnCloudState.getError());
             }
-            System.out.println(">>>CANCloud.getNodeState:"
+            log4j.debug(">>>CANCloud.getNodeState:"
                     + " - nodeNumber=" + nodeNumber
                     + " - bucket=" + bucket
                     + " - current OK=" + currentNodeState.getOk()
