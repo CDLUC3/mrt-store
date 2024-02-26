@@ -118,8 +118,8 @@ public class LogEntryVersion
         entry.setVersion(versionState.getIdentifier());
         entry.setProcessNode(node);
         entry.setDurationMs(duration);
-        entry.setBytes(versionState.getDeltaSize());
-        entry.setFiles(versionState.getDeltaNumFiles());
+        entry.setBytes(versionState.getTotalActualSize());
+        entry.setFiles(versionState.getNumActualFiles());
         entry.setVersions(1);
         entry.setCurrentVersion(versionState.getIdentifier());
         log4j.debug("LogEntryVersion entry built");
