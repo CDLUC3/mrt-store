@@ -154,6 +154,11 @@
         </dependency>
 
         <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-api</artifactId>
         </dependency>
@@ -168,15 +173,10 @@
           <groupId>org.apache.zookeeper</groupId>
           <artifactId>zookeeper</artifactId>
         </dependency>
-
-            <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-        </dependency>
             
         <dependency>
             <groupId>org.apache.zookeeper</groupId>
-            <artifactId>zookeeper</artifactId>
+            <artifactId>zookeeper-jute</artifactId>
             <!--artifactId>zookeeper-jute</artifactId-->
             <!-- ignore mvn dep warn -->
             <scope>compile</scope>
