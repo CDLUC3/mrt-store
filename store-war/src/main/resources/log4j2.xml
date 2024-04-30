@@ -37,6 +37,18 @@
       <PatternLayout pattern="%d{dd-MMM-yyyy HH:mm:ss.SSS} %-5level [%t] %c{1} - %msg%n"/>
     </RollingFile>
     
+    <RollingFile
+        name="Fix-File"
+        fileName="${env:CATALINA_BASE:-.}/logs/mrt-fix.log"
+        filePattern="logs/fix-text-json-%d{yyyy-MM-dd}-%i.log"
+        stackTraceAsArray="true">
+      <Policies>
+        <SizeBasedTriggeringPolicy size="19500KB" />
+      </Policies>
+      <DefaultRolloverStrategy max="10"/>
+      <PatternLayout pattern="%d{dd-MMM-yyyy HH:mm:ss.SSS} %-5level [%t] %c{1} - %msg%n"/>
+    </RollingFile>
+    
   </Appenders>
 
   <Loggers>
@@ -57,6 +69,10 @@
     
     <Logger name="JSONLog" level="INFO" additivity="false">
         <AppenderRef ref="ECS-File" />
+    </Logger>
+    
+    <Logger name="FixLog" level="TRACE" additivity="false">
+        <AppenderRef ref="Fix-File" />
     </Logger>
     
   </Loggers>

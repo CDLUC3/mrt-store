@@ -34,6 +34,7 @@ import java.io.File;
 import java.io.OutputStream;
 import java.net.URL;
 import java.util.Properties;
+import org.json.JSONObject;
 import org.cdlib.mrt.cloud.action.ContentVersionLink;
 
 import org.cdlib.mrt.core.Identifier;
@@ -119,6 +120,11 @@ public interface StorageServiceInf
      * @throws TException Exception condition during storage service procssing
      */
     public ObjectState deleteObject (
+            int nodeID,
+            Identifier objectID)
+    throws TException;
+    
+    public JSONObject fixChangeToken (
             int nodeID,
             Identifier objectID)
     throws TException;
