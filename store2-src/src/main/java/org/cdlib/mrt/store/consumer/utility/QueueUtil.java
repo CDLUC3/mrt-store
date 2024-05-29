@@ -30,33 +30,18 @@ OF THE POSSIBILITY OF SUCH DAMAGE.
 package org.cdlib.mrt.store.consumer.utility;
 
 import java.io.IOException;
-import java.io.ByteArrayOutputStream;
-import java.io.FileOutputStream;
-import java.io.ObjectOutputStream;
-import java.lang.Long;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Properties;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.KeeperException;
 import org.apache.zookeeper.WatchedEvent;
 import org.apache.zookeeper.Watcher;
-import org.apache.zookeeper.ZooDefs;
 import org.apache.zookeeper.ZooKeeper;
-import org.apache.zookeeper.data.ACL;
-import org.apache.zookeeper.data.Stat;
-import org.apache.zookeeper.KeeperException.ConnectionLossException;
-
-import org.cdlib.mrt.formatter.FormatType;
+import org.cdlib.mrt.zk.Access;
+import org.cdlib.mrt.zk.MerrittZKNodeInvalid;
 import org.cdlib.mrt.queue.DistributedQueue;
 import org.cdlib.mrt.store.consumer.Consumer;
 import org.cdlib.mrt.utility.TException;
-import org.cdlib.mrt.utility.TFileLogger;
-
-import org.json.JSONException;
 // import javax.json.JsonNumber;
 import org.json.JSONObject;
 /**
@@ -67,31 +52,15 @@ import org.json.JSONObject;
 public class QueueUtil 
 {
 
+    private static final Logger log4j = LogManager.getLogger();
+    
     protected static final String NAME = "QueueUtil";
     protected static final String MESSAGE = NAME + ": ";
     protected static final boolean DEBUG = true;
     private static ZooKeeper zooKeeper;
-    private static DistributedQueue distributedQueue;
-    private static String queueNode = null;
-
-    public static void submit (byte[] bytes) throws KeeperException, InterruptedException {
-        int retryCount = 0;
-        while (true) {
-            try {
-                distributedQueue.submit(bytes);
-                return;
-            } catch (KeeperException.ConnectionLossException ex) {
-                if (retryCount >= 3) throw ex;
-                retryCount++;
-            } catch (KeeperException.SessionExpiredException ex) {
-                if (retryCount >= 3) throw ex;
-                retryCount++;
-            } catch (InterruptedException ex) {
-                if (retryCount >= 3) throw ex;
-                retryCount++;
-            }
-        }
-    }
+    //private static DistributedQueue distributedQueue;
+    private static Access distributedAccess;
+    private static Access.Queues  queueNode = null;
 
 
     /**
@@ -106,39 +75,49 @@ public class QueueUtil
         try {
 	    // sample request: {"status":201,"token":"bf6ef133-9b05-4fd8-a4d1-845c40125315","cloud-content-byte":206290233,"delivery-node":7001}
 	    JSONObject jo = string2json(request);
-
-	    queueNode = Consumer.queueNodeSmall;
+            queueNode = Access.Queues.small;
 	    long size = jo.getLong("cloud-content-byte");
 	    String token = jo.getString("token");
 	    if (size  > Consumer.queueSizeLimit) {
 		System.out.println("[info]" + MESSAGE + NAME + " Detected LARGE access request: " + token);
-	        queueNode = Consumer.queueNodeLarge;
+	        queueNode = Access.Queues.large;
 	    } else {
 		System.out.println("[info]" + MESSAGE + NAME + " Detected SMALL access request: " + token);
 	    }
 		
             zooKeeper = new ZooKeeper(Consumer.queueConnectionString, DistributedQueue.sessionTimeout, new Ignorer());
 	    String priority = calculatePriority(size);
-            distributedQueue = new DistributedQueue(zooKeeper, queueNode, priority, null);
+            distributedAccess = Access.createAssembly(zooKeeper, queueNode, jo);
 
-	    System.out.println("[info]" + MESSAGE + NAME + " Writing access data to queue: " + queueNode);
-            submit(request.getBytes());
             String msg = String.format("SUCCESS: %s completed successfully", getName());
-
-
+            log4j.info(msg);
             return true;
+            
         } catch (IOException ex) {
             String msg = String.format("WARNING: %s could not connect to Zookeeper", getName());
+            log4j.warn(msg);
             return false;
+            
         } catch (KeeperException ex) {
             String msg = String.format("WARNING: %s %s.", getName(), ex);
+            log4j.warn(msg);
             return false;
+            
         } catch (InterruptedException ex) {
             String msg = String.format("WARNING: %s %s.", getName(), ex);
+            log4j.warn(msg);
             return false;
+            
         } catch (org.json.JSONException ex) {
             String msg = String.format("WARNING: %s %s.", getName(), ex);
+            log4j.warn(msg);
             return false;
+            
+        } catch (MerrittZKNodeInvalid ex) {
+            String msg = String.format("WARNING: %s %s.", getName(), ex);
+            log4j.warn(msg);
+            return false;   
+            
         } finally {
             try { zooKeeper.close(); }
             catch (Exception ex) {}

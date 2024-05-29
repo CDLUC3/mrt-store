@@ -80,6 +80,8 @@ import org.cdlib.mrt.s3.service.NodeIO;
 import org.cdlib.mrt.utility.ArchiveBuilderBase;
 import org.cdlib.mrt.core.DateState;
 import org.cdlib.mrt.log.utility.AddStateEntryGen;
+import org.cdlib.mrt.store.action.AccessLock;
+import static org.cdlib.mrt.store.action.AccessLock.setAccessLock;
 import org.cdlib.mrt.store.logging.LogEntryObject;
 import org.cdlib.mrt.store.logging.LogEntryVersion;
 import org.cdlib.mrt.store.action.AsyncCloudArchive;
@@ -130,8 +132,9 @@ public class JerseyBase
     
     protected static final Logger log4j = LogManager.getLogger();
 
+    public enum AccessLockType {large, small, invalid};
 
-
+    public enum AccessLockStatus {on, off, invalid};
     /**
      * Shortcut enum for format types for both State display and Archive response
      */
@@ -2523,6 +2526,34 @@ public class JerseyBase
             
         } catch (TException tex) {
             return getExceptionResponse(cs, tex, formatType, logger);
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            throw new TException.GENERAL_EXCEPTION(MESSAGE + "Exception:" + ex);
+        }
+    }
+    
+    
+    protected JSONObject processAccessLock(
+            String type,
+            String operation,
+            CloseableService cs,
+            ServletConfig sc)
+        throws TException
+    { 
+        
+        System.out.println("processFlag"
+                + " - type:" + type
+                + " - operation:" + operation
+        );
+        StorageServiceInit storageServiceInit = StorageServiceInit.getStorageServiceInit(sc);
+        StorageServiceInf storageService = storageServiceInit.getStorageService();
+        StorageConfig storageConfig = storageService.getStorageConfig();
+        try {
+            return AccessLock.setAccessLock(storageConfig, type, operation);
+            
+        } catch (TException tex) {
+            throw tex;
 
         } catch (Exception ex) {
             ex.printStackTrace();

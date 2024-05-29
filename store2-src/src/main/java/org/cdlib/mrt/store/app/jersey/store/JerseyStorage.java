@@ -377,6 +377,31 @@ public class JerseyStorage
         ); 
         return processFlag(service, flagName, operation, payload, formatType, cs, sc);
     }
+    
+    @POST
+    @Path("accesslock/{type}/{operation}")
+    public Response callAccessLock(
+            @PathParam("type") String type,
+            @PathParam("operation") String operation,
+            @Context CloseableService cs,
+            @Context ServletConfig sc)
+        throws TException
+    {
+        System.out.println("callAccessLock" 
+                + " - type:" + type
+                + " - operation:" + operation
+        );
+        JSONObject jsonStatus  = processAccessLock(type, operation, cs, sc);
+        boolean OK = jsonStatus.getBoolean("OK");
+        String jsonS = jsonStatus.toString();
+        
+        int status = 200;
+        if (!OK) status = 500;
+        return Response 
+                    .status(status).entity(jsonS)
+                    .build();
+    }
+
 
     @GET
     @Path("fixity/{nodeid}/{objectid}/{versionid}/{fileid}")

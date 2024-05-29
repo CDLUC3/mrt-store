@@ -38,6 +38,20 @@ import java.util.Properties;
 import org.cdlib.mrt.log.utility.Log4j2Util;
 
 
+
+import org.apache.zookeeper.CreateMode;
+import org.apache.zookeeper.KeeperException;
+import org.apache.zookeeper.WatchedEvent;
+import org.apache.zookeeper.Watcher;
+import org.apache.zookeeper.ZooDefs;
+import org.apache.zookeeper.ZooKeeper;
+import org.apache.zookeeper.data.ACL;
+import org.apache.zookeeper.data.Stat;
+import org.apache.zookeeper.KeeperException;
+import org.apache.zookeeper.KeeperException.ConnectionLossException;
+import org.apache.zookeeper.KeeperException.SessionExpiredException;
+
+
 import org.cdlib.mrt.utility.LoggerInf;
 import org.cdlib.mrt.s3.service.NodeIO;
 import org.cdlib.mrt.utility.TException;
@@ -79,6 +93,7 @@ public class StorageConfig
     protected String queueNumThreadsLarge = null;
     protected String queueSizeLimit = null;
     protected String queueLargeWorker = null;
+    protected String queueTimeout = null;
     //protected NodeIO.AccessNode archiveAccessNode = null;
     private static class Test{ };
     
@@ -118,6 +133,7 @@ public class StorageConfig
             storageConfig.setQueueNumThreadsSmall(jStoreQueue.getString("NumThreadsSmall"));
             storageConfig.setQueueNumThreadsLarge(jStoreQueue.getString("NumThreadsLarge"));
             storageConfig.setQueueSizeLimit(jStoreQueue.getString("QueueSizeLimit"));
+            storageConfig.setQueueTimeout(jStoreQueue.getString("QueueTimeout"));
             storageConfig.setQueueLargeWorker(jStoreQueue.getString("QueueLargeWorker"));
             String asyncArchivePropS = null;
             try {
@@ -189,6 +205,20 @@ public class StorageConfig
         }
     }
     
+    public ZooKeeper getZooKeeper()
+        throws TException
+    {
+        ZooKeeper zooKeeper = null;
+        Integer queueTimeOut = null;
+        try {
+            System.out.println("timeout=" + getQueueTimeout());
+            queueTimeOut = Integer.parseInt(getQueueTimeout());
+            zooKeeper = new ZooKeeper(getQueueService(), queueTimeOut, new Ignorer());
+            return zooKeeper;
+        } catch (Exception ex) {
+            throw new TException(ex);
+        }
+    }
 
     public String getBaseURI() {
         return baseURI;
@@ -339,6 +369,14 @@ public class StorageConfig
         return queueService;
     }
 
+    public String getQueueTimeout() {
+        return queueTimeout;
+    }
+
+    public void setQueueTimeout(String queueTimeout) {
+        this.queueTimeout = queueTimeout;
+    }
+
     public void setSupportURI(String supportURI) {
         this.supportURI = supportURI;
     }
@@ -482,5 +520,12 @@ public class StorageConfig
                 ex.printStackTrace();
         }
     }
+
+   public class Ignorer implements Watcher {
+       public void process(WatchedEvent event){
+           if (event.getState().equals("Disconnected"))
+               System.out.println("Disconnected: " + event.toString());
+       }
+   }
 }
 

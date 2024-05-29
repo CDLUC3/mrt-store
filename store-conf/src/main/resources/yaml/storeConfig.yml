@@ -33,6 +33,7 @@ store-info:
     QueueLockBase: "{!SSM: store/zoo/QueueLockBase !DEFAULT: /mrt.lock}"
     QueueHoldLock: "{!SSM: store/zoo/QueueHoldFile !DEFAULT: access/LargeAccessHold}"
     QueueSizeLimit: "{!SSM: store/zoo/AccessQSize !DEFAULT: 500000000}"
+    QueueTimeout: "{!SSM: store/zoo/Timeout !DEFAULT: 40000}"
     LargeAccessHold: "{!SSM: store/zoo/LargeAccessHold !DEFAULT: access/LargeAccessHold}"
     SmallAccessHold: "{!SSM: store/zoo/SmallAccessHold !DEFAULT: access/SmallAccessHold}" 
     
@@ -74,6 +75,7 @@ store-info-docker: &docker
     QueueLockBase: "/mrt.lock"
     QueueHoldLock: "access/LargeAccessHold"
     QueueHoldFile: "/dpr2store/mrtHomes/AccessHold"
+    QueueTimeout: "40000"
     LargeAccessHold: "access/LargeAccessHold"
     SmallAccessHold: "access/SmallAccessHold" 
     PollingInterval: "15"
