@@ -121,10 +121,13 @@ public class Consumer extends HttpServlet
 	String queueSizeLimit = null;
         StorageServiceInit storageServiceInit = null;
         StorageServiceInf storageService = null;
+        StorageConfig storageConfig = null;
 
 	try {
             storageServiceInit = StorageServiceInit.getStorageServiceInit(servletConfig);
             storageService = storageServiceInit.getStorageService();
+            storageConfig = storageService.getStorageConfig();
+            
 	} catch (Exception e) {
 	    System.err.println("[warn] " + MESSAGE + "Could not create store service in daemon init. ");
 	}
@@ -216,6 +219,16 @@ public class Consumer extends HttpServlet
             if (cleanupThread == null) {
 	    	System.out.println("[info] " + MESSAGE + "Normal cleanup daemon would occur here");
 	    }
+        } catch (Exception e) {
+	    throw new ServletException("[error] " + MESSAGE + "could not queue cleanup daemon");
+        }
+
+        // initialize Access
+        try {
+            ZooKeeper zooKeeper = storageConfig.getZooKeeper();
+            Access.initNodes(zooKeeper);
+            log4j.debug("Consumer - Access initialized");
+            
         } catch (Exception e) {
 	    throw new ServletException("[error] " + MESSAGE + "could not queue cleanup daemon");
         }
