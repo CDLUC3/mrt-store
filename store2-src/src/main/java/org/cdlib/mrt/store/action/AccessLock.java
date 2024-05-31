@@ -63,10 +63,6 @@ public class AccessLock
     protected String operationS = null; 
     protected ZooKeeper zooKeeper = null;
     protected Boolean OK = false;
-    protected Boolean initialize = false;
-    protected int opNum = 0;
-    protected int retry = 0;
-    protected Exception retException = null;
     
     public static void main(String[] args) 
             throws Exception
@@ -141,8 +137,6 @@ public class AccessLock
                     + " - resetStatus:" + resetStatus.toString()
             );
             zooKeeper = config.getZooKeeper();
-            Access.initNodes(zooKeeper);
-            log4j.debug("AccessLock - Access initialized");
                         
         } catch (IllegalArgumentException e) {
             
@@ -153,17 +147,6 @@ public class AccessLock
                 resetStatus = AccessLockStatus.invalid;
             }
          
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            throw new TException.GENERAL_EXCEPTION(MESSAGE + "Exception:" + ex);
-        }
-        
-        try {
-            zooKeeper = config.getZooKeeper();
-            Access.initNodes(zooKeeper);
-            log4j.debug("AccessLock - Access initialized");
-            initialize = true;
-                        
         } catch (Exception ex) {
             ex.printStackTrace();
             throw new TException.GENERAL_EXCEPTION(MESSAGE + "Exception:" + ex);
@@ -186,14 +169,10 @@ public class AccessLock
         
         oldSmallLockStatus = getSmallLock();
         oldLargeLockStatus = getLargeLock();
-                for (retry=0; retry < 4; retry++) {
-                    setStatus = setAccessLock(resetType, resetStatus);
-                    if (setStatus == resetStatus) {
-                        break;
-                    }
-                    try { Thread.sleep(1000); } catch (Exception e) { }
-                }
-        OK=true;
+        setStatus = setAccessLock(resetType, resetStatus);
+        if (setStatus == resetStatus) {
+            OK=true;
+        }
         currentSmallLockStatus = getSmallLock();
         currentLargeLockStatus = getLargeLock();
         
@@ -217,31 +196,26 @@ public class AccessLock
         try {
             if (lockType == AccessLockType.invalid 
                 || lockStatus == AccessLockStatus.invalid) {
-                opNum=1;
                 return AccessLockStatus.invalid;
             }
             
             if (lockType == AccessLockType.small) {
                 if (lockStatus == AccessLockStatus.on) {
                     MerrittLocks.lockSmallAccessQueue(zooKeeper);
-                    opNum=2;
                     retStatus = getSmallLock();
                     
                 } if (lockStatus == AccessLockStatus.off) {
                     MerrittLocks.unlockSmallAccessQueue(zooKeeper);
-                    opNum=3;
                     retStatus = getSmallLock();
                 }
             } else if (lockType == AccessLockType.large) {
                 if (lockStatus == AccessLockStatus.on) {
                     MerrittLocks.lockLargeAccessQueue(zooKeeper);
-                    opNum=4;
                     retStatus = getLargeLock();
                     
                 } if (lockStatus == AccessLockStatus.off) {
                     MerrittLocks.unlockLargeAccessQueue(zooKeeper);
-                opNum=5;
-                retStatus = getLargeLock();
+                    retStatus = getLargeLock();
                 }
             }
             return retStatus;
@@ -292,16 +266,11 @@ public class AccessLock
         try {
             JSONObject status = new JSONObject();
             status.put("OK", OK);
-            status.put("opNum", opNum);
             status.put("accessType", resetType.toString());
             status.put("accessLocked", getCommandLock());
-            status.put("initialized", initialize);
             status.put("typeS", typeS);
             status.put("operationS", operationS);
-            status.put("resetType", resetType.toString());
-            status.put("resetStatus", resetStatus.toString());
             status.put("setStatus", setStatus.toString());
-            status.put("retry", retry);
             JSONObject smallLock = new JSONObject();
             smallLock.put("oldStatus", oldSmallLockStatus.toString());
             smallLock.put("currentStatus", currentSmallLockStatus.toString());

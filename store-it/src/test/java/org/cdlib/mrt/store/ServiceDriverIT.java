@@ -828,8 +828,7 @@ public class ServiceDriverIT {
                                 attempt++;
                                 Thread.sleep(ASSM_WAIT);
                                 json = getJsonContent(tokenRetrieveUrl(token), 0);
-                                System.out.println("getstatus:" + json.toString(2));
-                                try{Thread.sleep(10000);}catch(Exception e){ }
+                                // DEBUG System.out.println("getstatus:" + json.toString(2));
                         }
 
                         assertEquals(200, json.getInt("status"));
@@ -850,14 +849,11 @@ public class ServiceDriverIT {
         public void manageLock(String url, boolean val) throws IOException, JSONException {
                 try (CloseableHttpClient client = HttpClients.createDefault()) {
                         HttpPost post = new HttpPost(url);
-
-                        //System.out.println(url);
-
                         HttpResponse response = client.execute(post);
                         assertEquals(200, response.getStatusLine().getStatusCode());
     
                         String s = new BasicResponseHandler().handleResponse(response).trim();
-                        System.out.print("manageLock:" + s);
+                        // DEBUG System.out.print("manageLock>>>\n" + s + "\n<<<\n");
                         JSONObject json =  new JSONObject(s);
                         //JSONObject v = json.getJSONObject("tok:zooTokenState");
                         assertEquals(val, json.getBoolean("accessLocked"));

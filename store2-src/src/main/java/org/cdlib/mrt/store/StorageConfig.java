@@ -60,6 +60,8 @@ import org.cdlib.mrt.utility.LoggerAbs;
 import org.cdlib.mrt.utility.PropertiesUtil;
 import org.cdlib.mrt.utility.StringUtil;
 import org.cdlib.mrt.utility.TFileLogger;
+import org.cdlib.mrt.zk.Access;
+import org.cdlib.mrt.zk.MerrittLocks;
 import org.json.JSONObject;
 import org.json.JSONArray;
 
@@ -94,6 +96,7 @@ public class StorageConfig
     protected String queueSizeLimit = null;
     protected String queueLargeWorker = null;
     protected String queueTimeout = null;
+    protected static Boolean initZooKeeper = true;
     //protected NodeIO.AccessNode archiveAccessNode = null;
     private static class Test{ };
     
@@ -208,13 +211,19 @@ public class StorageConfig
     public ZooKeeper getZooKeeper()
         throws TException
     {
-        ZooKeeper zooKeeper = null;
+        
         Integer queueTimeOut = null;
         try {
             System.out.println("timeout=" + getQueueTimeout());
             queueTimeOut = Integer.parseInt(getQueueTimeout());
-            zooKeeper = new ZooKeeper(getQueueService(), queueTimeOut, new Ignorer());
+            ZooKeeper zooKeeper = new ZooKeeper(getQueueService(), queueTimeOut, new Ignorer());
+            if (initZooKeeper) {
+                MerrittLocks.initLocks(zooKeeper);
+                Access.initNodes(zooKeeper);
+                initZooKeeper = false;
+            }
             return zooKeeper;
+            
         } catch (Exception ex) {
             throw new TException(ex);
         }

@@ -226,7 +226,6 @@ public class Consumer extends HttpServlet
         // initialize Access
         try {
             ZooKeeper zooKeeper = storageConfig.getZooKeeper();
-            Access.initNodes(zooKeeper);
             log4j.debug("Consumer - Access initialized");
             
         } catch (Exception e) {
@@ -325,7 +324,7 @@ class ConsumerDaemon implements Runnable
     // session data
     private long sessionID;
     private byte[] sessionAuth;
-
+    private StorageConfig storageConfig = null;
 
     // Constructor
     public ConsumerDaemon(String queueConnectionString, Access.Queues queueNode, ServletConfig servletConfig, 
@@ -341,11 +340,10 @@ class ConsumerDaemon implements Runnable
 
 	try {
             storageServiceInit = StorageServiceInit.getStorageServiceInit(servletConfig);
-            storageService = storageServiceInit.getStorageService();
-	
-            zooKeeper = new ZooKeeper(queueConnectionString, queueTimeOut, new Ignorer());
+            storageService = storageServiceInit.getStorageService();;
             
-            StorageConfig storageConfig = storageService.getStorageConfig();
+            storageConfig = storageService.getStorageConfig();
+            zooKeeper = storageConfig.getZooKeeper();
 	    LoggerInf mrtLogger = storageService.getLogger();
 
 	} catch (Exception e) {
@@ -456,7 +454,7 @@ class ConsumerDaemon implements Runnable
         	} catch (SessionExpiredException see) {
 		    see.printStackTrace(System.err);
 		    System.err.println("[warn] " + MESSAGE + "Session expired.  Attempting to recreate session.");
-            	    zooKeeper = new ZooKeeper(queueConnectionString, DistributedQueue.sessionTimeout, new Ignorer());
+            	    zooKeeper = storageConfig.getZooKeeper();
                     log4j.warn("Session expired.  Attempting to recreate session.");
                     
 		} catch (RejectedExecutionException ree) {
@@ -567,13 +565,14 @@ class ConsumeData implements Runnable
 
     private Access access = null;
     private StorageServiceInf storageService = null;
+    private StorageConfig config = null;
 
     // Constructor
     public ConsumeData(StorageServiceInf storageService, Access access)
     {
 	this.access = access;
 	this.storageService = storageService;
-        StorageConfig config = storageService.getStorageConfig();
+        config = storageService.getStorageConfig();
         this.queueConnectionString = config.getQueueService();
         String queueTimeoutS = config.getQueueTimeout();
         try {
@@ -587,7 +586,7 @@ class ConsumeData implements Runnable
     {
         String token = null;
         try {
-            zooKeeper = new ZooKeeper(queueConnectionString, queueTimeout, new Ignorer());
+            zooKeeper = config.getZooKeeper();
 	    JSONObject jo = access.data();
 	    token = jo.getString("token");
             System.out.println("JO DUMP:" + jo.toString(2));
