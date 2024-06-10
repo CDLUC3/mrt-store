@@ -31,6 +31,7 @@ store-info:
     QueueLargeWorker: "it-server"
     QueueSizeLimit: "1"
     QueueLockBase: "/mrt.lock"
+    QueueTimeout: "100"
     LargeAccessHold: "access/LargeAccessHold"
     SmallAccessHold: "access/SmallAccessHold"
     PollingInterval: "3"

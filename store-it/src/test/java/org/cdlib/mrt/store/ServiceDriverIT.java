@@ -43,7 +43,7 @@ import javax.xml.xpath.XPathConstants;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
-
+import org.cdlib.mrt.utility.HTTPUtil;
 import static org.junit.Assert.*;
 
 public class ServiceDriverIT {
@@ -149,6 +149,7 @@ public class ServiceDriverIT {
                         post.setEntity(multipart);
                         
                         HttpResponse response = client.execute(post);
+//                        HTTPUtil.dumpHttpResponse(response, 200);
                         assertEquals(200, response.getStatusLine().getStatusCode());
     
                         String s = new BasicResponseHandler().handleResponse(response).trim();
@@ -322,7 +323,8 @@ public class ServiceDriverIT {
 
         public String lockUrl() throws UnsupportedEncodingException {
                 return String.format(
-                        "http://localhost:%d/%s/flag/set/access/LargeAccessHold?t=json", 
+                        //"http://localhost:%d/%s/flag/set/access/LargeAccessHold?t=json", 
+                        "http://localhost:%d/%s/accesslock/large/on", 
                         port, 
                         cp, 
                         node
@@ -331,7 +333,8 @@ public class ServiceDriverIT {
 
         public String unlockUrl() throws UnsupportedEncodingException {
                 return String.format(
-                        "http://localhost:%d/%s/flag/clear/access/LargeAccessHold?t=json", 
+                        //"http://localhost:%d/%s/flag/clear/access/LargeAccessHold?t=json", 
+                        "http://localhost:%d/%s/accesslock/large/off", 
                         port, 
                         cp, 
                         node
@@ -825,6 +828,7 @@ public class ServiceDriverIT {
                                 attempt++;
                                 Thread.sleep(ASSM_WAIT);
                                 json = getJsonContent(tokenRetrieveUrl(token), 0);
+                                // DEBUG System.out.println("getstatus:" + json.toString(2));
                         }
 
                         assertEquals(200, json.getInt("status"));
@@ -845,19 +849,14 @@ public class ServiceDriverIT {
         public void manageLock(String url, boolean val) throws IOException, JSONException {
                 try (CloseableHttpClient client = HttpClients.createDefault()) {
                         HttpPost post = new HttpPost(url);
-
-                        //System.out.println(url);
-
                         HttpResponse response = client.execute(post);
                         assertEquals(200, response.getStatusLine().getStatusCode());
     
                         String s = new BasicResponseHandler().handleResponse(response).trim();
+                        // DEBUG System.out.print("manageLock>>>\n" + s + "\n<<<\n");
                         JSONObject json =  new JSONObject(s);
-
-                        //System.out.println(json.toString(2));
-
-                        JSONObject v = json.getJSONObject("tok:zooTokenState");
-                        assertEquals(val, v.getBoolean("tok:tokenStatus"));
+                        //JSONObject v = json.getJSONObject("tok:zooTokenState");
+                        assertEquals(val, json.getBoolean("accessLocked"));
                 }
         }
 
