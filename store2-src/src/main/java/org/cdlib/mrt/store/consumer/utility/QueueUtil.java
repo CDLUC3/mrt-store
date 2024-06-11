@@ -39,6 +39,7 @@ import org.apache.zookeeper.Watcher;
 import org.apache.zookeeper.ZooKeeper;
 import org.cdlib.mrt.zk.Access;
 import org.cdlib.mrt.zk.MerrittZKNodeInvalid;
+import org.cdlib.mrt.zk.MerrittStateError;
 import org.cdlib.mrt.queue.DistributedQueue;
 import org.cdlib.mrt.store.consumer.Consumer;
 import org.cdlib.mrt.utility.TException;
@@ -114,6 +115,11 @@ public class QueueUtil
             return false;
             
         } catch (MerrittZKNodeInvalid ex) {
+            String msg = String.format("WARNING: %s %s.", getName(), ex);
+            log4j.warn(msg);
+            return false;   
+            
+        } catch (MerrittStateError ex) {
             String msg = String.format("WARNING: %s %s.", getName(), ex);
             log4j.warn(msg);
             return false;   
