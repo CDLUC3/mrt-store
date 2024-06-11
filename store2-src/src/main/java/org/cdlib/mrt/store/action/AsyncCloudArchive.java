@@ -307,14 +307,17 @@ public class AsyncCloudArchive
             tokenStatus.currentBuildEnd();
             saveCloud(outKey, outputFile, logger);
             System.out.println(MESSAGE + "Complete:" + tokenStatus.getToken());
+            tokenStatus.setTokenStatusEnum(TokenStatus.TokenStatusEnum.OK);
 
-        } catch (Exception ex) {
+        } catch (Exception locex) {
             String msgx = MESSAGE + "Exception for "
-                    + " - Exception:" + ex
+                    + " - Exception:" + locex
                     ;
             System.out.println("Exception: " + msgx);
-            ex.printStackTrace();
+            locex.printStackTrace();
             logger.logError(msgx, 2);
+            tokenStatus.setExMsg(msgx);
+            tokenStatus.setTokenStatusEnum(TokenStatus.TokenStatusEnum.SERVICE_EXCEPTION);
 
         } finally {
             // delete zip and base

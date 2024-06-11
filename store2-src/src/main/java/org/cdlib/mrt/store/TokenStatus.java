@@ -36,6 +36,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 import java.util.Vector;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 //import com.google.gson.Gson;
 //import com.google.gson.JsonObject;
 //import com.google.gson.GsonBuilder;
@@ -124,6 +126,7 @@ public class TokenStatus
     protected long buildTimeMs = 0;
     protected long buildFileCnt = 0;
     
+    private static final Logger log4j = LogManager.getLogger(StoreNodeManager.class.getName());
     public static void main(String[] args) 
         throws TException
     {
@@ -602,7 +605,7 @@ public class TokenStatus
             return tokenJson.toString();
             
         } catch (Exception ex) {
-            System.out.println("TokenStatus Exception:" + ex);
+            log4j.debug("TokenStatus Exception:" + ex, ex);
             return null;
         }
     }

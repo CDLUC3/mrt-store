@@ -313,6 +313,7 @@ public class TokenGetState
             
         } catch (Exception ex) {
             System.out.println("TokenStatus Exception:" + ex);
+            ex.printStackTrace();
             return null;
         }
     }
@@ -333,6 +334,7 @@ public class TokenGetState
             
         } catch (Exception ex) {
             System.out.println("TokenStatus Exception:" + ex);
+            ex.printStackTrace();
             return null;
         }
     }
@@ -356,6 +358,7 @@ public class TokenGetState
             
         } catch (Exception ex) {
             System.out.println("TokenStatus Exception:" + ex);
+            ex.printStackTrace();
             return null;
         }
     }
@@ -369,9 +372,6 @@ public class TokenGetState
         //JsonObject tokenJson = new JsonObject();
         try {
             String errMessage = runStatus.getDescription();
-            if (runStatus.getHttpResponse() == 500) {
-                errMessage = ex.toString();
-            }
             JSONObject tokenJson = new JSONObject();
             tokenJson.put("status", runStatus.getHttpResponse());
             tokenJson.put("token", getToken());
@@ -380,6 +380,7 @@ public class TokenGetState
             
         } catch (Exception ex) {
             System.out.println("TokenStatus Exception:" + ex);
+            ex.printStackTrace();
             return null;
         }
     }

@@ -280,6 +280,10 @@ public class TokenRun
             processTokenStatus.setTokenStatusEnum(TokenStatus.TokenStatusEnum.NotReady);
             saveCloudTokenStatus(processTokenStatus);
             buildTokenSynch();
+            if (processTokenStatus.getTokenStatusEnum() == TokenStatus.TokenStatusEnum.SERVICE_EXCEPTION) {
+                saveCloudTokenStatus(processTokenStatus);
+                return;
+            }
             endTokenStatus = getCloudTokenStatus();
             TokenStatus.TokenStatusEnum endStatusEnum = endTokenStatus.getTokenStatusEnum();
             if (endStatusEnum == TokenStatus.TokenStatusEnum.OK) {
@@ -318,7 +322,7 @@ public class TokenRun
                 System.out.println("buildTokenSynch Exception:" + asyncCloudArchive.ex);
                 asyncCloudArchive.ex.printStackTrace();
             }
-                    
+            
         } catch (TException tex) {
             System.out.println("TRACE:" + StringUtil.stackTrace(tex));
             throw tex;
