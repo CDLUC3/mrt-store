@@ -605,11 +605,13 @@ class ConsumeData implements Runnable
                 if (DEBUG) System.out.println("[error] TokenRun error:" + tokenRun.getRunStatus());
                 log4j.info("access.setStatus fail id:" + access.id() + " - token:" + token);
 	        access.setStatus(zooKeeper, access.status().fail());
+                access.unlock(zooKeeper);
             } else {
 		// complete or delete??
             	if (DEBUG) System.out.println("[item] END: completed queue data:" + jo.toString(2));
                 log4j.info("access.setStatus OK id:" + access.id() + " - token:" + token);
 	        access.setStatus(zooKeeper, access.status().success());
+                access.unlock(zooKeeper);
 	    }
             log4j.debug("************STATUS after*********\n"
                     + " - access.id():" + access.id() + "\n"
@@ -622,6 +624,7 @@ class ConsumeData implements Runnable
             log4j.error("access.setStatus fail" + access.id() + " - token:" + token + " - exception:" + e);
             try {
                 access.setStatus(zooKeeper, access.status().fail());
+                access.unlock(zooKeeper);
             } catch (Exception ze) {
                 System.out.println("Unable to set acccee status - Zookeeper exception:" + ze);
             }
