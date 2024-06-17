@@ -80,7 +80,7 @@ public class TokenRun
     implements Runnable
 {
     // Presigned errors
-    public enum TokenRunStatus {OK, Ready, Processing, Missing, Error};
+    public enum TokenRunStatus {OK, Ready, Processing, Missing, Retry, Error};
 
     protected static final String NAME = "TokenRun";
     protected static final String MESSAGE = NAME + ": ";
@@ -255,6 +255,8 @@ public class TokenRun
                 setRunStatus(TokenRunStatus.OK);
                 return runStatus;
                 
+            } else if (startStatusEnum  == TokenStatus.TokenStatusEnum.SERVICE_EXCEPTION) {
+            
             } else if (startStatusEnum  != TokenStatus.TokenStatusEnum.Queued) {
                 endTokenStatus = startTokenStatus;
                 String errMsg = "initial state not supported:" + startStatusEnum.toString();
@@ -278,6 +280,7 @@ public class TokenRun
         try {
             setRunStatus(TokenRunStatus.Processing);
             processTokenStatus.setTokenStatusEnum(TokenStatus.TokenStatusEnum.NotReady);
+            processTokenStatus.setExMsg(null);
             saveCloudTokenStatus(processTokenStatus);
             buildTokenSynch();
             if (processTokenStatus.getTokenStatusEnum() == TokenStatus.TokenStatusEnum.SERVICE_EXCEPTION) {
