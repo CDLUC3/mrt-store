@@ -256,6 +256,7 @@ public class TokenRun
                 return runStatus;
                 
             } else if (startStatusEnum  == TokenStatus.TokenStatusEnum.SERVICE_EXCEPTION) {
+                System.out.println("***RETRY ATTEMPTED:" + startTokenStatus.getToken());
             
             } else if (startStatusEnum  != TokenStatus.TokenStatusEnum.Queued) {
                 endTokenStatus = startTokenStatus;
