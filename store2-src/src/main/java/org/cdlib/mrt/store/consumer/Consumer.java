@@ -32,57 +32,35 @@ package org.cdlib.mrt.store.consumer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import org.apache.zookeeper.CreateMode;
-import org.apache.zookeeper.KeeperException;
 import org.apache.zookeeper.WatchedEvent;
 import org.apache.zookeeper.Watcher;
-import org.apache.zookeeper.ZooDefs;
 import org.apache.zookeeper.ZooKeeper;
-import org.apache.zookeeper.data.ACL;
-import org.apache.zookeeper.data.Stat;
-import org.apache.zookeeper.KeeperException;
 import org.apache.zookeeper.KeeperException.ConnectionLossException;
 import org.apache.zookeeper.KeeperException.SessionExpiredException;
 
-import org.cdlib.mrt.core.Identifier;
 import org.cdlib.mrt.store.storage.StorageServiceInf;
 import org.cdlib.mrt.store.app.StorageServiceInit;
-import org.cdlib.mrt.queue.DistributedQueue;
-import org.cdlib.mrt.queue.Item;
-import org.cdlib.mrt.utility.StateInf;
 import org.cdlib.mrt.utility.StringUtil;
-import org.cdlib.mrt.store.consumer.utility.QueueUtil;
 import org.cdlib.mrt.store.StorageConfig;
 import org.cdlib.mrt.store.action.TokenRun;
 import org.json.JSONObject;
 
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.RejectedExecutionException;
-import java.util.NoSuchElementException;
 
 import javax.servlet.*;
 import javax.servlet.http.*;
-import java.io.*;
 import java.lang.Long;
 import java.lang.IllegalArgumentException;
-import java.net.ConnectException;
-import java.net.URI;
-import java.util.Iterator;
 import java.util.NoSuchElementException;
-import java.util.Properties;
 import java.net.InetAddress;  
 import java.net.UnknownHostException; 
-import org.cdlib.mrt.queue.ZooTokenManager;
 import org.cdlib.mrt.utility.LoggerInf;
 import org.cdlib.mrt.zk.Access;
 import org.cdlib.mrt.zk.AccessState;
-import org.cdlib.mrt.zk.MerrittLocks;
 import org.cdlib.mrt.zk.QueueItem;
 import org.cdlib.mrt.zk.QueueItemHelper;
 
@@ -105,7 +83,7 @@ public class Consumer extends HttpServlet
     public static final Access.Queues  queueNodeSmall = Access.Queues.small;
     public static final Access.Queues queueNodeLarge = Access.Queues.large;
     private Access.Queues queueNode = null;	// Consumer will process this node
-    public int queueTimeOut = 400000;
+    public static int queueTimeOut = 400000;
     boolean largeWorker = true;
     private int numThreads = 5;		// default size
     private int pollingInterval = 2;	// default interval (minutes)
@@ -361,7 +339,6 @@ class ConsumerDaemon implements Runnable
 	sessionID = zooKeeper.getSessionId();
 	System.out.println("[info]" + MESSAGE + "session id: " + Long.toHexString(sessionID));
 	sessionAuth = zooKeeper.getSessionPasswd();
-        Item item = null;
         log4j.info("ConsumerDaemon Start"
                 + " - poolSize=" + poolSize
                 + " - smallQueueBool=" + smallQueueBool
@@ -458,8 +435,8 @@ class ConsumerDaemon implements Runnable
                     log4j.warn("Session expired.  Attempting to recreate session.");
                     
 		} catch (RejectedExecutionException ree) {
-	            System.out.println("[info] " + MESSAGE + "Thread pool limit reached. no submission, and requeuing: " + item.toString());
-                    log4j.warn("Thread pool limit reached. no submission, and requeuing: " + item.toString());
+	            System.out.println("[info] " + MESSAGE + "Thread pool limit reached. no submission, and requeuing: " + ree);
+                    log4j.warn("Thread pool limit reached. no submission, and requeuing: " + ree);
         	    Thread.currentThread().sleep(5 * 1000);         // let thread pool relax a bit
                     
 		} catch (NoSuchElementException nsee) {

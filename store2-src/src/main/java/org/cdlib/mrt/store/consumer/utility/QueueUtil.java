@@ -40,7 +40,6 @@ import org.apache.zookeeper.ZooKeeper;
 import org.cdlib.mrt.zk.Access;
 import org.cdlib.mrt.zk.MerrittZKNodeInvalid;
 import org.cdlib.mrt.zk.MerrittStateError;
-import org.cdlib.mrt.queue.DistributedQueue;
 import org.cdlib.mrt.store.consumer.Consumer;
 import org.cdlib.mrt.utility.TException;
 // import javax.json.JsonNumber;
@@ -86,7 +85,7 @@ public class QueueUtil
 		System.out.println("[info]" + MESSAGE + NAME + " Detected SMALL access request: " + token);
 	    }
 		
-            zooKeeper = new ZooKeeper(Consumer.queueConnectionString, DistributedQueue.sessionTimeout, new Ignorer());
+            zooKeeper = new ZooKeeper(Consumer.queueConnectionString, Consumer.queueTimeOut, new Ignorer());
 	    String priority = calculatePriority(size);
             distributedAccess = Access.createAssembly(zooKeeper, queueNode, jo);
 
