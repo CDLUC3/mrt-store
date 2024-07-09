@@ -38,6 +38,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import org.json.JSONObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.ThreadContext;
@@ -47,6 +48,8 @@ import org.cdlib.mrt.core.Identifier;
 import org.cdlib.mrt.core.FileContent;
 import org.cdlib.mrt.core.FileComponent;
 import org.cdlib.mrt.core.PingState;
+import org.cdlib.mrt.s3.service.NodeIO;
+import org.cdlib.mrt.store.fix.BuildTokenCC;
 import org.cdlib.mrt.store.StorageConfig;
 import org.cdlib.mrt.store.FileFixityState;
 import org.cdlib.mrt.store.FileState;
@@ -328,7 +331,38 @@ public class StorageService
         bump("getCloudManifest", startTime);
         return state;
     }
-    
+        
+    @Override
+    public JSONObject fixChangeToken (
+            int nodeID,
+            Identifier objectID)
+    throws TException
+    {
+        try {
+            //NodeIO nodeIO = storageConfig.getNodeIO();
+
+            String yamlName = "jar:nodes-sdsc-temp";
+            NodeIO nodeIO = NodeIO.getNodeIOConfig(yamlName, logger) ;
+
+            long processNode = nodeID;
+            BuildTokenCC buildTokenCC = new BuildTokenCC(
+                nodeIO, 
+                processNode, 
+                objectID, 
+                logger);
+            buildTokenCC.process();
+            return buildTokenCC.getJsonResponse();
+
+        } catch (TException tex) {
+            tex.printStackTrace();
+            throw tex;
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            throw new TException(ex);
+        }
+    }
+
     @Override
     public void getCloudManifestStream(
             int nodeID,

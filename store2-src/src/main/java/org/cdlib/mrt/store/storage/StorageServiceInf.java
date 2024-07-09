@@ -34,6 +34,7 @@ import java.io.File;
 import java.io.OutputStream;
 import java.net.URL;
 import java.util.Properties;
+import org.json.JSONObject;
 import org.cdlib.mrt.cloud.action.ContentVersionLink;
 
 import org.cdlib.mrt.core.Identifier;
@@ -122,7 +123,19 @@ public interface StorageServiceInf
             int nodeID,
             Identifier objectID)
     throws TException;
-
+    
+    /**
+     * Special customize fix object handling
+     * @param nodeID NodeIO node number
+     * @param objectID ark object Identifier
+     * @return json describing details of process completion
+     * @throws TException 
+     */
+    public JSONObject fixChangeToken (
+            int nodeID,
+            Identifier objectID)
+    throws TException;
+    
     /**
      * Get state information about this Storage Service
      * @return Storage Service state information
