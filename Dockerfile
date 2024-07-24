@@ -10,7 +10,7 @@ FROM ${ECR_REGISTRY}/merritt-tomcat:dev
 COPY store-war/target/mrt-storewar-*.war /usr/local/tomcat/webapps/store.war
 
 RUN mkdir -p /build/static
-RUN date -r /usr/local/tomcat/webapps/store.war +'mrt-ingest: %Y-%m-%d:%H:%M:%S' > /build/static/build.content.txt 
+RUN date -r /usr/local/tomcat/webapps/store.war +'mrt-store: %Y-%m-%d:%H:%M:%S' > /build/static/build.content.txt 
 RUN jar uf /usr/local/tomcat/webapps/store.war -C /build static/build.content.txt
 
 RUN mkdir -p /dpr2store/mrtHomes/store \
