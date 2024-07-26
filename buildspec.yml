@@ -16,6 +16,10 @@ phases:
       - BRANCHTAG=`git describe --tags --exact-match 2> /dev/null || git symbolic-ref -q --short HEAD || git name-rev $(git rev-parse --short HEAD) | cut -d' ' -f2 || git rev-parse --short HEAD`
       - echo "Branchtag ${BRANCHTAG}"
 
+      # - docker buildx create --use 
+      # - BUILDCMD="buildx build --platform linux/arm64,linux/amd64 --push --quiet"
+      - BUILDCMD="build --push --quiet"
+
   build:
     on-failure: ABORT
     commands:
@@ -35,8 +39,7 @@ phases:
       # - mvn -ntp deploy:deploy-file -Durl=${CODEARTIFACT_URL} -DrepositoryId=cdlib-uc3-mrt-uc3-mrt-java -Dfile=$(ls store-it/target/mrt-store-it-*.war) ${SEMVER}
       - mvn -ntp deploy:deploy-file -Durl=${CODEARTIFACT_URL} -DrepositoryId=cdlib-uc3-mrt-uc3-mrt-java -Dfile=$(ls store-war/target/mrt-storewar-*.war) ${SEMVER}
 
-      - docker buildx create --use 
       - |
-          docker buildx build --quiet --platform linux/arm64,linux/amd64 --push \
+          docker ${BUILDCMD} \
           --build-arg ECR_REGISTRY=${ECR_REGISTRY} \
           -t ${ECR_REGISTRY}/mrt-store:dev .
