@@ -36,7 +36,6 @@ phases:
           SEMVER="-Dversion=${BRANCHTAG}"
         fi
       - echo "Semver [${SEMVER}]"
-      # - mvn -ntp deploy:deploy-file -Durl=${CODEARTIFACT_URL} -DrepositoryId=cdlib-uc3-mrt-uc3-mrt-java -Dfile=$(ls store-it/target/mrt-store-it-*.war) ${SEMVER}
       - mvn -ntp deploy:deploy-file -Durl=${CODEARTIFACT_URL} -DrepositoryId=cdlib-uc3-mrt-uc3-mrt-java -Dfile=$(ls store-war/target/mrt-storewar-*.war) ${SEMVER}
 
       - |

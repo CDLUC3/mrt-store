@@ -4,7 +4,7 @@
     <groupId>org.cdlib.mrt</groupId>
     <artifactId>mrt-storewar</artifactId>
     <packaging>war</packaging>
-    <version>1.0-SNAPSHOT</version>
+    <version>3.0-SNAPSHOT</version>
     <name>UC3-mrtStorePub-war</name>
   
     <dependencyManagement>
@@ -12,7 +12,7 @@
           <dependency>
             <groupId>org.cdlib.mrt</groupId>
             <artifactId>mrt-reflectoring-bom</artifactId>
-            <version>1.0.0</version>
+            <version>3.0-SNAPSHOT</version>
             <type>pom</type>
             <scope>import</scope>
           </dependency>
@@ -22,7 +22,7 @@
     <parent>
         <groupId>org.cdlib.mrt</groupId>
         <artifactId>mrt-parent-properties</artifactId>
-        <version>1.0.0</version>
+        <version>3.0-SNAPSHOT</version>
     </parent>
 
     <url>http://uc3.cdlib.org</url>
@@ -76,7 +76,7 @@
                                     <groupId>org.cdlib.mrt</groupId>
                                     <artifactId>mrt-storewar</artifactId>
 
-                                    <version>1.0-SNAPSHOT</version>
+                                    <version>3.0-SNAPSHOT</version>
                                     <type>war</type>
                                     <overWrite>true</overWrite>
                                     <outputDirectory>./${warLocation}</outputDirectory>
@@ -97,7 +97,7 @@
         <dependency>
             <groupId>org.cdlib.mrt</groupId>
             <artifactId>mrt-store2pub-src</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>3.0-SNAPSHOT</version>
         </dependency> 
             
 
