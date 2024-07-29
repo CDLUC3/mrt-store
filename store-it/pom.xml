@@ -139,7 +139,7 @@
                   </run>
                 </image>
                 <image>
-                  <name>zookeeper</name>
+                  <name>public.ecr.aws/docker/library/zookeeper:3.8.4</name>
                   <alias>zoo-it</alias>
                   <run>
                     <network>
