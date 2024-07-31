@@ -5,16 +5,24 @@
   <groupId>org.cdlib.mrt</groupId>
   <artifactId>mrt-store-it</artifactId>
   <packaging>war</packaging>
-  <version>1.0-SNAPSHOT</version>
+  <version>3.0-SNAPSHOT</version>
   <name>UC3-mrtStoreIT</name>
   <url>http://uc3.cdlib.org</url>
   
+    <properties>
+      <merritt-bom.version>3.0-SNAPSHOT</merritt-bom.version>
+      <itDockerRegistry>it-docker-registry</itDockerRegistry>
+      <propertyDir>test</propertyDir>
+      <docker.skip>${env.SKIP_DOCKER_TEST}</docker.skip>
+      <skipTests>${env.SKIP_DOCKER_TEST}</skipTests>
+    </properties>
+
   <dependencyManagement>
     <dependencies>
       <dependency>
         <groupId>org.cdlib.mrt</groupId>
         <artifactId>mrt-reflectoring-bom</artifactId>
-        <version>1.0.0</version>
+        <version>${merritt-bom.version}</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -24,7 +32,8 @@
     <parent>
         <groupId>org.cdlib.mrt</groupId>
         <artifactId>mrt-parent-properties</artifactId>
-        <version>1.0.0</version>
+        <!--This version cannot be set as a property-->
+        <version>PAR-3.0-SNAPSHOT</version>
     </parent>
 
   <repositories>
@@ -39,13 +48,6 @@
       </snapshots>
     </repository>
   </repositories>
-
-  <properties>
-    <itDockerRegistry>it-docker-registry</itDockerRegistry>
-    <propertyDir>test</propertyDir>
-    <docker.skip>${env.SKIP_DOCKER_TEST}</docker.skip>
-    <skipTests>${env.SKIP_DOCKER_TEST}</skipTests>
-  </properties>
 
   <profiles>
     <profile>
@@ -63,14 +65,6 @@
   </profiles>
   <build>
     <plugins>
-      <!--plugin>
-        <artifactId>maven-war-plugin</artifactId>
-        <version>3.3.2</version>
-        <configuration>
-          <packagingExcludes>WEB-INF/lib/slf4j-log4j12-1.5.*.jar</packagingExcludes>
-        </configuration>
-      </plugin-->
-     
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
@@ -147,7 +141,7 @@
                   </run>
                 </image>
                 <image>
-                  <name>zookeeper</name>
+                  <name>public.ecr.aws/docker/library/zookeeper:3.8.4</name>
                   <alias>zoo-it</alias>
                   <run>
                     <network>
@@ -177,7 +171,7 @@
                     <volumes>
                       <bind>
                         <volume>
-                          ${project.basedir}/target/mrt-store-it-1.0-SNAPSHOT.war:/usr/local/tomcat/webapps/store.war</volume>
+                          ${project.basedir}/target/mrt-store-it-${project.version}.war:/usr/local/tomcat/webapps/store.war</volume>
                       </bind>
                     </volumes>
                     <env>
@@ -239,7 +233,7 @@
     <dependency>
       <groupId>org.cdlib.mrt</groupId>
       <artifactId>mrt-store2pub-src</artifactId>
-      <version>1.0-SNAPSHOT</version>
+      <version>${project.version}</version>
     </dependency>
 
     <dependency>

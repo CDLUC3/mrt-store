@@ -23,7 +23,7 @@ services:
   it-server:
     container_name: it-server
     hostname: it-server
-    image: tomcat:8-jre8
+    image: ${ECR_REGISTRY}/merritt-tomcat:dev
     volumes:
     - "${MDIR}/store-it/target/mrt-store-it-1.0-SNAPSHOT.war:/usr/local/tomcat/webapps/store.war"
     ports:
@@ -33,7 +33,7 @@ services:
       target: 8099
     environment:
       CATALINA_OPTS: "-Dfile.encoding=UTF8 -Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true"
-      JPDA_ADDRESS: 8099
+      JPDA_ADDRESS: "*:8099"
       JPDA_TRANSPORT: dt_socket
       SSM_SKIP_RESOLUTION: Y
     networks:
@@ -45,7 +45,7 @@ services:
     entrypoint: ["catalina.sh", "jpda", "run"]
   zoo-it:
     container_name: zoo-it
-    image: zookeeper
+    image: public.ecr.aws/docker/library/zookeeper:3.8.4
     networks:
       merrittnet:
     restart: unless-stopped

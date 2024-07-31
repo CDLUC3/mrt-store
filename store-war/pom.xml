@@ -4,15 +4,20 @@
     <groupId>org.cdlib.mrt</groupId>
     <artifactId>mrt-storewar</artifactId>
     <packaging>war</packaging>
-    <version>1.0-SNAPSHOT</version>
+    <version>3.0-SNAPSHOT</version>
     <name>UC3-mrtStorePub-war</name>
   
+    <properties>
+      <merritt-bom.version>3.0-SNAPSHOT</merritt-bom.version>
+      <propertyDir>test</propertyDir>
+    </properties>
+
     <dependencyManagement>
         <dependencies>
           <dependency>
             <groupId>org.cdlib.mrt</groupId>
             <artifactId>mrt-reflectoring-bom</artifactId>
-            <version>1.0.0</version>
+            <version>${merritt-bom.version}</version>
             <type>pom</type>
             <scope>import</scope>
           </dependency>
@@ -22,7 +27,8 @@
     <parent>
         <groupId>org.cdlib.mrt</groupId>
         <artifactId>mrt-parent-properties</artifactId>
-        <version>1.0.0</version>
+        <!--This version cannot be set as a property-->
+        <version>PAR-3.0-SNAPSHOT</version>
     </parent>
 
     <url>http://uc3.cdlib.org</url>
@@ -40,11 +46,6 @@
         </repository>
     </repositories>
 
-    <!-- force UTF-8 -->
-    <properties>
-        <propertyDir>test</propertyDir>
-    </properties>
-
     <profiles>
       <profile>
           <id>uc3</id>
@@ -60,14 +61,6 @@
 
     <build>
         <plugins>
-            <!--plugin>
-              <artifactId>maven-war-plugin</artifactId>
-              <version>3.3.2</version>
-              <configuration>
-                <packagingExcludes>WEB-INF/lib/slf4j-log4j12-1.5.*.jar</packagingExcludes>
-              </configuration>
-            </plugin-->
-            
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
@@ -84,7 +77,7 @@
                                     <groupId>org.cdlib.mrt</groupId>
                                     <artifactId>mrt-storewar</artifactId>
 
-                                    <version>1.0-SNAPSHOT</version>
+                                    <version>${project.version}</version>
                                     <type>war</type>
                                     <overWrite>true</overWrite>
                                     <outputDirectory>./${warLocation}</outputDirectory>
@@ -105,7 +98,7 @@
         <dependency>
             <groupId>org.cdlib.mrt</groupId>
             <artifactId>mrt-store2pub-src</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>${project.version}</version>
         </dependency> 
             
 

@@ -6,14 +6,15 @@
     <groupId>org.cdlib.mrt</groupId>
     <artifactId>mrt-storeconf</artifactId>
     <packaging>jar</packaging>
-    <version>1.0-SNAPSHOT</version>
+    <version>3.0-SNAPSHOT</version>
     <name>UC3-mrtStoreConf</name>
     <url>http://uc3.cdlib.org</url>
     
     <parent>
         <groupId>org.cdlib.mrt</groupId>
         <artifactId>mrt-parent-properties</artifactId>
-        <version>1.0.0</version>
+        <!--This version cannot be set as a property-->
+        <version>PAR-3.0-SNAPSHOT</version>
     </parent>
     
     <build>
