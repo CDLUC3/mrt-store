@@ -9,36 +9,33 @@ phases:
   pre_build:
     on-failure: ABORT
     commands:
-      - cp settings.xml ~/.m2/
-      - export CODEARTIFACT_AUTH_TOKEN=`aws codeartifact get-authorization-token --domain cdlib-uc3-mrt --domain-owner $AWS_ACCOUNT_ID --region $AWS_REGION --query authorizationToken --output text`
-      - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin ${ECR_REGISTRY}
-      - aws ecr create-repository --repository-name mrt-store || echo 'ignore if exists...'
-      - BRANCHTAG=`git describe --tags --exact-match 2> /dev/null || git symbolic-ref -q --short HEAD || git name-rev $(git rev-parse --short HEAD) | cut -d' ' -f2 || git rev-parse --short HEAD`
-      - echo "Branchtag ${BRANCHTAG}"
+    - cp settings.xml ~/.m2/
+    - export CODEARTIFACT_AUTH_TOKEN=`aws codeartifact get-authorization-token --domain cdlib-uc3-mrt --domain-owner $AWS_ACCOUNT_ID --region $AWS_REGION --query authorizationToken --output text`
+    - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin ${ECR_REGISTRY}
+    - aws ecr create-repository --repository-name mrt-store || echo 'ignore if exists...'
 
-      # - docker buildx create --use 
-      # - BUILDCMD="buildx build --platform linux/arm64,linux/amd64 --push --quiet"
-      - BUILDCMD="build --push --quiet"
+    - COMMIT=`git rev-parse --short HEAD`
+    - BRANCH=`git symbolic-ref -q --short HEAD || git name-rev $(git rev-parse --short HEAD) | cut -d' ' -f2 || echo ''`
+    - TAG=`git describe --tags --exact-match 2> /dev/null || echo ''`
+    - BRANCHTAG=`git describe --tags --exact-match 2> /dev/null || git symbolic-ref -q --short HEAD || git name-rev $(git rev-parse --short HEAD) | cut -d' ' -f2 || git rev-parse --short HEAD`
+    - echo "Branchtag ${BRANCHTAG}"
 
   build:
     on-failure: ABORT
     commands:
-      # - mvn -ntp clean install -Ddocker.skip -DskipITs -Dmaven.test.skip=true
-      - mvn -ntp clean install
-      - |
-        if [[ "${BRANCHTAG}" == "main" ]]
-        then
-          SEMVER=''
-        elif [[ "${BRANCHTAG}" == "codebuild" ]]
-        then
-          SEMVER=''
-        else
-          SEMVER="-Dversion=${BRANCHTAG}"
-        fi
-      - echo "Semver [${SEMVER}]"
-      - mvn -ntp deploy:deploy-file -Durl=${CODEARTIFACT_URL} -DrepositoryId=cdlib-uc3-mrt-uc3-mrt-java -Dfile=$(ls store-war/target/mrt-storewar-*.war) ${SEMVER}
+    # - mvn -ntp clean install -Ddocker.skip -DskipITs -Dmaven.test.skip=true
+    - mvn -ntp clean install
+    - |
+      if [[ "${BRANCHTAG}" == "main" ]]
+      then
+        SEMVER=''
+      else
+        SEMVER="-Dversion=${BRANCHTAG}"
+      fi
+    - echo "Semver [${SEMVER}]"
+    - mvn -ntp deploy:deploy-file -Durl=${CODEARTIFACT_URL} -DrepositoryId=cdlib-uc3-mrt-uc3-mrt-java -Dfile=$(ls store-war/target/mrt-storewar-*.war) ${SEMVER}
 
-      - |
-          docker ${BUILDCMD} \
-          --build-arg ECR_REGISTRY=${ECR_REGISTRY} \
-          -t ${ECR_REGISTRY}/mrt-store:dev .
+    - |
+        docker build --push --quiet \
+        --build-arg ECR_REGISTRY=${ECR_REGISTRY} \
+        -t ${ECR_REGISTRY}/mrt-store:dev .
