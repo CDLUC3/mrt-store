@@ -12,7 +12,6 @@ phases:
     - cp settings.xml ~/.m2/
     - export CODEARTIFACT_AUTH_TOKEN=`aws codeartifact get-authorization-token --domain cdlib-uc3-mrt --domain-owner $AWS_ACCOUNT_ID --region $AWS_REGION --query authorizationToken --output text`
     - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin ${ECR_REGISTRY}
-    - aws ecr create-repository --repository-name mrt-store || echo 'ignore if exists...'
 
     - COMMIT=`git rev-parse --short HEAD`
     - BRANCH=`git symbolic-ref -q --short HEAD || git name-rev $(git rev-parse --short HEAD) | cut -d' ' -f2 || echo ''`
