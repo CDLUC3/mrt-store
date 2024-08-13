@@ -29,6 +29,7 @@ phases:
       if [[ "${BRANCHTAG}" == "main" ]]
       then
         SEMVER=''
+        DOCKTAG='dev'
       elif [[ "${TAG}" == "" ]]
       then
         SEMVER="-Dversion=${BRANCHTAG}-SNAPSHOT"
