@@ -18,7 +18,8 @@ phases:
     - TAG=`git describe --tags --exact-match 2> /dev/null || echo ''`
     - BRANCHTAG=`git describe --tags --exact-match 2> /dev/null || git symbolic-ref -q --short HEAD || git name-rev $(git rev-parse --short HEAD) | cut -d' ' -f2 || git rev-parse --short HEAD`
     - DOCKTAG=$BRANCHTAG
-    - echo "Branchtag ${BRANCHTAG}"
+    - COMMITDATE=`git --no-pager log -1 --pretty='format:%cd' --date='format:%Y-%m-%d %H:%M:%S'`
+    - echo "Branchtag ${BRANCHTAG}; COMMITDATE=${COMMITDATE}"
 
   build:
     on-failure: ABORT
@@ -42,4 +43,5 @@ phases:
     - |
         docker build --push --quiet \
         --build-arg ECR_REGISTRY=${ECR_REGISTRY} \
+        --build-arg COMMITDATE="${COMMITDATE}" \
         -t ${ECR_REGISTRY}/mrt-store:${DOCKTAG} .
