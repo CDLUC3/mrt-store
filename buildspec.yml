@@ -38,10 +38,50 @@ phases:
         SEMVER="-Dversion=${BRANCHTAG}"
       fi
     - echo "Semver [${SEMVER}]"
-    - mvn -ntp deploy:deploy-file -Durl=${CODEARTIFACT_URL} -DrepositoryId=cdlib-uc3-mrt-uc3-mrt-java -Dfile=$(ls store-war/target/mrt-storewar-*.war) ${SEMVER}
+    - |
+      mvn -ntp deploy:deploy-file \
+        -Durl=${CODEARTIFACT_URL} \
+        -DrepositoryId=cdlib-uc3-mrt-uc3-mrt-java \
+        -Dfile=$(ls store-war/target/mrt-storewar-*.war) ${SEMVER}
 
     - |
-        docker build --push --quiet \
+      docker build --push --quiet \
         --build-arg ECR_REGISTRY=${ECR_REGISTRY} \
         --build-arg COMMITDATE="${COMMITDATE}" \
         -t ${ECR_REGISTRY}/mrt-store:${DOCKTAG} .
+    # report results
+    - mkdir -p reports
+    - RPT=reports/mrt-store.md
+    - echo "## Semantic Tags" > $RPT
+    - |
+      git for-each-ref --sort=-creatordate --format '- %(refname) (%(creatordate:short))' refs/tags \
+        | egrep "tags/[0-9]+\.[0-9]+\.[0-9]+ " \
+        | sed -e "s/refs\/tags\///" \
+        | head -10 >> $RPT
+    - echo "## Feature Tags" >> $RPT
+    - |
+      git for-each-ref --sort=-creatordate --format '- %(refname) (%(creatordate:short))' refs/tags \
+        | egrep -v "tags/[0-9]+\.[0-9]+\.[0-9]+ " \
+        | sed -e "s/refs\/tags\///" \
+        | head -10 >> $RPT
+    - echo "## Docker Image Tags mrt-store" >> $RPT
+    - |
+      aws ecr list-images --repository-name mrt-store --filter tagStatus=TAGGED --output=text \
+        | cut -f3 \
+        | sed -e "s/^/- /" >> $RPT
+
+    - |
+      for pkg in mrt-storewar
+      do
+        echo "## Code Artifact Packages for $pkg" >> $RPT
+        aws codeartifact list-package-versions \
+          --domain=cdlib-uc3-mrt --repository=uc3-mrt-java \
+          --format=maven --namespace=org.cdlib.mrt \
+          --package=$pkg --status=Published --output=text \
+          | grep Published \
+          | cut -f4 \
+          | sed -e "s/^/- /" >> $RPT
+      done
+
+    - aws s3 cp $RPT s3://${S3CFBUCKET}/$RPT
+    - aws cloudfront create-invalidation --distribution-id ${CFDISTRIBUTIONID} --paths /reports/* --region us-east-1
