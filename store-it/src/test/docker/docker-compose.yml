@@ -25,7 +25,7 @@ services:
     hostname: it-server
     image: ${ECR_REGISTRY}/merritt-tomcat:dev
     volumes:
-    - "${MDIR}/store-it/target/mrt-store-it-1.0-SNAPSHOT.war:/usr/local/tomcat/webapps/store.war"
+    - "${MDIR}/store-it/target/mrt-store-it-3.0-SNAPSHOT.war:/usr/local/tomcat/webapps/store.war"
     ports:
     - published: 8080
       target: 8080
