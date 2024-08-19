@@ -19,7 +19,7 @@ phases:
     - BRANCHTAG=`git describe --tags --exact-match 2> /dev/null || git symbolic-ref -q --short HEAD || git name-rev $(git rev-parse --short HEAD) | cut -d' ' -f2 || git rev-parse --short HEAD`
     - DOCKTAG=$BRANCHTAG
     - COMMITDATE=`git --no-pager log -1 --pretty='format:%cd' --date='format:%Y-%m-%d %H:%M:%S'`
-    - echo "Branchtag ${BRANCHTAG}; COMMITDATE=${COMMITDATE}"
+    - echo "Branchtag ${BRANCHTAG}; COMMITDATE=${COMMITDATE}; REPONAME=${REPONAME}; BRANCHNAME=${BRANCHNAME}"
 
   build:
     on-failure: ABORT
@@ -48,10 +48,10 @@ phases:
       docker build --push --quiet \
         --build-arg ECR_REGISTRY=${ECR_REGISTRY} \
         --build-arg COMMITDATE="${COMMITDATE}" \
-        -t ${ECR_REGISTRY}/mrt-store:${DOCKTAG} .
+        -t ${ECR_REGISTRY}/${REPONAME}:${DOCKTAG} .
     # report results
     - mkdir -p reports
-    - RPT=reports/mrt-store.md
+    - RPT=reports/${REPONAME}.md
     - echo "## Semantic Tags" > $RPT
     - |
       git for-each-ref --sort=-creatordate --format '- %(refname) (%(creatordate:short))' refs/tags \
@@ -65,9 +65,9 @@ phases:
         | egrep -v "sprint-" \
         | sed -e "s/refs\/tags\///" \
         | head -10 >> $RPT
-    - echo "## Docker Image Tags mrt-store" >> $RPT
+    - echo "## Docker Image Tags ${REPONAME}" >> $RPT
     - |
-      aws ecr list-images --repository-name mrt-store --filter tagStatus=TAGGED --output=text \
+      aws ecr list-images --repository-name ${REPONAME} --filter tagStatus=TAGGED --output=text \
         | cut -f3 \
         | sed -e "s/^/- /" >> $RPT
 
