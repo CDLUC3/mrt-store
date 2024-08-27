@@ -59,7 +59,7 @@
       </activation>
       <properties>
         <!-- Override only if necessary -->
-        <itDockerRegistry>env.ECR_REGISTRY</itDockerRegistry>
+        <itDockerRegistry>${env.ECR_REGISTRY}</itDockerRegistry>
       </properties>
     </profile>
   </profiles>
