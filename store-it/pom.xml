@@ -54,12 +54,12 @@
       <id>aws</id>
       <activation>
         <property>
-          <name>env.AWS_ACCOUNT_ID</name>
+          <name>env.ECR_REGISTRY</name>
         </property>
       </activation>
       <properties>
         <!-- Override only if necessary -->
-        <itDockerRegistry>${env.AWS_ACCOUNT_ID}.dkr.ecr.${env.AWS_REGION}.amazonaws.com</itDockerRegistry>
+        <itDockerRegistry>env.ECR_REGISTRY</itDockerRegistry>
       </properties>
     </profile>
   </profiles>
