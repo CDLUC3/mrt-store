@@ -69,7 +69,8 @@ phases:
     - |
       aws ecr list-images --repository-name ${REPONAME} --filter tagStatus=TAGGED --output=text \
         | cut -f3 \
-        | sed -e "s/^/- /" >> $RPT
+        | sed -e "s/^/- /" \
+        | sort >> $RPT
 
     - |
       for pkg in mrt-storewar
@@ -81,7 +82,8 @@ phases:
           --package=$pkg --status=Published --output=text \
           | grep Published \
           | cut -f4 \
-          | sed -e "s/^/- /" >> $RPT
+          | sed -e "s/^/- /" \
+          | sort >> $RPT
         for ver in `aws codeartifact list-package-versions \
           --domain=cdlib-uc3-mrt --repository=uc3-mrt-java \
           --format=maven --namespace=org.cdlib.mrt \
