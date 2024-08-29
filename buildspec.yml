@@ -38,6 +38,12 @@ phases:
         SEMVER="-Dversion=${BRANCHTAG}"
       fi
     - echo "Semver [${SEMVER}]"
+
+    - mkdir -p /build/static
+    - |
+      echo "build_tag: ${BRANCHTAG}" > /build/static/build.content.txt 
+    - ${JAVA_HOME}/bin/jar uf $(ls store-war/target/mrt-storewar-*.war) -C /build static/build.content.txt
+
     - |
       mvn -ntp deploy:deploy-file \
         -Durl=${CODEARTIFACT_URL} \
@@ -47,7 +53,6 @@ phases:
     - |
       docker build --push --quiet \
         --build-arg ECR_REGISTRY=${ECR_REGISTRY} \
-        --build-arg COMMITDATE="${COMMITDATE}" \
         -t ${ECR_REGISTRY}/${REPONAME}:${DOCKTAG} .
     # report results
     - mkdir -p reports
