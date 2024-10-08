@@ -837,6 +837,36 @@ public class JerseyStorage
     }
 
     @GET
+    @Path("fix/{collection}/{nodeid}/{objectid}")
+    public Response callFixObject(
+            @PathParam("nodeid") String collection,
+            @PathParam("nodeid") String nodeIDS,
+            @PathParam("objectid") String objectIDS,
+            @DefaultValue("true") @QueryParam("type") String fixType,
+            @Context CloseableService cs,
+            @Context ServletConfig sc)
+        throws TException
+    {
+        int nodeID = getNodeID(nodeIDS);
+        log4j.debug("FIX"
+                    + " - nodeID=" + nodeID
+                    + " - objectIDS=" + objectIDS
+                    + " - fixType=" + fixType
+                    );
+        JSONObject jsonResponse = fixObject(
+            collection,
+            nodeID,
+            objectIDS,
+            fixType,
+            cs,
+            sc);
+
+            return Response 
+                .status(200).entity(jsonResponse.toString())
+                    .build();
+    }
+    
+    @GET
     @Path("producer/{nodeid}/{objectid}/{versionid}")
     public Response getProducerVersion(
             @PathParam("nodeid") String nodeIDS,

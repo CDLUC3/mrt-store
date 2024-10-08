@@ -26,6 +26,26 @@
     </RollingFile>
     
     <RollingFile
+        name="FixJson-File"
+        fileName="${env:CATALINA_BASE:-.}/logs/log4j-fix-json.log"
+        filePattern="logs/log4j-ecs-json-%d{yyyy-MM-dd}-%i.log">
+      <!-- https://logging.apache.org/log4j/2.x/manual/lookups.html -->
+      <EcsLayout
+          serviceName="${env:SERVICE:-service}"
+          serviceNodeName="${env:HOSTNAME:-${env:SERVICE:-service}}"
+          eventDataset="tomcat"
+          includeMarkers="true"
+          stackTraceAsArray="false"
+          includeOrigin="true">
+      </EcsLayout>
+      
+      <Policies>
+        <SizeBasedTriggeringPolicy size="19500KB" />
+      </Policies>
+      <DefaultRolloverStrategy max="10"/>
+    </RollingFile>
+    
+    <RollingFile
         name="Text-File"
         fileName="${env:CATALINA_BASE:-.}/logs/log4j-text.log"
         filePattern="logs/log4j-text-json-%d{yyyy-MM-dd}-%i.log"
@@ -49,6 +69,10 @@
     
     <Logger name="FileLog" level="DEBUG" additivity="false">
         <AppenderRef ref="Text-File" />
+    </Logger>
+    
+    <Logger name="FixJson" level="DEBUG" additivity="false">
+        <AppenderRef ref="FixJson-File" />
     </Logger>
     
     <Logger name="ConsoleLog" level="DEBUG" additivity="false">

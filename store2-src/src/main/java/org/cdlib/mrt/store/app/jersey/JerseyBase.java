@@ -360,6 +360,43 @@ public class JerseyBase
             throw new TException.GENERAL_EXCEPTION(MESSAGE + "Exception:" + ex);
         }
     }
+    
+    public JSONObject fixObject(
+            String collection,
+            int nodeID,
+            String objectIDS,
+            String fixType,
+            CloseableService cs,
+            ServletConfig sc)
+        throws TException
+    {
+        LoggerInf logger = defaultLogger;
+        StateInf responseState = null;
+        try {
+            Identifier objectID = getObjectID(objectIDS);
+            StorageServiceInit storageServiceInit = StorageServiceInit.getStorageServiceInit(sc);
+            StorageServiceInf storageService = storageServiceInit.getStorageService();
+            if (fixType == null) {
+                throw new TException.INVALID_OR_MISSING_PARM("fixType not provided");
+            } 
+            fixType = fixType.toLowerCase();
+            if (fixType.equals("changetoken")) {
+                JSONObject jsonResponse = storageService.fixChangeToken(collection, nodeID, objectID);
+                return jsonResponse;
+
+            } else {
+                throw new TException.INVALID_OR_MISSING_PARM("fix serviceType not supported");
+            }
+
+         } catch (TException tex) {
+            throw tex;
+
+        } catch (Exception ex) {
+            System.out.println("TRACE:" + StringUtil.stackTrace(ex));
+            throw new TException.GENERAL_EXCEPTION(MESSAGE + "Exception:" + ex);
+        }
+    }
+
 
     /**
      * Get state information about a specific node
