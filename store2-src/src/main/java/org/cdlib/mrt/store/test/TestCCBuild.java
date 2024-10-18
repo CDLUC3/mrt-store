@@ -26,7 +26,7 @@ public class TestCCBuild
             throws IOException,TException 
     {
         try {
-            Log4j2Util.setRootLevel("debug");
+            Log4j2Util.setRootLevel("info");
             Log4j2Util.whichLog4j2("start");
             if (false) return;
             //Log4j2Util.setLoggerLevel("FixLog","trace");
@@ -37,7 +37,7 @@ public class TestCCBuild
             String yamlName = "jar:nodes-sdsc-temp";
             String collection = "testCollection";
             NodeIO nodeIO = NodeIO.getNodeIOConfig(yamlName, logger) ;
-            //Identifier objectID = new Identifier("ark:/13030/m56t6p2z");
+            Identifier objectID = new Identifier("ark:/13030/m56t6p2z");
             //Identifier objectID = new Identifier("ark:/13030/m5dz7ggg");
             //Identifier objectID = new Identifier("ark:/13030/m5n40rb7");
             //Identifier objectID = new Identifier("ark:/13030/m5m38x40");
@@ -45,7 +45,7 @@ public class TestCCBuild
             //Identifier objectID = new Identifier("ark:/13030/m5fc148t");
             //Identifier objectID = new Identifier("ark:/13030/m5rz4kds");
             //Identifier objectID = new Identifier("ark:/13030/qt0dd8d1c2"); // no changes
-            Identifier objectID = new Identifier("ark:/13030/m50057c3");
+            //Identifier objectID = new Identifier("ark:/13030/m50057c3");
             if (false) return;
             
             BuildTokenCC buildTokenCC = new BuildTokenCC(
@@ -53,6 +53,7 @@ public class TestCCBuild
                 nodeIO, 
                 processNode, 
                 objectID, 
+                false,
                 logger);
             buildTokenCC.process();
             
