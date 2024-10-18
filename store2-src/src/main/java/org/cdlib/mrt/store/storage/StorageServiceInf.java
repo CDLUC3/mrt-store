@@ -129,13 +129,15 @@ public interface StorageServiceInf
      * @param collection object collection mnemonic
      * @param nodeID NodeIO node number
      * @param objectID ark object Identifier
+     * @param runS3 true=execute update; false=do not execute update
      * @return json describing details of process completion
      * @throws TException 
      */
     public JSONObject fixChangeToken (
             String collection,
             int nodeID,
-            Identifier objectID)
+            Identifier objectID,
+            Boolean runS3)
     throws TException;
     
     /**

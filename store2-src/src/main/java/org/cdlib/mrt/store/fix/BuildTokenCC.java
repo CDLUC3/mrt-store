@@ -77,6 +77,7 @@ public class BuildTokenCC
     protected ArrayList<LinkedHashMap<String, ChangeComponent>> outComponents = null;
     protected LinkedHashMap<String, ChangeComponent> addComponents = new LinkedHashMap<>();
     protected LinkedHashMap<String, FileComponent> deleteComponents = new LinkedHashMap<String, FileComponent>();
+    protected LinkedHashMap<ChangeComponent.Operation, Integer> tallyOperation = new LinkedHashMap<>();
     protected VersionMap outVersionMap = null;
     protected MatchObject matchObject = null;
     protected long totalDeleteBytes = 0;
@@ -91,7 +92,6 @@ public class BuildTokenCC
     protected int inComponentCnt = 0;
     protected int outComponentCnt = 0;
     protected int matchKeyCnt = 0;
-    protected int newKeyCnt = 0;
     protected int saveFileCnt = 0;
     protected int mimeChangeCnt = 0;
     protected int mimeMatchCnt = 0;
@@ -103,10 +103,16 @@ public class BuildTokenCC
             NodeIO nodeIO, 
             Long nodeID, 
             Identifier objectID, 
+            Boolean runS3,
             LoggerInf logger)
         throws TException
     {
         super(nodeIO, nodeID, objectID, logger);
+        if (runS3 != null) {
+            this.runS3 = runS3;
+            log4j.info("runS3:" + this.runS3);
+            this.runS3 = false; //!!!!! do not remove until ready
+        }
         this.collection = collection;
         outVersionMap = new VersionMap(objectID, logger);
         tika = new Tika(logger);
@@ -171,11 +177,33 @@ public class BuildTokenCC
                         + "in.Key: " + inComponent.getLocalID() + "\n"
                         + "out.Key:" + outComponent.getLocalID() + "\n"
                 );
+                tallyComponent(component);
                 saveAddComponent(component);
                 saveDeleteComponent(component);
             }
             
         }
+    }
+    
+    protected void tallyComponent(ChangeComponent component)
+        throws TException
+    {
+        Integer cnt = tallyOperation.get(component.op);
+        if (cnt == null) cnt = 0;
+        cnt++;
+        tallyOperation.put(component.op, cnt);
+    }
+    
+    protected JSONObject tallyComponent2JSON()
+        throws TException
+    {
+        JSONObject tallyJSON = new JSONObject();
+        Set<ChangeComponent.Operation> keys = tallyOperation.keySet();
+        for (ChangeComponent.Operation op : keys) {
+            Integer opTally = tallyOperation.get(op);
+            tallyJSON.put("sum-" + op.toString(), opTally);
+        }
+        return tallyJSON;
     }
     
     protected void saveDeleteComponent(ChangeComponent component)
@@ -236,7 +264,7 @@ public class BuildTokenCC
             manifestFile = buildXMLManifest (outVersionMap, null);
             //String manifestFileContent = FileUtil.file2String(manifestFile);
             boolean isMatch = runMatchObject();
-            System.out.println("***runMatchObject:" + isMatch);
+            log4j.info("***runMatchObject:" + isMatch);
             if (!isMatch) {
                 throw new TException.INVALID_CONFIGURATION("Expected new Version Map invalid");
             }
@@ -270,7 +298,7 @@ public class BuildTokenCC
         int digestFailCnt = matchObject.getDiffCnt("digest_fail");
 
         //matchObject.printStatus(); //!!!
-        System.out.println("digestFailCnt:" + digestFailCnt);
+        log4j.debug("digestFailCnt:" + digestFailCnt);
         if (digestFailCnt != 1) {
             return false;
         }
@@ -278,7 +306,7 @@ public class BuildTokenCC
         List<MatchObject.DiffInfo> diffs = matchObject.getDiffList("digest_fail");
         MatchObject.DiffInfo diff = diffs.get(0);
         String fileID = diff.fileComponent.getIdentifier();
-        System.out.println("New fileID:" + fileID);
+        log4j.info("New fileID:" + fileID);
         if (fileID.equals("system/provenance_manifest.xml")) {
             return true;
         } 
@@ -346,7 +374,7 @@ public class BuildTokenCC
     { 
         
         ArrayList<FileComponent> components = new ArrayList<>();
-        System.out.println("!!!getNewVersionList=" + versionID 
+        log4j.debug("!!!getNewVersionList=" + versionID 
                 + " - outComponents.size:" + outComponents.size()
         );
                 
@@ -370,7 +398,7 @@ public class BuildTokenCC
                 }
                 components.add(extComponent);
             }
-            System.out.println("!!!getNewVersionList(" + versionID + ") tokenCnt=" + tokenCnt);
+            log4j.debug("!!!getNewVersionList(" + versionID + ") tokenCnt=" + tokenCnt);
             //outComponentCnt = components.size();
             return components;
            
@@ -460,11 +488,11 @@ public class BuildTokenCC
         try {
             componentStream = new FileInputStream(tmpFile);
             mimeType = tika.getMimeType(componentStream, fileID);
-            if (DEBUG) System.out.println("add mimeType=" + mimeType);
+            log4j.debug("add mimeType=" + mimeType);
             return mimeType;
 
         }  catch (Exception ex) {
-            System.out.println("WARNING tika exception:" + ex);
+            log4j.debug("WARNING tika exception:" + ex);
             return null;
 
         } finally {
@@ -481,7 +509,7 @@ public class BuildTokenCC
    {
        Set<String> keys = newVersion.keySet();
        for (String key : keys) {
-           System.out.println("@@@DUMP(" + versionID + "):" + key);
+           log4j.debug("@@@DUMP(" + versionID + "):" + key);
            
        }
     }
@@ -494,7 +522,7 @@ public class BuildTokenCC
                 + oldMapS + "\n"
                 + "<<<<<<< " + header + " ********\n";
         if (doPrint) {
-            System.out.println(msg);
+            log4j.debug(msg);
         }
         if (doLog4j) {
             log4j.debug(msg);
@@ -536,7 +564,6 @@ public class BuildTokenCC
             count.put("totalDeleteBytes", totalDeleteBytes);
             count.put("duplicateKeys", duplicateCnt);
             count.put("matchKey", matchKeyCnt);
-            count.put("newKey", newKeyCnt);
             count.put("mimeChange", mimeChangeCnt);
             count.put("mimeMatch", mimeMatchCnt);
             //LogManager.getLogger().info(counts);
@@ -561,7 +588,7 @@ public class BuildTokenCC
                 startDateS = startDate.getIsoDate();
             }
             String currentDate = lastAddVersion.getIsoDate();
-            System.out.println(jsonCounts.toString(2));
+            log4j.debug(jsonCounts.toString(2));
             JSONObject jsonStatus = new JSONObject();
             //LinkedHashMap<String, Object> counts = new LinkedHashMap<>();
             //JSONObject jsonCounts = new JSONObject();
@@ -577,10 +604,11 @@ public class BuildTokenCC
             jsonStatus.put("totalDeleteBytes", totalDeleteBytes);
             jsonStatus.put("duplicateKeys", duplicateCnt);
             jsonStatus.put("matchKey", matchKeyCnt);
-            jsonStatus.put("newKey", newKeyCnt);
             jsonStatus.put("mimeChange", mimeChangeCnt);
             jsonStatus.put("mimeMatch", mimeMatchCnt);
-            System.out.println(">>>jsonStatus\n" + jsonStatus.toString(2));
+            log4j.debug(">>>jsonStatus\n" + jsonStatus.toString(2));
+            JSONObject tallyJSON = tallyComponent2JSON();
+            jsonCounts.put("tallyVersion", tallyJSON);
             jsonCounts.put("processCounts", jsonStatus);
             jsonCounts.put("run", runS3);
             jsonCounts.put("status", "ok");
@@ -590,7 +618,7 @@ public class BuildTokenCC
             jsonCounts.put("fixDate", completion);
             jsonCounts.put("startDate", startDateS);
             jsonCounts.put("collection", collection);
-            System.out.println(">>>jsonCounts\n" + jsonCounts.toString(2));
+            log4j.debug(">>>jsonCounts\n" + jsonCounts.toString(2));
             JSONObject changeTokenJSON = new JSONObject();
             changeTokenJSON.put("changeToken", jsonCounts);
             //LogManager.getLogger().info(counts);

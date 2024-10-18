@@ -149,7 +149,7 @@ public class ChangeTokenCC
             outVerifyJson.put("objectID", objectID.getValue());
             outVerifyJson.put("versionCnt", objectCurrent);
             outVerifyJson.put("versions", stats);
-            System.out.println("validateObject" + outVerifyJson.toString(2));
+            log4j.debug("validateObject" + outVerifyJson.toString(2));
             logFix.info(outVerifyJson); 
         } catch (TException tex) {
             tex.printStackTrace();
@@ -305,7 +305,7 @@ public class ChangeTokenCC
             if (extractFileID.equals(fileID)) {
                 ChangeComponent cc = getCCAsis(versionID, currentComponent, currentComponent);
                 noChangeCnt++;
-                System.out.println(">>>equalID(" + versionID + ")=" + fileID);
+                log4j.debug(">>>equalID(" + versionID + ")=" + fileID);
                 return;
             }
             
@@ -322,7 +322,7 @@ public class ChangeTokenCC
                         + " - fileID:" + fileID
                 );
                 duplicateCnt++;
-                System.out.println(">>>skip version contains multiple(" + versionID + ")=" + fileID);
+                log4j.info(">>>skip version contains multiple(" + versionID + ")=" + fileID);
                 return;
             }
             log4j.trace(">>>orgID(" + versionID + ")=" + originalID + "\n"
@@ -378,7 +378,7 @@ public class ChangeTokenCC
     { 
         
         ArrayList<FileComponent> components = new ArrayList<>();
-        System.out.println("!!!getNewVersionList=" + versionID 
+        log4j.debug("!!!getNewVersionList=" + versionID 
                 + " - outComponents.size:" + outComponents.size()
         );
                 
@@ -405,7 +405,7 @@ public class ChangeTokenCC
                 }
                 components.add(extComponent);
             }
-            System.out.println("!!!getNewVersionList(" + versionID + ") tokenCnt=" + tokenCnt);
+            log4j.debug("!!!getNewVersionList(" + versionID + ") tokenCnt=" + tokenCnt);
             outComponentCnt += components.size();
             return components;
            
@@ -714,7 +714,7 @@ public class ChangeTokenCC
             //validateVersion.put("versionID", outVersionNum);
             validateVersion.put("testCnt", testCnt);
             //validateVersion.put("sysCnt", sysCnt);
-            System.out.println("***validateOutVersion(" + outVersionNum + ") "
+            log4j.debug("***validateOutVersion(" + outVersionNum + ") "
                     + " - testCnt=" + testCnt
                     + " - sysCnt=" + sysCnt
             );
@@ -723,7 +723,7 @@ public class ChangeTokenCC
             for (ChangeComponent.Operation op : opKeys) {
                 int value = opCnts.get(op);
                 validateVersion.put(op.toString(), value);
-                System.out.println("++optype(" + op.toString() + ")=" + value);
+                log4j.debug("++optype(" + op.toString() + ")=" + value);
             }
             return validateVersion;
             

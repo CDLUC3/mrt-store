@@ -839,25 +839,30 @@ public class JerseyStorage
     @GET
     @Path("fix/{collection}/{nodeid}/{objectid}")
     public Response callFixObject(
-            @PathParam("nodeid") String collection,
+            @PathParam("collection") String collection,
             @PathParam("nodeid") String nodeIDS,
             @PathParam("objectid") String objectIDS,
             @DefaultValue("true") @QueryParam("type") String fixType,
+            @DefaultValue("false") @QueryParam("exec") String execS,
             @Context CloseableService cs,
             @Context ServletConfig sc)
         throws TException
     {
         int nodeID = getNodeID(nodeIDS);
         log4j.debug("FIX"
+                    + " - collection=" + collection
                     + " - nodeID=" + nodeID
                     + " - objectIDS=" + objectIDS
                     + " - fixType=" + fixType
+                    + " - execS=" + execS
                     );
+        
         JSONObject jsonResponse = fixObject(
             collection,
             nodeID,
             objectIDS,
             fixType,
+            execS,
             cs,
             sc);
 

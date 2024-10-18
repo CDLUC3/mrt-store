@@ -336,7 +336,8 @@ public class StorageService
     public JSONObject fixChangeToken (
             String collection,
             int nodeID,
-            Identifier objectID)
+            Identifier objectID,
+            Boolean runS3)
     throws TException
     {
         try {
@@ -351,6 +352,7 @@ public class StorageService
                 nodeIO, 
                 processNode, 
                 objectID, 
+                runS3,
                 logger);
             buildTokenCC.process();
             return buildTokenCC.getJsonResponse();

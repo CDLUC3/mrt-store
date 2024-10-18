@@ -62,8 +62,8 @@
   <Loggers>
     
     <Root level="${env:LOGLEVEL:-info}">
-        <AppenderRef ref="Text-Console" level="TRACE"/>
-        <AppenderRef ref="Text-File" level="TRACE"/>
+        <AppenderRef ref="Text-Console" level="DEBUG"/>
+        <AppenderRef ref="Text-File" level="DEBUG"/>
         <AppenderRef ref="ECS-File" level="INFO"/>
     </Root>
     
@@ -71,12 +71,8 @@
         <AppenderRef ref="Text-File" />
     </Logger>
     
-    <Logger name="FixJson" level="DEBUG" additivity="false">
+    <Logger name="FixJson" level="INFO" additivity="false">
         <AppenderRef ref="FixJson-File" />
-    </Logger>
-    
-    <Logger name="ConsoleLog" level="DEBUG" additivity="false">
-        <AppenderRef ref="Text-Console" />
     </Logger>
     
     <Logger name="JSONLog" level="INFO" additivity="false">

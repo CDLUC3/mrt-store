@@ -366,6 +366,7 @@ public class JerseyBase
             int nodeID,
             String objectIDS,
             String fixType,
+            String execS,
             CloseableService cs,
             ServletConfig sc)
         throws TException
@@ -374,6 +375,7 @@ public class JerseyBase
         StateInf responseState = null;
         try {
             Identifier objectID = getObjectID(objectIDS);
+            Boolean exec = setBool(execS, false, false, false);
             StorageServiceInit storageServiceInit = StorageServiceInit.getStorageServiceInit(sc);
             StorageServiceInf storageService = storageServiceInit.getStorageService();
             if (fixType == null) {
@@ -381,7 +383,7 @@ public class JerseyBase
             } 
             fixType = fixType.toLowerCase();
             if (fixType.equals("changetoken")) {
-                JSONObject jsonResponse = storageService.fixChangeToken(collection, nodeID, objectID);
+                JSONObject jsonResponse = storageService.fixChangeToken(collection, nodeID, objectID, exec);
                 return jsonResponse;
 
             } else {
