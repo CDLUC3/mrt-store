@@ -343,9 +343,10 @@ public class StorageService
         try {
             //NodeIO nodeIO = storageConfig.getNodeIO();
 
-            String yamlName = "jar:nodes-sdsc-temp";
-            NodeIO nodeIO = NodeIO.getNodeIOConfig(yamlName, logger) ;
-
+            //String yamlName = "yaml:";
+            //String yamlName = "jar:nodes-sdsc-temp";
+            //NodeIO nodeIO = NodeIO.getNodeIOConfig(yamlName, logger) ;
+            NodeIO nodeIO = storageConfig.getNodeIO();
             long processNode = nodeID;
             BuildTokenCC buildTokenCC = new BuildTokenCC(
                 collection,

@@ -529,53 +529,6 @@ public class BuildTokenCC
         }
     }
 
-    protected void dumpCounts()
-    {
-       
-            /*
-            log4j.info("NoChange count=" + noChangeCnt);
-            log4j.info("Change count=" + changeCnt);
-            log4j.info("Delete count=" + deleteComponents.size());
-            log4j.info("Duplicate count=" + duplicateCnt);
-            log4j.info("InComponent count=" + inComponentCnt);
-            log4j.info("OutComponent count=" + inComponentCnt);
-            log4j.info("Match Key count=" + matchKeyCnt);
-            log4j.info("New Key count=" + newKeyCnt);
-            */
-            LinkedHashMap<String, Object> count = new LinkedHashMap<>();
-            
-            
-            //JSONObject jsonRequest = new JSONObject();
-            count.put("run", runS3);
-            count.put("status", "ok");
-            count.put("objectID", objectID.getValue());
-            count.put("node", "" + nodeID);
-            //LinkedHashMap<String, Object> counts = new LinkedHashMap<>();
-            //JSONObject jsonCounts = new JSONObject();
-            count.put("inComponent", inComponentCnt);
-            count.put("outComponent", outComponentCnt);
-            count.put("noChange", noChangeCnt);
-            count.put("change", changeCnt);
-            count.put("saveFileCnt", saveFileCnt);
-            count.put("totalSaveBytes", totalSaveBytes);
-            count.put("duplicateDeleteCnt", duplicateDeleteCnt);
-            count.put("addComponents", addComponents.size());
-            count.put("deleteComponents", deleteComponents.size());
-            count.put("totalDeleteBytes", totalDeleteBytes);
-            count.put("duplicateKeys", duplicateCnt);
-            count.put("matchKey", matchKeyCnt);
-            count.put("mimeChange", mimeChangeCnt);
-            count.put("mimeMatch", mimeMatchCnt);
-            //LogManager.getLogger().info(counts);
-            
-            //JSONObject jsonRequest = new JSONObject(request);
-            //JSONObject jsonCounts = new JSONObject(counts);
-            log4j.info(count);
-            
-            jsonResponse = new JSONObject(count);
-            logFix.info(jsonResponse.toString(2));
-    }
-
     protected void logCounts()
     {
         try {
@@ -602,6 +555,7 @@ public class BuildTokenCC
             jsonStatus.put("addComponents", addComponents.size());
             jsonStatus.put("deleteComponents", deleteComponents.size());
             jsonStatus.put("totalDeleteBytes", totalDeleteBytes);
+            jsonStatus.put("totalDiffBytes", (totalDeleteBytes-totalSaveBytes));
             jsonStatus.put("duplicateKeys", duplicateCnt);
             jsonStatus.put("matchKey", matchKeyCnt);
             jsonStatus.put("mimeChange", mimeChangeCnt);
@@ -619,10 +573,10 @@ public class BuildTokenCC
             jsonCounts.put("startDate", startDateS);
             jsonCounts.put("collection", collection);
             log4j.debug(">>>jsonCounts\n" + jsonCounts.toString(2));
-            JSONObject changeTokenJSON = new JSONObject();
-            changeTokenJSON.put("changeToken", jsonCounts);
+            jsonResponse = new JSONObject();
+            jsonResponse.put("changeToken", jsonCounts);
             //LogManager.getLogger().info(counts);
-            addEntry("info", changeTokenJSON);
+            addEntry("info", jsonResponse);
             //log4j.info(jsonCounts);
             //logFix.info(jsonResponse.toString(2));
             

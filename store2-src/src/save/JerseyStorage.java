@@ -577,6 +577,30 @@ public class JerseyStorage
         return copyObject(sourceNode, targetNode, objectIDS, formatType, cs, sc);
     }
     
+    @POST
+    @Path("copy")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    public Response backupObjectMultipart(
+            @DefaultValue("") @FormDataParam("sourceNode") String sourceNodeS,
+            @DefaultValue("") @FormDataParam("targetNode") String targetNodeS,
+            @DefaultValue("") @FormDataParam("objectid") String objectIDS,
+            @DefaultValue("xhtml") @QueryParam(KeyNameHttpInf.RESPONSEFORM) String formatType,
+            @Context CloseableService cs,
+            @Context ServletConfig sc)
+        throws TException
+    {
+        if (DEBUG) System.out.println(MESSAGE + "backupObject entered"
+                    + " - sourceNodeS=" + sourceNodeS + NL
+                    + " - targetNodeS=" + targetNodeS + NL
+                    + " - objectIDS=" + objectIDS + NL
+                    + " - formatType=" + formatType + NL
+                    );
+        if (DEBUG) System.out.println("addVersionMultipart entered");
+        int sourceNode = getNodeID(sourceNodeS);
+        int targetNode = getNodeID(targetNodeS);
+        return copyObject(sourceNode, targetNode, objectIDS, formatType, cs, sc);
+    }
+
     /**
      * This form of updateVersion is specific to Ingest
      */
@@ -844,6 +868,41 @@ public class JerseyStorage
             @DefaultValue("") @FormDataParam("node") String nodeIDS,
             @DefaultValue("") @FormDataParam("ark") String objectIDS,
             @DefaultValue("") @FormDataParam("type") String fixType,
+            @DefaultValue("false") @QueryParam("exec") String execS,
+            @Context CloseableService cs,
+            @Context ServletConfig sc)
+        throws TException
+    {
+        int nodeID = getNodeID(nodeIDS);
+        log4j.debug("FIX"
+                    + " - collection=" + collection
+                    + " - nodeID=" + nodeID
+                    + " - objectIDS=" + objectIDS
+                    + " - fixType=" + fixType
+                    + " - execS=" + execS
+                    );
+        
+        JSONObject jsonResponse = fixObject(
+            collection,
+            nodeID,
+            objectIDS,
+            fixType,
+            execS,
+            cs,
+            sc);
+
+            return Response 
+                .status(200).entity(jsonResponse.toString())
+                    .build();
+    }
+
+    @GET
+    @Path("fix/{collection}/{nodeid}/{objectid}")
+    public Response callFixObject(
+            @PathParam("collection") String collection,
+            @PathParam("nodeid") String nodeIDS,
+            @PathParam("objectid") String objectIDS,
+            @DefaultValue("true") @QueryParam("type") String fixType,
             @DefaultValue("false") @QueryParam("exec") String execS,
             @Context CloseableService cs,
             @Context ServletConfig sc)
