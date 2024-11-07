@@ -96,6 +96,10 @@ public class BuildTokenCC
     protected int mimeChangeCnt = 0;
     protected int mimeMatchCnt = 0;
     protected JSONObject jsonCounts = null;
+    protected boolean newManifestWritten = false;
+    protected int runAdd = 0;
+    protected int runProvenance = 0;
+    protected int runDelete = 0;
     
                     
     public BuildTokenCC(
@@ -111,7 +115,7 @@ public class BuildTokenCC
         if (runS3 != null) {
             this.runS3 = runS3;
             log4j.info("runS3:" + this.runS3);
-            this.runS3 = false; //!!!!! do not remove until ready
+            //this.runS3 = false; //!!!!! do not remove until ready
         }
         this.collection = collection;
         outVersionMap = new VersionMap(objectID, logger);
@@ -271,6 +275,11 @@ public class BuildTokenCC
             dumpMap("replaceMap - manifestFile", manifestFile, true, true);
             if (runS3) {
                 s3service.putManifest(bucket, objectID, manifestFile);
+                newManifestWritten = true;
+                log4j.info("RUNS3 add new manifest:"
+                        + " - bucket:" + bucket
+                        + " - objectID:" + objectID.getValue()
+                );
             }
             
         } catch (TException ex) {
@@ -300,6 +309,7 @@ public class BuildTokenCC
         //matchObject.printStatus(); //!!!
         log4j.debug("digestFailCnt:" + digestFailCnt);
         if (digestFailCnt != 1) {
+            log4j.warn("FAIL digestFailCnt:" + digestFailCnt);
             return false;
         }
 
@@ -347,7 +357,12 @@ public class BuildTokenCC
                 //logFix.info("deleteRemove S3(" + deleteKey + ") size=" + deleteSize);
                 if (runS3) {
                     CloudResponse response = s3service.deleteObject(bucket, deleteKey);
-                }
+                    runDelete++;
+                    log4j.info("RUNS3 delete file:"
+                            + " - bucket:" + bucket
+                            + " - deleteKey:" + deleteKey
+                    );
+                 }
                 totalDeleteBytes += deleteSize;
                 deleteCnt++;
                 logFixMsg(runS3, "DELETE", bucket, key, "", deleteSize);
@@ -430,9 +445,14 @@ public class BuildTokenCC
         );
         File tmpFile = FileUtil.getTempFile("extract", ".txt");
         try {
+            if (newS3Key.contains("system/provenance_manifest.xml")) {
+                saveProvenance(addcomponent);
+                return;
+            }
             if (runS3) {
                 CloudResponse response = new CloudResponse(bucket, oldS3Key);
                 s3service.getObject(bucket, oldS3Key, tmpFile, response);
+                
                 if (inLength != tmpFile.length()) {
                     throw new TException.INVALID_DATA_FORMAT("s3 length does not match extract length"
                         + " - newS3Key:" + newS3Key
@@ -441,9 +461,16 @@ public class BuildTokenCC
                         + " - tmpFile.length():" + tmpFile.length()
                     );
                 }
+
                 String oldMimeType = outComponent.getMimeType();
                 String newMimeType = getMime(tmpFile, newS3Key);
-                if (!oldMimeType.equals(newMimeType)) {
+                if ((oldMimeType == null) || (newMimeType == null)) {
+                    log4j.debug("mimeType null:"
+                            + " - newS3Key:" + newS3Key + " - newMimeType:" + newMimeType
+                            + " - oldS3Key:" + oldS3Key + " - oldMimeType:" + oldMimeType
+                    );
+
+                } else if (!oldMimeType.equals(newMimeType)) {
                     log4j.trace("!!!changeMime\n"
                         + " - newS3Key:" + newS3Key + "\n"
                         + " - oldS3Key:" + oldS3Key + "\n"
@@ -459,7 +486,13 @@ public class BuildTokenCC
                     );
                     mimeMatchCnt++;
                 }
-                if (runS3) s3service.putObject(bucket, newS3Key, tmpFile);
+
+                CloudResponse cloudResponse = s3service.putObject(bucket, newS3Key, tmpFile);
+                if (response.getStatus() == CloudResponse.ResponseStatus.fail) {
+                    throw new TException.GENERAL_EXCEPTION("BuildTokenCC.saveProvenance" + response.getErrMsg());
+                }
+                
+                runAdd++;
             }
             
             logFixMsg(runS3, "ADD", bucket, oldS3Key, newS3Key, inLength);
@@ -472,10 +505,46 @@ public class BuildTokenCC
             throw me;
             
         } catch (Exception ex) {
+            ex.printStackTrace();
             throw new TException(ex);
             
         } finally {
             tmpFile.delete();
+        }
+    }
+    
+    protected void saveProvenance(ChangeComponent addcomponent)
+        throws TException
+    {
+        FileComponent outComponent = addcomponent.getOutComponent();
+        
+        String newS3Key = outComponent.getLocalID();
+        logFix.debug("saveProvenance - ChangeComponent:\n"
+                + " - newS3Key:" + newS3Key + "\n"
+        );
+        //dumpManFile("saveProvenance2", oldManFile);
+        
+        try {
+            if (runS3) {
+                CloudResponse response = s3service.putObject(bucket, newS3Key, oldManFile);
+                if (response.getStatus() == CloudResponse.ResponseStatus.fail) {
+                    throw new TException.GENERAL_EXCEPTION("BuildTokenCC.saveProvenance" + response.getErrMsg());
+                }
+                runProvenance++;
+            }
+            
+            logFixMsg(runS3, "ADD", bucket, "NEW FILE", newS3Key, oldManFile.length());
+            //logFix.info("Add S3(" + newS3Key + ") size=" + inLength);
+            //log4j.debug("Add S3(" + bucket + "):" + newS3Key);
+            saveFileCnt++;
+            
+        } catch (TException me) {
+            throw me;
+            
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            throw new TException(ex);
+            
         }
     }
     
@@ -555,15 +624,24 @@ public class BuildTokenCC
             jsonStatus.put("addComponents", addComponents.size());
             jsonStatus.put("deleteComponents", deleteComponents.size());
             jsonStatus.put("totalDeleteBytes", totalDeleteBytes);
-            jsonStatus.put("totalDiffBytes", (totalDeleteBytes-totalSaveBytes));
+            jsonStatus.put("totalDiffBytes", (totalSaveBytes-totalDeleteBytes));
             jsonStatus.put("duplicateKeys", duplicateCnt);
             jsonStatus.put("matchKey", matchKeyCnt);
             jsonStatus.put("mimeChange", mimeChangeCnt);
             jsonStatus.put("mimeMatch", mimeMatchCnt);
             log4j.debug(">>>jsonStatus\n" + jsonStatus.toString(2));
+            
+            JSONObject jsonRun = new JSONObject();
+            jsonRun.put("newManifestWritten", newManifestWritten);
+            jsonRun.put("runAdd", runAdd);
+            jsonRun.put("runProvenance", runProvenance);
+            jsonRun.put("runDelete", runDelete);
+            
             JSONObject tallyJSON = tallyComponent2JSON();
             jsonCounts.put("tallyVersion", tallyJSON);
             jsonCounts.put("processCounts", jsonStatus);
+            jsonCounts.put("runCounts", jsonRun);
+            
             jsonCounts.put("run", runS3);
             jsonCounts.put("status", "ok");
             jsonCounts.put("objectID", objectID.getValue());

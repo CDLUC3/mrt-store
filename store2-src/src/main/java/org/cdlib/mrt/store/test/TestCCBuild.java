@@ -12,6 +12,9 @@ import org.cdlib.mrt.utility.TFileLogger;
 import org.cdlib.mrt.core.Identifier;
 import org.cdlib.mrt.log.utility.Log4j2Util;
 import org.cdlib.mrt.store.fix.BuildTokenCC;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 /**
  * 
  *
@@ -31,18 +34,24 @@ public class TestCCBuild
             if (false) return;
             //Log4j2Util.setLoggerLevel("FixLog","trace");
             Log4j2Util.setLoggerLevel("FixLog","info");
-            //long processNode = 9501;
             long processNode = 9501;
+            //long processNode = 2001;
             LoggerInf logger = new TFileLogger(NAME, 50, 50);
             String yamlName = "jar:nodes-sdsc-temp";
-            String collection = "testCollection";
+            //String yamlName = "yaml:";
+            //String collection = "testCollection";
+            //String collection = "ucm_lib_elowe";
+            String collection = "ucm_lib_ucce_humboldt";
             NodeIO nodeIO = NodeIO.getNodeIOConfig(yamlName, logger) ;
-            Identifier objectID = new Identifier("ark:/13030/m56t6p2z");
+            //->Identifier objectID = new Identifier("ark:/13030/m5dc576c");
+            //Identifier objectID = new Identifier("ark:/13030/m52p27h8");
+            //Identifier objectID = new Identifier("ark:/13030/m5qz9h96");
+            //Identifier objectID = new Identifier("ark:/13030/m56t6p2z");
             //Identifier objectID = new Identifier("ark:/13030/m5dz7ggg");
             //Identifier objectID = new Identifier("ark:/13030/m5n40rb7");
             //Identifier objectID = new Identifier("ark:/13030/m5m38x40");
             //Identifier objectID = new Identifier("ark:/13030/m5bk6gpc");
-            //Identifier objectID = new Identifier("ark:/13030/m5fc148t");
+            Identifier objectID = new Identifier("ark:/13030/m5fc148t");
             //Identifier objectID = new Identifier("ark:/13030/m5rz4kds");
             //Identifier objectID = new Identifier("ark:/13030/qt0dd8d1c2"); // no changes
             //Identifier objectID = new Identifier("ark:/13030/m50057c3");
@@ -56,6 +65,8 @@ public class TestCCBuild
                 false,
                 logger);
             buildTokenCC.process();
+            JSONObject jsonResponse = buildTokenCC.getJsonResponse();
+            System.out.println("\n\nResponse:\n" + jsonResponse.toString(2));
             
         } catch (TException tex) {
             System.out.println("TException:" + tex);

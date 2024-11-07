@@ -526,7 +526,9 @@ public class ChangeTokenCC
             oldFileComponent.setLocalID(manifestKey);
             oldFileComponent.addMessageDigest(oldManResponse.getSha256(), "sha256");
             oldFileComponent.setSize(oldManResponse.getStorageSize());
+            oldFileComponent.setMimeType("application/xml");
             
+            //dumpManFile("getProvenanceCC", oldManFile);
             String newFileID = "system/provenance_manifest.xml";
             ChangeComponent provenanceChangeComponent = setNewComponent(currVersion, newFileID, oldFileComponent);
             provenanceChangeComponent.setOp(ChangeComponent.Operation.provenance);
