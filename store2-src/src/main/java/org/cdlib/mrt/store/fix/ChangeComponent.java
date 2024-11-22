@@ -27,7 +27,7 @@ public class ChangeComponent
     protected static final String MESSAGE = NAME + ": ";
     
     //public enum Operation { none, asis, move, reference, delete };
-    public enum Operation { none, asis_data, asis_reference, move_data, move_reference, provenance, delete };
+    public enum Operation { none, asis_data, asis_reference, move_data, move_reference, previous_fix, provenance, delete };
     
     protected Long nodeID = null;
     protected Identifier objectID = null;

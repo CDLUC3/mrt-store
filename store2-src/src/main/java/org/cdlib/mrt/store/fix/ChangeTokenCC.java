@@ -99,6 +99,7 @@ public class ChangeTokenCC
     protected int inComponentCnt = 0;
     protected int outComponentCnt = 0;
     protected int matchKeyCnt = 0;
+    protected int previousFixCnt = 0;
     protected JSONObject outVerifyJson = new JSONObject();
     //protected int newKeyCnt = 0;
     //protected int saveFileCnt = 0;
@@ -332,7 +333,8 @@ public class ChangeTokenCC
             // Test new key (+content) needs to be added
             ChangeComponent cc = setNewComponent(versionID, fileID, currentComponent);
             FileComponent addComponent = cc.getOutComponent();
-            log4j.trace(">>>mcKey(" + versionID + ")=" + addComponent.getLocalID()+ "\n");
+            int addVersion = addDigestFileid(versionID, addComponent);
+            log4j.trace(">>>mcKey(" + versionID + "," + addVersion+ ")=" + addComponent.getLocalID()+ "\n");
             newVersion.put(fileID, cc);
             changeCnt++;
             
@@ -352,11 +354,23 @@ public class ChangeTokenCC
         throws TException
     {
         ChangeComponent component = ChangeComponent.get(nodeID, objectID, versionID, inComponent);
+        Integer digestVersion = getDigestFileidVersion(inComponent);
+        if (digestVersion != null) {
+            if (digestVersion < versionID) {
+                if (inComponent.getLocalID().contains("|" + versionID + "|")) {
+                    component.setOp(ChangeComponent.Operation.previous_fix);
+                    previousFixCnt++;
+                    return component;
+                }
+                
+            }
+        }
         component.setOutComponent(outComponent);
         if (inComponent.getLocalID().contains("|" + versionID + "|"))
             component.setOp(ChangeComponent.Operation.asis_data);
         else component.setOp(ChangeComponent.Operation.asis_reference);
         
+        addDigestFileid(versionID, inComponent);
         log4j.trace(">>>getCCAsis - " 
         //System.out.println(">>>getCCAsis - " 
                 + "versionID:" + versionID
@@ -619,6 +633,7 @@ public class ChangeTokenCC
             jsonCounts.put("duplicateKeys", duplicateCnt);
             jsonCounts.put("matchKey", matchKeyCnt);
             jsonCounts.put("mimeMatch", mimeMatchCnt);
+            jsonCounts.put("previousFix", previousFixCnt);
             //LogManager.getLogger().info(counts);
             
             //JSONObject jsonRequest = new JSONObject(request);
@@ -775,6 +790,10 @@ public class ChangeTokenCC
 
     public JSONObject getOutVerifyJson() {
         return outVerifyJson;
+    }
+
+    public int getPreviousFixCnt() {
+        return previousFixCnt;
     }
 
     public DateState getStartDate() {

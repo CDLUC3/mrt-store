@@ -35,7 +35,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Set;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -91,6 +93,7 @@ public class CloudFixAbs
     protected CloudResponse oldManResponse = null;
     
     protected ChangeComponent oldMapCC = null;
+    protected LinkedHashMap<String, Integer> digestFileid = new LinkedHashMap<>();
     protected int objectCurrent = 0;
     protected static final Logger log4j = LogManager.getLogger();
     
@@ -674,6 +677,78 @@ public class CloudFixAbs
                 + " - fromKey=" + fromKey
                 + " - toKey=" + toKey
         );
+    }
+    
+    protected static LinkedHashMap<String, Integer> buildDigestFileid(VersionMap map)
+        throws TException
+    {
+        try {
+            LinkedHashMap<String, Integer>digestFileid = new LinkedHashMap<>();
+            int current = map.getCurrent();
+            for (int versionId=1; versionId<=current; versionId++) {
+                List<FileComponent> components = map.getVersionComponents(versionId);
+                for (FileComponent component : components) {
+                    String dfkey = getDigestFileidKey(component);
+                    Integer extractVersion = digestFileid.get(dfkey);
+                    if (extractVersion == null) {
+                        digestFileid.put(dfkey, versionId);
+                    }
+                    
+                }
+            }
+            return digestFileid;
+            
+        } catch (Exception ex) {
+            throw new TException(ex);
+        }
+        
+    }
+    
+    protected int addDigestFileid(int versionId, FileComponent component)
+        throws TException
+    {
+        try {
+            
+            String dfkey = getDigestFileidKey(component);
+            Integer extractVersion = digestFileid.get(dfkey);
+            if (extractVersion == null) {
+                digestFileid.put(dfkey, versionId);
+                return versionId;
+            } else {
+                return extractVersion;
+            }
+            
+        } catch (Exception ex) {
+            throw new TException(ex);
+        }
+        
+    }
+    
+    protected static String getDigestFileidKey(FileComponent component)
+    {
+        String fileId = component.getIdentifier();
+        String sha256 = component.getMessageDigest().getValue();
+        Long len = component.getSize();
+        String dfkey = sha256 + "|" + len + "|" + fileId;
+        return dfkey;
+    }
+    
+    protected Integer getDigestFileidVersion(FileComponent component)
+    {
+        String dfkey = getDigestFileidKey(component);
+        Integer extractVersion = digestFileid.get(dfkey);
+        return extractVersion;
+    }
+    
+    protected void dumpDigestFileid(String hdr)
+    {
+        System.out.println("\n\n*** dumpDigestFileid ***:" + hdr + "\n");
+        Set<String> keys = digestFileid.keySet();
+        for (String dfkey : keys) {
+                Integer extractVersion = digestFileid.get(dfkey);
+                System.out.println(dfkey + "==" + extractVersion);
+            
+        }
     }
 }
 

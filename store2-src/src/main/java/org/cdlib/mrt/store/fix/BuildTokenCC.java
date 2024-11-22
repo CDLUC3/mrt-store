@@ -95,6 +95,7 @@ public class BuildTokenCC
     protected int saveFileCnt = 0;
     protected int mimeChangeCnt = 0;
     protected int mimeMatchCnt = 0;
+    protected int previousFixCnt = 0;
     protected JSONObject jsonCounts = null;
     protected boolean newManifestWritten = false;
     protected int runAdd = 0;
@@ -184,6 +185,7 @@ public class BuildTokenCC
                 tallyComponent(component);
                 saveAddComponent(component);
                 saveDeleteComponent(component);
+                savePreviousFixDeleteComponent(component);
             }
             
         }
@@ -229,6 +231,23 @@ public class BuildTokenCC
             deleteComponents.put(deleteKey,deleteComponent);
         }
         log4j.debug("Delete(" + component.getVersionID() + "):" + deleteKey);
+    }
+    
+    protected void savePreviousFixDeleteComponent(ChangeComponent component)
+        throws TException
+    {
+        if (component.getOp() != ChangeComponent.Operation.previous_fix)
+                return;
+        
+        FileComponent deleteComponent = component.getInComponent();
+        String deleteKey = deleteComponent.getLocalID();
+        FileComponent existing = deleteComponents.get(deleteKey);
+        if (existing != null) {
+            duplicateDeleteCnt++;
+        } else {
+            deleteComponents.put(deleteKey,deleteComponent);
+        }
+        log4j.info("DeleteFix(" + component.getVersionID() + "):" + deleteKey);
     }
     
     protected void saveAddComponent(ChangeComponent component)
@@ -629,6 +648,7 @@ public class BuildTokenCC
             jsonStatus.put("matchKey", matchKeyCnt);
             jsonStatus.put("mimeChange", mimeChangeCnt);
             jsonStatus.put("mimeMatch", mimeMatchCnt);
+            jsonStatus.put("previousFixCnt", previousFixCnt);
             log4j.debug(">>>jsonStatus\n" + jsonStatus.toString(2));
             
             JSONObject jsonRun = new JSONObject();
@@ -686,11 +706,16 @@ public class BuildTokenCC
         inComponentCnt = changeTokenCC.getInComponentCnt();
         outComponentCnt = changeTokenCC.getOutComponentCnt();
         matchKeyCnt = changeTokenCC.getMatchKeyCnt();
+        previousFixCnt = changeTokenCC.getPreviousFixCnt();
         jsonCounts = changeTokenCC.getOutVerifyJson();
     }
     
 
     public JSONObject getJsonResponse() {
         return jsonResponse;
+    }
+
+    public ChangeTokenCC getChangeTokenCC() {
+        return changeTokenCC;
     }
 }
