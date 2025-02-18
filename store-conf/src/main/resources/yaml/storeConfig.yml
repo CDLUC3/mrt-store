@@ -1,7 +1,7 @@
 ---
 which-store-info: "{!ENV: MERRITT_STORE_INFO !DEFAULT: store-info}"
 store-info:
-  baseURI: "{!SSM: store/config/baseURI !DEFAULT: http://store-stage.cdlib.org:35121}"
+  baseURI: "http://storage.cdlib.org:35121"
   servicePattern: "{!SSM: store/config/servicePattern !DEFAULT: http://$hostname.cdlib.org:35121/service/$serviceType}"
   supportURI: mailto:merritt-support@ucop.edu
   verifyOnRead: "{!SSM: store/config/verifyOnRead !DEFAULT: true}"
@@ -19,7 +19,7 @@ store-info:
     - mrt-provenance.xml
     - stash-wrapper.xml
   archiveNode: 7001
-  nodePath: "{!SSM: store/config/nodePath  !DEFAULT: yaml:}"
+  nodePath: "nodes-fix-v2"
   fileLogger:
     messageMaximumLevel: "{!SSM: store/config/log/messageMaximumLevel !DEFAULT: 5}"
     messageMaximumError: "{!SSM: store/config/log/messageMaximumError !DEFAULT: 10}"
@@ -28,7 +28,7 @@ store-info:
     qualifier: yyMMdd
     trace: 5
   queueInfo:
-    QueueService: "{!SSM: inventory/zoo/queueService !DEFAULT: localhost:2181}"
+    QueueService: "localhost:2181"
     QueueLargeWorker: "{!SSM: store/zoo/AccessLarge !DEFAULT: localhost}"
     QueueLockBase: "{!SSM: store/zoo/QueueLockBase !DEFAULT: /mrt.lock}"
     QueueHoldLock: "{!SSM: store/zoo/QueueHoldFile !DEFAULT: access/LargeAccessHold}"
