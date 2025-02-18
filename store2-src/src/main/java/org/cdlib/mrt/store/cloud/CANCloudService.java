@@ -143,8 +143,9 @@ public class CANCloudService
                 File manifestFile)
         throws TException
     {
+        InputStream inStream = null;
         try {
-            InputStream inStream = new FileInputStream(manifestFile);
+            inStream = new FileInputStream(manifestFile);
             //AddVersion addVersion = AddVersion.getAddVersion(s3service, bucket, objectID, verifyOnWrite, normVersionMap, inStream, logger);        
             AddVersionThread addVersion = AddVersionThread.getAddVersionThread(s3service, bucket, objectID, verifyOnWrite, inStream, 10, logger);
             VersionState versionState = addVersion.callEx();
@@ -156,6 +157,12 @@ public class CANCloudService
         
         } catch (Exception ex) {
             throw makeTException(ex);
+            
+        } finally {
+            try {
+                inStream.close();
+            } catch (Exception e) { }
+            FileUtil.deleteTempFile(manifestFile);
         }
     }
 
@@ -167,8 +174,8 @@ public class CANCloudService
             String [] deleteList)
         throws TException
     {
+        InputStream inStream = null;
         try {
-            InputStream inStream = null;
             if (manifestFile != null) {
                 inStream = new FileInputStream(manifestFile);
             }
@@ -192,6 +199,12 @@ public class CANCloudService
         } catch (Exception ex) {
             ex.printStackTrace();
             throw makeTException(ex);
+            
+        } finally {
+            try {
+                inStream.close();
+            } catch (Exception e) { }
+            FileUtil.deleteTempFile(manifestFile);
         }
     }
     
