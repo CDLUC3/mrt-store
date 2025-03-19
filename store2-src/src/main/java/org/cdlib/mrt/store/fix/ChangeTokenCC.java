@@ -359,6 +359,15 @@ public class ChangeTokenCC
             if (digestVersion < versionID) {
                 if (inComponent.getLocalID().contains("|" + versionID + "|")) {
                     component.setOp(ChangeComponent.Operation.previous_fix);
+                    FileComponent fixComponent = new FileComponent();
+                    fixComponent.copy(inComponent);
+                    String fixKey = inComponent.getLocalID().replace("|" + versionID + "|", "|" + digestVersion + "|");
+                    System.out.println("***GETCCASIS FIX***"
+                            + "\n - localid:" + inComponent.getLocalID()
+                            + "\n - fixKey: " + fixKey
+                    );
+                    fixComponent.setLocalID(fixKey);
+                    component.setOutComponent(fixComponent);
                     previousFixCnt++;
                     return component;
                 }
