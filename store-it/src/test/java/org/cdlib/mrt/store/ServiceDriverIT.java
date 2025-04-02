@@ -180,6 +180,23 @@ public class ServiceDriverIT {
 
         }
 
+        public JSONObject replicObject(String url) throws IOException, JSONException {
+                try (CloseableHttpClient client = HttpClients.createDefault()) {
+                        HttpPost post = new HttpPost(url);
+                        
+                        HttpResponse response = client.execute(post);
+                        assertEquals(200, response.getStatusLine().getStatusCode());
+    
+                        String s = new BasicResponseHandler().handleResponse(response).trim();
+                        assertFalse(s.isEmpty());
+
+                        JSONObject json =  new JSONObject(s);
+                        assertNotNull(json);
+                        return json;
+                }
+
+        }
+
         public JSONObject deleteObject(String url) throws IOException, JSONException {
                 try (CloseableHttpClient client = HttpClients.createDefault()) {
                         HttpDelete del = new HttpDelete(url);
@@ -294,6 +311,17 @@ public class ServiceDriverIT {
         public String copyUrl(String ark, int copynode) throws UnsupportedEncodingException {
                 return String.format(
                         "http://localhost:%d/%s/copy/%d/%d/%s?t=json", 
+                        port, 
+                        cp, 
+                        node,
+                        copynode,
+                        URLEncoder.encode(ark, StandardCharsets.UTF_8.name())
+                );
+        }
+
+        public String replicUrl(String ark, int copynode) throws UnsupportedEncodingException {
+                return String.format(
+                        "http://localhost:%d/%s/replic/%d/%d/%s?t=json", 
                         port, 
                         cp, 
                         node,
@@ -645,6 +673,42 @@ public class ServiceDriverIT {
                         verifyObject(json, ark, 1, 7);
 
                         json = copyObject(copyUrl(ark, 8888));
+                        //Version 1 has 7 files
+                        verifyObject(json, ark, 1, 7);
+
+                        json = getJsonContent(nodeStateUrl(8888, ark), 200);
+                        //Version 1 has 7 files
+                        verifyObject(json, ark, 1, 7);
+                } catch(Exception e) {
+                        e.printStackTrace();
+                        throw e;
+                } catch(AssertionError e) {
+                        e.printStackTrace();
+                        throw e;
+                } finally {
+                        deleteObject(deleteUrl(ark));
+                        getContent(stateUrl(ark), 404);        
+
+                        deleteObject(deleteUrl(8888, ark));
+                        getContent(stateUrl(ark), 404);        
+                }
+        }
+
+        @Test
+        public void ReplicObjectTest() throws UnsupportedEncodingException, IOException, JSONException {
+                String ark = "ark:/1111/6666";
+                String checkm = "src/test/resources/object1.checkm";
+
+                try {
+                        JSONObject json = addObjectByManifest(addUrl(ark), checkm);
+                        //Version 1 has 7 files
+                        verifyVersion(json, ark, 1, 7);
+
+                        json = getJsonContent(stateUrl(ark), 200);
+                        //Version 1 has 7 files
+                        verifyObject(json, ark, 1, 7);
+
+                        json = replicObject(replicUrl(ark, 8888));
                         //Version 1 has 7 files
                         verifyObject(json, ark, 1, 7);
 

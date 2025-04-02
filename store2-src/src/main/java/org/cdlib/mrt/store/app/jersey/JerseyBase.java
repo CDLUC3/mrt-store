@@ -1186,6 +1186,43 @@ public class JerseyBase
             throw new TException.GENERAL_EXCEPTION(MESSAGE + "Exception:" + ex);
         }
     }    
+    
+    public Response replicObject(
+            int sourceNode,
+            int targetNode,
+            String objectIDS,
+            String formatType,
+            CloseableService cs,
+            ServletConfig sc)
+        throws TException
+    {        LoggerInf logger = defaultLogger;
+        try {
+            log4j.debug("replicObject entered:"
+                    + " - formatType=" + formatType
+                    + " - sourceNode=" + sourceNode
+                    + " - targetNode=" + targetNode
+                    + " - objectIDS=" + objectIDS
+                    + " - t=" + formatType
+                    );
+
+            formatType = StringUtil.normParm(formatType);
+            if (StringUtil.isEmpty(formatType)) formatType = "xml";
+
+            Identifier objectID = getObjectID(objectIDS);
+            StorageServiceInit storageServiceInit = StorageServiceInit.getStorageServiceInit(sc);
+            StorageServiceInf storageService = storageServiceInit.getStorageService();
+            logger = getNodeLogger(sourceNode, storageService);
+            StateInf responseState = storageService.replicObject(sourceNode, targetNode, objectID);
+            return getStateResponse(responseState, formatType, logger, cs, sc);
+
+        } catch (TException tex) {
+            return getExceptionResponse(cs, tex, formatType, logger);
+
+        } catch (Exception ex) {
+            System.out.println("TRACE:" + StringUtil.stackTrace(ex));
+            throw new TException.GENERAL_EXCEPTION(MESSAGE + "Exception:" + ex);
+        }
+    }    
 
     /**
      * Update an object to this storage service

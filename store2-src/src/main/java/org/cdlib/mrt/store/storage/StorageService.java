@@ -49,6 +49,7 @@ import org.cdlib.mrt.core.FileContent;
 import org.cdlib.mrt.core.FileComponent;
 import org.cdlib.mrt.core.PingState;
 import org.cdlib.mrt.s3.service.NodeIO;
+import org.cdlib.mrt.s3.tools.CloudManifestCopyVersion;
 import org.cdlib.mrt.store.fix.BuildTokenCC;
 import org.cdlib.mrt.store.StorageConfig;
 import org.cdlib.mrt.store.FileFixityState;
@@ -217,6 +218,74 @@ public class StorageService
         ObjectState state = sourceCan.copyObject(storageBase, objectID, targetCan);
         bump("copyObject", startTime);
         return state;
+    }
+
+    @Override
+    public ObjectState replicObject (
+            int sourceNodeID,
+            int targetNodeID,
+            Identifier objectID)
+    throws TException
+    {
+        long startTime = DateUtil.getEpochUTCDate();
+        long inNode = sourceNodeID;
+        long outNode = targetNodeID;
+        if (inNode <= 0) {
+            throw new TException.INVALID_OR_MISSING_PARM("replicObject inNode invalid:" + inNode);
+        }
+        if (outNode <= 0) {
+            throw  new TException.INVALID_OR_MISSING_PARM("replicObject inNode = outNode:" + inNode);
+        }
+        if (inNode == outNode) {
+            throw new TException.INVALID_OR_MISSING_PARM("replicObject inNode = outNode:" + inNode);
+        }
+        if (objectID == null) {
+            throw new TException.INVALID_OR_MISSING_PARM("replicObject objectID not set");
+        }
+        NodeIO nodeIO = storageConfig.getNodeIO();
+        CloudManifestCopyVersion cloudManifestCopyVersion = CloudManifestCopyVersion.getCloudManifestCopyVersion(
+            nodeIO,
+            inNode,
+            outNode,
+            logger
+        );
+        CloudManifestCopyVersion.Stat stat = new CloudManifestCopyVersion.Stat(objectID.getValue());
+        boolean completion = copyContentCloud(objectID,cloudManifestCopyVersion, stat);
+        System.out.println("replicObject"
+                + " - inNode=" + inNode
+                + " - outNode=" + outNode
+                + " - objectID=" + objectID.getValue()
+                + " - completion=" + completion
+        );
+        ObjectState state = getObjectState (targetNodeID, objectID);
+        bump("copyObject", startTime);
+        return state;
+    }
+    
+    protected boolean copyContentCloud(
+            Identifier objectID,
+            CloudManifestCopyVersion cmct,
+            CloudManifestCopyVersion.Stat stat) 
+        throws TException
+    {
+        try {
+            cmct.copyObject(objectID.getValue(), stat);
+            return true;
+            
+        } catch (TException.REQUESTED_ITEM_NOT_FOUND rinf) {
+            throw rinf;
+                    
+        } catch (TException tex) {
+            tex.printStackTrace();
+            throw tex;
+            
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            throw new TException(ex);
+            
+        }
+        
+        
     }
 
     @Override

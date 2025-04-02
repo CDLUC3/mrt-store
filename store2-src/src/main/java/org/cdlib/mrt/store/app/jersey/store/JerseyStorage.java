@@ -577,6 +577,31 @@ public class JerseyStorage
         return copyObject(sourceNode, targetNode, objectIDS, formatType, cs, sc);
     }
     
+    
+    
+    @POST
+    @Path("replic/{sourceNode}/{targetNode}/{objectid}")
+    public Response replicObject(
+            @PathParam("sourceNode") String sourceNodeS,
+            @PathParam("targetNode") String targetNodeS,
+            @PathParam("objectid") String objectIDS,
+            @DefaultValue("xhtml") @QueryParam(KeyNameHttpInf.RESPONSEFORM) String formatType,
+            @Context CloseableService cs,
+            @Context ServletConfig sc)
+        throws TException
+    {
+        if (DEBUG) System.out.println(MESSAGE + "backupObject entered"
+                    + " - sourceNodeS=" + sourceNodeS + NL
+                    + " - targetNodeS=" + targetNodeS + NL
+                    + " - objectIDS=" + objectIDS + NL
+                    + " - formatType=" + formatType + NL
+                    );
+        if (DEBUG) System.out.println("addVersionMultipart entered");
+        int sourceNode = getNodeID(sourceNodeS);
+        int targetNode = getNodeID(targetNodeS);
+        return replicObject(sourceNode, targetNode, objectIDS, formatType, cs, sc);
+    }
+    
     /**
      * This form of updateVersion is specific to Ingest
      */
