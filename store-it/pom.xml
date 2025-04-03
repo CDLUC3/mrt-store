@@ -175,7 +175,7 @@
                       </bind>
                     </volumes>
                     <env>
-                      <CATALINA_OPTS>-Dfile.encoding=UTF8 -Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true</CATALINA_OPTS>
+                      <CATALINA_OPTS>-Djava.net.preferIPv4Stack=true -Dfile.encoding=UTF8 -Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true</CATALINA_OPTS>
                       <SSM_SKIP_RESOLUTION>Y</SSM_SKIP_RESOLUTION>
                     </env>
                     <log>
