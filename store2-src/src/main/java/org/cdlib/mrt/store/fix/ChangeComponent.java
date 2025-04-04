@@ -123,10 +123,13 @@ public class ChangeComponent
         String out = header 
                 + " - nodeID:" +  nodeID
                 + " - objectID:" +  objectID.getValue()
-                + " - versionID:" +  versionID
-                + " - IN:" + inComponent.dump("inComponent")
-                + " - OUT:" + outComponent.dump("outComponent")
-                ;
+                + " - versionID:" +  versionID;
+        if (inComponent != null) {
+                out += " - IN:" + inComponent.dump("inComponent");
+        } else   out += " - IN: null";     
+        if (outComponent != null) {
+                 out += " - OUT:" + outComponent.dump("outComponent");
+        } else   out += " - OUT: null";     
         return out;
                 
     }

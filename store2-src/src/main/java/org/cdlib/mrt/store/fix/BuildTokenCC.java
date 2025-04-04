@@ -310,7 +310,7 @@ public class BuildTokenCC
             throw new TException(ex);
             
         } finally {
-            manifestFile.delete();
+                manifestFile.delete();
         }
         
     }
@@ -605,9 +605,9 @@ public class BuildTokenCC
     protected void dumpMap(String header, File manifestFile, boolean doPrint, boolean doLog4j)
         throws TException
     {
-        String oldMapS = FileUtil.file2String(oldManFile);
+        String manifestFileS = FileUtil.file2String(manifestFile);
         String msg = "******* " + header + " >>>>>>>>\n"
-                + oldMapS + "\n"
+                + manifestFileS + "\n"
                 + "<<<<<<< " + header + " ********\n";
         if (doPrint) {
             log4j.debug(msg);
