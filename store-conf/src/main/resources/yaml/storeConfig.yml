@@ -60,7 +60,7 @@ store-info-docker: &docker
     - mrt-provenance.xml
     - stash-wrapper.xml
   archiveNode: 7777
-  nodePath: "yaml:"
+  nodePath:  "{!SSM: store/config/nodePath  !DEFAULT: yaml:2}"
   fileLogger:
     messageMaximumLevel: 5
     messageMaximumError: 10
