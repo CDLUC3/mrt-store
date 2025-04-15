@@ -138,5 +138,10 @@ public class StorageServiceAbs
     public StorageConfig getStorageConfig() {
         return storageConfig;
     }
+
+    public Integer getAwsVersion() {
+        if (storageConfig == null) return null;
+        return storageConfig.getAwsVersion();
+    }
 }
 

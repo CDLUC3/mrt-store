@@ -70,6 +70,7 @@ public class LogEntryVersion
     protected VersionState versionState = null;
     protected Long addBytes = null;
     protected Long addFiles = null;
+    protected Integer awsVersion = null;
     protected AddStateEntryGen entry = null;
     
     public static LogEntryVersion getLogEntryVersion(
@@ -77,15 +78,16 @@ public class LogEntryVersion
             String serviceProcess,
             Long node,
             Long duration,
+            Integer awsVersion,
             VersionState versionState)
     
         throws TException
     {
-        return new LogEntryVersion(keyPrefix, serviceProcess, node, duration, versionState);
+        return new LogEntryVersion(keyPrefix, serviceProcess, node, duration, awsVersion, versionState);
     }
     
     public LogEntryVersion(
-            String keyPrefix, String serviceProcess, Long node, Long duration, VersionState versionState)
+            String keyPrefix, String serviceProcess, Long node, Long duration, Integer awsVersion, VersionState versionState)
         throws TException
     {
         if (StringUtil.isAllBlank(keyPrefix)) {
@@ -107,7 +109,7 @@ public class LogEntryVersion
         this.node = node;
         this.duration = duration;
         this.versionState = versionState;
-        entry = AddStateEntryGen.getAddStateEntryGen(keyPrefix, "storage", serviceProcess);
+        entry = AddStateEntryGen.getAddStateEntryGen(keyPrefix, "storage", serviceProcess, awsVersion);
         setEntry();
     }
     

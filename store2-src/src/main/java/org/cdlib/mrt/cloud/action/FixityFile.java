@@ -201,6 +201,8 @@ public class FixityFile
                     + " - versionID=" + versionID
                     + " - fileID=" + fileID
                     + " - key=" + component.getLocalID()
+                    + " - size=" + component.getSize()
+                    + " - manifest=" + component.getMessageDigest().toString()
                     , 10);
             tmpFile = FileUtil.getTempFile("tmp", ".txt");
             String key = component.getLocalID();
@@ -220,7 +222,7 @@ public class FixityFile
                 state.setFileSize(component.getSize());
                 state.setFixityDate(new DateState());
                 
-                if (tmpFile.length() != response.getStorageSize()) {
+                if (tmpFile.length() != component.getSize()) {
                     state.setSizeMatches(false);
                 } else {
                     state.setSizeMatches(true);

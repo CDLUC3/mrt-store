@@ -1,5 +1,6 @@
 ---
 node-table: "nodes-pairtree-docker"
+aws-s3-version: "{!SSM: cloud/nodes/aws-s3-version !DEFAULT: 2}"
 services: &services
   aws-near: &aws-near
     type: aws-near

@@ -293,6 +293,20 @@ public interface StorageServiceInf
     throws TException;
     
     /**
+     * Replic object from sourceNodeID to targetNodeID
+     * @param sourceNodeID source Node for copy
+     * @param targetNodeID target Node for copy
+     * @param objectID object identifier of object to be copied
+     * @return Object State of copied object
+     * @throws TException system exception
+     */
+    public ObjectState replicObject (
+            int sourceNodeID,
+            int targetNodeID,
+            Identifier objectID)
+    throws TException;
+    
+    /**
      * Get a sigle archive file containing the producer contents for a specific
      * object-version
      * @param nodeID node identifier for object to be retrieved
@@ -552,5 +566,11 @@ public interface StorageServiceInf
      * @return Storage Properties
      */
     public StorageConfig getStorageConfig();
+    
+    /**
+     * Return current AWS java sdk being uesd
+     * @return AWS SDK version number
+     */
+    public Integer getAwsVersion();
 }
 

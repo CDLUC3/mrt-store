@@ -10,8 +10,8 @@
   
     <properties>
       <merritt-zk.version>3.0-SNAPSHOT</merritt-zk.version>
-      <merritt-cloud.version>3.0-SNAPSHOT</merritt-cloud.version>
-      <merritt-core.version>3.0-SNAPSHOT</merritt-core.version>
+      <merritt-cloud.version>3.1-SNAPSHOT</merritt-cloud.version>
+      <merritt-core.version>3.1-SNAPSHOT</merritt-core.version>
       <merritt-bom.version>3.0-SNAPSHOT</merritt-bom.version>
     </properties>
 

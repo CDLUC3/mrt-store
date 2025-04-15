@@ -459,6 +459,12 @@ public class StorageConfig
         this.logger = logger;
     }
     
+    public Integer getAwsVersion() {
+        if (nodeIO != null) {
+            return nodeIO.getAwsVersion();
+        }
+        return null;
+    }
 
     /**
      * set local logger to node/log/...

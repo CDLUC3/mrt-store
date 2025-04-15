@@ -70,6 +70,7 @@ public class LogEntryObject
     protected ObjectState objectState = null;
     protected Long addBytes = null;
     protected Long addFiles = null;
+    protected Integer awsVersion = null;
     protected AddStateEntryGen entry = null;
     protected String keyPrefix = null;
     
@@ -78,13 +79,14 @@ public class LogEntryObject
             String serviceProcess, 
             Long node, 
             Long duration, 
+            Integer awsVersion,
             ObjectState objectState)
         throws TException
     {
-        return new LogEntryObject(keyPrefix, serviceProcess, node, duration, objectState);
+        return new LogEntryObject(keyPrefix, serviceProcess, node, duration, awsVersion, objectState);
     }
     
-    public LogEntryObject(String keyPrefix, String serviceProcess, Long node, Long duration, ObjectState objectState)
+    public LogEntryObject(String keyPrefix, String serviceProcess, Long node, Long duration, Integer awsVersion, ObjectState objectState)
         throws TException
     {
         if (StringUtil.isAllBlank(keyPrefix)) {
@@ -107,7 +109,8 @@ public class LogEntryObject
         this.node = node;
         this.duration = duration;
         this.objectState = objectState;
-        entry = AddStateEntryGen.getAddStateEntryGen(keyPrefix, "storage", serviceProcess);
+        this.awsVersion = awsVersion;
+        entry = AddStateEntryGen.getAddStateEntryGen(keyPrefix, "storage", serviceProcess, awsVersion);
         log4j.debug("LogEntryVersion constructor");
         setEntry();
     }
@@ -125,6 +128,7 @@ public class LogEntryObject
         entry.setFiles(numFilesL);
         entry.setVersions(objectState.getNumVersions());
         entry.setCurrentVersion(0);
+        entry.setAwsVersion(awsVersion);
         log4j.debug("LogEntryObject entry built");
     }
     
