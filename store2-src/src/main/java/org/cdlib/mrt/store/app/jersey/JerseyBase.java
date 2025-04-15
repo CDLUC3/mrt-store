@@ -1098,7 +1098,8 @@ public class JerseyBase
             long nodeL = nodeID;
             LogEntryVersion logEntry = LogEntryVersion.getLogEntryVersion("add", "StoreAdd",
                     nodeL,
-                    System.currentTimeMillis() - startTime, 
+                    System.currentTimeMillis() - startTime,
+                    storageService.getAwsVersion(),
                     responseState);
             logEntry.addEntry();
             return getStateResponse(responseState, formatType, logger, cs, sc);
@@ -1305,6 +1306,7 @@ public class JerseyBase
             LogEntryVersion logEntry = LogEntryVersion.getLogEntryVersion("update", "StoreUpdate",
                     nodeL,
                     System.currentTimeMillis() - startTime, 
+                    storageService.getAwsVersion(),
                     responseState);
             logEntry.addEntry();
             return getStateResponse(responseState, formatType, logger, cs, sc);
@@ -1504,6 +1506,7 @@ public class JerseyBase
             LogEntryObject logEntry = LogEntryObject.getLogEntryObject("delete", "StoreDelete",
                     nodeL,
                     System.currentTimeMillis() - startTime, 
+                    storageService.getAwsVersion(),
                     responseState);
             logEntry.addEntry();
             return getStateResponse(responseState, formatType, logger, cs, sc);
@@ -1611,7 +1614,7 @@ public class JerseyBase
             StorageServiceInit storageServiceInit = StorageServiceInit.getStorageServiceInit(sc);
             StorageServiceInf storageService = storageServiceInit.getStorageService();
             logger = getNodeLogger(nodeID, storageService);
-            AddStateEntryGen logEntry = AddStateEntryGen.getAddStateEntryGen("archive", "store", "getObjectArchive")
+            AddStateEntryGen logEntry = AddStateEntryGen.getAddStateEntryGen("archive", "store", "getObjectArchive", storageService.getAwsVersion())
                     .setObjectID(objectID)
                     .setSourceNode(nodeID);
             FileContent content = storageService.getObjectArchive(

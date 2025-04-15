@@ -566,5 +566,11 @@ public interface StorageServiceInf
      * @return Storage Properties
      */
     public StorageConfig getStorageConfig();
+    
+    /**
+     * Return current AWS java sdk being uesd
+     * @return AWS SDK version number
+     */
+    public Integer getAwsVersion();
 }
 
