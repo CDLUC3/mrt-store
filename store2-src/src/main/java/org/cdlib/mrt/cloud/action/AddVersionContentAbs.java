@@ -134,12 +134,27 @@ public abstract class AddVersionContentAbs
                             + " - runCnt=" + runCnt
                             + " - tallyCnt=" + tallyCnt
                             );
-            if (runCnt != tallyCnt) {
-                throw new TException.INVALID_ARCHITECTURE(MESSAGE + "Mismatch counts"
+            
+            for (int ret=1; ret<=3; ret++) {
+                System.out.println("Add Retry Cnts(" + ret + "):"
                         + " - runCnt=" + runCnt
-                        + " - threadCnt=" + tallyCnt
-                        );
+                        + " - tallyCnt=" + tallyCnt
+                        ); 
+                if (runCnt == tallyCnt) break;
+                if (ret < 3) {
+                    try {
+                        Thread.sleep(1000*ret);
+                    } catch (Exception e) { }
+
+                } else {
+                    throw new TException.INVALID_ARCHITECTURE(MESSAGE + "Mismatch counts"
+                            + " - runCnt=" + runCnt
+                            + " - threadCnt=" + tallyCnt
+                            );
+
+                }
             }
+            
             setCloudKey(map, objectID, nextVersion, inComponents);
             map.addVersion(inComponents);
             normVersionMap.normalize(map, bucket, objectID);
@@ -186,12 +201,26 @@ public abstract class AddVersionContentAbs
                                 + " - runCnt=" + runCnt
                                 + " - tallyCnt=" + tallyCnt
                                 );
-                if (runCnt != tallyCnt) {
-                    throw new TException.INVALID_ARCHITECTURE(MESSAGE + "Mismatch counts"
+                for (int ret=1; ret<=3; ret++) {
+                    System.out.println("Update Retry Cnts(" + ret + "):"
                             + " - runCnt=" + runCnt
-                            + " - threadCnt=" + tallyCnt
-                            );
+                            + " - tallyCnt=" + tallyCnt
+                            ); 
+                    if (runCnt == tallyCnt) break;
+                    if (ret < 3) {
+                        try {
+                            Thread.sleep(1000*ret);
+                        } catch (Exception e) { }
+                        
+                    } else {
+                        throw new TException.INVALID_ARCHITECTURE(MESSAGE + "Mismatch counts"
+                                + " - runCnt=" + runCnt
+                                + " - threadCnt=" + tallyCnt
+                                );
+                        
+                    }
                 }
+               
             //setCloudKey(map, objectID, nextVersion, inComponents);
             }
             map.updateVersion(inComponents, deleteList);
