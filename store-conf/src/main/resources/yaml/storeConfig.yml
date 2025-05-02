@@ -91,3 +91,8 @@ store-ecs-docker:
   <<: *docker
   nodePath: "yaml:1"
   archiveNode: 8888
+
+store-ecs-docker2: 
+  <<: *docker
+  nodePath: "yaml:2"
+  archiveNode: 8888
