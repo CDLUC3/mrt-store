@@ -86,3 +86,8 @@ store-info-docker: &docker
 store-info-dev-docker: 
   <<: *docker
   archiveNode: 5003
+
+store-ecs-docker: 
+  <<: *docker
+  nodePath: "yaml:1"
+  archiveNode: 8888
