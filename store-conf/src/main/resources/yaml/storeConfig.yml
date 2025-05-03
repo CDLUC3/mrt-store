@@ -89,10 +89,10 @@ store-info-dev-docker:
 
 store-ecs-docker: 
   <<: *docker
-  nodePath: "yaml:1"
+  nodePath: "yaml:2"
   archiveNode: 8888
 
-store-ecs-docker2: 
+store-ecs-docker-v1: 
   <<: *docker
-  nodePath: "yaml:2"
+  nodePath: "yaml:1"
   archiveNode: 8888
