@@ -25,12 +25,12 @@ export ECR_REGISTRY=it-docker-registry
 
 Launch Containers
 ```
-MDIR=$(pwd) docker-compose -f store-it/src/test/docker/docker-compose.yml up -d
+MDIR=$(pwd) docker compose -f store-it/src/test/docker/docker-compose.yml up -d
 ```
 
 Run the junit test in VSCode
 
 Stop Containers
 ```
-MDIR=$(pwd) docker-compose -f store-it/src/test/docker/docker-compose.yml down
+MDIR=$(pwd) docker compose -f store-it/src/test/docker/docker-compose.yml down
 ```
