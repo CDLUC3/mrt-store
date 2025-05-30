@@ -2,6 +2,7 @@
 which-store-info: "store-info"
 store-info:
   baseURI: "http://mock-merritt-it:4567/store"
+  backOutOnException: "false"
   supportURI: mailto:merritt-support@ucop.edu
   verifyOnRead: true
   verifyOnWrite: true

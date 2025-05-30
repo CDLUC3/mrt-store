@@ -50,6 +50,7 @@ import org.apache.zookeeper.data.Stat;
 import org.apache.zookeeper.KeeperException;
 import org.apache.zookeeper.KeeperException.ConnectionLossException;
 import org.apache.zookeeper.KeeperException.SessionExpiredException;
+import org.cdlib.mrt.cloud.action.AddVersionContentAbs;
 
 
 import org.cdlib.mrt.utility.LoggerInf;
@@ -146,6 +147,11 @@ public class StorageConfig
             
             storageConfig.setAsyncArchiveProp(asyncArchivePropS);
             storageConfig.setNodePath(jStoreInfo.getString("nodePath"));
+            String backOutOnExceptionS = "false";
+            try {
+                backOutOnExceptionS = jStoreInfo.getString("backOutOnException");
+            } catch (Exception e) { }
+            storageConfig.setBackOutOnException(backOutOnExceptionS);
             storageConfig.setNodeIO(storageConfig.getNodePath());
             storageConfig.setArchiveNode(jStoreInfo.getLong("archiveNode"));
             storageConfig.setStoreLink();
@@ -426,6 +432,36 @@ public class StorageConfig
     public String getNodeName() {
         if (nodeIO == null) return null;
         return nodeIO.getNodeName();
+    }
+
+    public void setBackOutOnException(String backOutOnExceptionS) 
+        throws TException
+    {
+        boolean defaultVal = false;
+        boolean backOutOnException = defaultVal;
+        try { 
+            backOutOnException = testTrueFalse(backOutOnExceptionS, backOutOnException);
+            AddVersionContentAbs.setBackOutOnException(backOutOnException);
+            String msg = "BackoutOnException=" + backOutOnException;
+            System.out.println(msg);
+            logger.logMessage(msg, 2, true);
+            
+        } catch (Exception ex) {
+            throw new TException(ex);
+        }
+        
+    }
+    
+    public static boolean testTrueFalse(String key, boolean defaultBool)
+    {
+        key = key.toLowerCase();
+        if (key.equals("true") || key.equals("yes") || key.equals("y")) {
+            return true;
+        } else if (key.equals("false") || key.equals("no") || key.equals("n")) {
+            return false;
+        } else {
+            return defaultBool;
+        }
     }
     
     public String dump(String header)

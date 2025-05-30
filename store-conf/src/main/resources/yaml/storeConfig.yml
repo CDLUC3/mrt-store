@@ -20,6 +20,7 @@ store-info:
     - stash-wrapper.xml
   archiveNode: 7001
   nodePath: "{!SSM: store/config/nodePath  !DEFAULT: yaml:2}"
+  backOutOnException: "{!SSM: store/config/backOutOnException  !DEFAULT: false}"
   fileLogger:
     messageMaximumLevel: "{!SSM: store/config/log/messageMaximumLevel !DEFAULT: 5}"
     messageMaximumError: "{!SSM: store/config/log/messageMaximumError !DEFAULT: 10}"
@@ -61,6 +62,7 @@ store-info-docker: &docker
     - stash-wrapper.xml
   archiveNode: 7777
   nodePath: "yaml:2"
+  backOutOnException: "false"
   fileLogger:
     messageMaximumLevel: 5
     messageMaximumError: 10

@@ -34,6 +34,8 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.List;
 import java.util.ArrayList;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import org.cdlib.mrt.cloud.VersionMap;
 
@@ -56,6 +58,7 @@ import org.cdlib.mrt.utility.TException;
 import org.cdlib.mrt.utility.LoggerInf;
 import org.cdlib.mrt.s3.service.CloudResponse;
 import org.cdlib.mrt.s3.service.CloudStoreInf;
+import org.cdlib.mrt.store.StoreNodeManager;
 import org.cdlib.mrt.store.tools.FileFromUrl;
 import org.cdlib.mrt.utility.StringUtil;
 /**
@@ -70,9 +73,11 @@ public abstract class AddVersionContentAbs
     protected static final String MESSAGE = NAME + ": ";
     protected static final boolean DEBUG = false;
     protected static final boolean DEBUGLOW = false;
+    protected static boolean backOutOnException = true;
     protected boolean DEBUGOUT = false;
     protected static final String WRITE = "write";
     protected int threadCnt = 4;
+    private static final Logger log4j = LogManager.getLogger();
 
     protected VersionState versionState = null;
     //protected Identifier objectID = null;
@@ -443,7 +448,12 @@ public abstract class AddVersionContentAbs
     public void backOutPut(ComponentContent versionContent)
         throws TException
     {   
+        if (!backOutOnException) {
+            log4j.info("AddVersionContentAbs.backOutPut - because of flag no backout performed");
+            return;
+        }
         try {
+            log4j.info("AddVersionContentAbs.backOutPut - error backout performed");
             List<FileComponent> inComponents = versionContent.getFileComponents();
             for (FileComponent component: inComponents) {
                 if ((component.getTitle() != null) && component.getTitle().equals(WRITE)) {
@@ -677,5 +687,15 @@ public abstract class AddVersionContentAbs
             this.componentException = componentException;
         }
     }
+
+    public static boolean isBackOutOnException() {
+        return backOutOnException;
+    }
+
+    public static void setBackOutOnException(boolean backOutOnException) {
+        AddVersionContentAbs.backOutOnException = backOutOnException;
+        log4j.info("setBackOutOnException:" + backOutOnException);
+    }
+    
 }
 

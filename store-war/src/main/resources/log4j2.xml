@@ -7,7 +7,7 @@
     
     <RollingFile
         name="ECS-File"
-        fileName="${env:CATALINA_BASE:-.}/logs/log4j-ecs-json.log"
+        fileName="${env:LOG_STORE:-.}/logs/log4j-ecs-json.log"
         filePattern="logs/log4j-ecs-json-%d{yyyy-MM-dd}-%i.log">
       <!-- https://logging.apache.org/log4j/2.x/manual/lookups.html -->
       <EcsLayout
@@ -27,7 +27,7 @@
     
     <RollingFile
         name="FixJson-File"
-        fileName="${env:CATALINA_BASE:-.}/logs/log4j-fix-json.log"
+        fileName="${env:LOG_STORE:-.}/logs/log4j-fix-json.log"
         filePattern="logs/log4j-ecs-json-%d{yyyy-MM-dd}-%i.log">
       <!-- https://logging.apache.org/log4j/2.x/manual/lookups.html -->
       <EcsLayout
@@ -47,7 +47,7 @@
     
     <RollingFile
         name="Text-File"
-        fileName="${env:CATALINA_BASE:-.}/logs/log4j-text.log"
+        fileName="${env:LOG_STORE:-.}/logs/log4j-text.log"
         filePattern="logs/log4j-text-json-%d{yyyy-MM-dd}-%i.log"
         stackTraceAsArray="true">
       <Policies>
