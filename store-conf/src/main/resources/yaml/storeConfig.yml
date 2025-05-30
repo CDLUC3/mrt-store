@@ -71,7 +71,7 @@ store-info-docker: &docker
     qualifier: yyMMdd
     trace: 5
   queueInfo:
-    QueueService: "zoo:2181"
+    QueueService: "{!ENV: ZKCONN !DEFAULT: zoo:2181}"
     QueueLargeWorker: "xxxxstore"
     QueueSizeLimit: "600000000"
     QueueLockBase: "/mrt.lock"
