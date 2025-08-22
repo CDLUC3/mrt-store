@@ -1,16 +1,14 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" 
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.cdlib.mrt</groupId>
   <artifactId>mrt-store-it</artifactId>
   <packaging>war</packaging>
-  <version>3.0-SNAPSHOT</version>
+  <version>4.0-SNAPSHOT</version>
   <name>UC3-mrtStoreIT</name>
   <url>http://uc3.cdlib.org</url>
   
     <properties>
-      <merritt-bom.version>3.0-SNAPSHOT</merritt-bom.version>
+      <merritt-bom.version>4.0-SNAPSHOT</merritt-bom.version>
       <itDockerRegistry>it-docker-registry</itDockerRegistry>
       <propertyDir>test</propertyDir>
       <docker.skip>${env.SKIP_DOCKER_TEST}</docker.skip>
@@ -33,7 +31,7 @@
         <groupId>org.cdlib.mrt</groupId>
         <artifactId>mrt-parent-properties</artifactId>
         <!--This version cannot be set as a property-->
-        <version>PAR-3.0-SNAPSHOT</version>
+        <version>PAR-4.0-SNAPSHOT</version>
     </parent>
 
   <repositories>
