@@ -6,6 +6,9 @@ version: 0.2
 # test
 
 phases:
+  install:
+    runtime-versions:
+      java: corretto21
   pre_build:
     on-failure: ABORT
     commands:
