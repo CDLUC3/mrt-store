@@ -1323,7 +1323,7 @@ public class JerseyBase
         }
     }
 
-    protected void validateManifest(
+    public static void validateManifest(
             File manifest,
             String sizeS,
             String type,
@@ -1348,8 +1348,8 @@ public class JerseyBase
             }
         }
         if (size == 0) size = manifest.length();
-        if (StringUtil.isNotEmpty(type)
-                && StringUtil.isNotEmpty(value)) {
+        if (!StringUtil.isAllBlank(type)
+                && !StringUtil.isAllBlank(value)) {
             LoggerInf logger = new TFileLogger("JerseyStorage", 10, 10);
             FixityTests fixity = new FixityTests(manifest, type, logger);
             FixityTests.FixityResult fixityResult = fixity.validateSizeChecksum(value, type, size);
@@ -2692,7 +2692,7 @@ public class JerseyBase
      * @return object identifier
      * @throws TException invalid object identifier format
      */
-    protected Identifier getObjectID(String parm)
+    public static Identifier getObjectID(String parm)
         throws TException
     {
         return ValidateCmdParms.validateObjectID(parm);
@@ -2818,7 +2818,7 @@ public class JerseyBase
      * @return file containing addVersion manifest
      * @throws TException process exception
      */
-    protected File getManifest(
+    public static File getManifest(
             String manifestRequest,
             String url,
             LoggerInf logger)
@@ -3117,7 +3117,7 @@ public class JerseyBase
      * @return process logger within CAN
      * @throws TException logger not found
      */
-    protected LoggerInf getNodeLogger(int nodeID, StorageServiceInf storageService)
+    public static LoggerInf getNodeLogger(int nodeID, StorageServiceInf storageService)
         throws TException
     {
         LoggerInf nodeLogger = storageService.getLogger(nodeID);
