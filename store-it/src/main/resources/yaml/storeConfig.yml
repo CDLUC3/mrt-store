@@ -36,5 +36,7 @@ store-info:
     LargeAccessHold: "access/LargeAccessHold"
     SmallAccessHold: "access/SmallAccessHold"
     PollingInterval: "3"
+    PollingIntervalStore: "20"
     NumThreadsSmall: "0"
     NumThreadsLarge: "1"
+    NumThreadsStore: "2"

@@ -92,8 +92,10 @@ public class StorageConfig
     protected String largeAccessHold = null;
     protected String smallAccessHold = null;
     protected String queuePollingInterval = null;
+    protected String queuePollingIntervalStore = null;
     protected String queueNumThreadsSmall = null;
     protected String queueNumThreadsLarge = null;
+    protected String queueNumThreadsStore = null;
     protected String queueSizeLimit = null;
     protected String queueLargeWorker = null;
     protected String queueTimeout = null;
@@ -134,8 +136,10 @@ public class StorageConfig
             storageConfig.setLargeAccessHold(jStoreQueue.getString("LargeAccessHold"));
             storageConfig.setSmallAccessHold(jStoreQueue.getString("SmallAccessHold"));
             storageConfig.setQueuePollingInterval(jStoreQueue.getString("PollingInterval"));
+            storageConfig.setQueuePollingIntervalStore(jStoreQueue.getString("PollingIntervalStore"));
             storageConfig.setQueueNumThreadsSmall(jStoreQueue.getString("NumThreadsSmall"));
             storageConfig.setQueueNumThreadsLarge(jStoreQueue.getString("NumThreadsLarge"));
+            storageConfig.setQueueNumThreadsStore(jStoreQueue.getString("NumThreadsStore"));
             storageConfig.setQueueSizeLimit(jStoreQueue.getString("QueueSizeLimit"));
             storageConfig.setQueueTimeout(jStoreQueue.getString("QueueTimeout"));
             storageConfig.setQueueLargeWorker(jStoreQueue.getString("QueueLargeWorker"));
@@ -316,12 +320,20 @@ public class StorageConfig
         this.queuePollingInterval = queuePollingInterval;
     }
 
+    public void setQueuePollingIntervalStore(String queuePollingIntervalStore) {
+        this.queuePollingIntervalStore = queuePollingIntervalStore;
+    }
+
     public void setQueueNumThreadsSmall(String queueNumThreadsSmall) {
         this.queueNumThreadsSmall = queueNumThreadsSmall;
     }
 
     public void setQueueNumThreadsLarge(String queueNumThreadsLarge) {
         this.queueNumThreadsLarge = queueNumThreadsLarge;
+    }
+
+    public void setQueueNumThreadsStore(String queueNumThreadsStore) {
+        this.queueNumThreadsStore = queueNumThreadsStore;
     }
 
     public void setQueueLargeWorker(String queueLargeWorker) {
@@ -364,12 +376,20 @@ public class StorageConfig
         return queuePollingInterval;
     }
 
+    public String getQueuePollingIntervalStore() {
+        return queuePollingIntervalStore;
+    }
+
     public String getQueueNumThreadsSmall() {
         return queueNumThreadsSmall;
     }
 
     public String getQueueNumThreadsLarge() {
         return queueNumThreadsLarge;
+    }
+
+    public String getQueueNumThreadsStore() {
+        return queueNumThreadsStore;
     }
 
     public String getQueueLargeWorker() {
