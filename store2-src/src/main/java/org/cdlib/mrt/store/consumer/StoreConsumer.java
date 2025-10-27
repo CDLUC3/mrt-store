@@ -84,7 +84,7 @@ public class StoreConsumer extends HttpServlet
     private volatile Thread consumerThread = null;
     private volatile Thread cleanupThread = null;
 
-    private String queueConnectionString = "localhost:2181";	// default single server connection
+    private String zooConnectString = "localhost:2181";	// default single server connection
     private String queuePath = null;
     private int numThreads = 5;		// default size
     private int pollingInterval = 15;	// default interval (seconds)
@@ -94,7 +94,7 @@ public class StoreConsumer extends HttpServlet
             throws ServletException {
         super.init(servletConfig);
 
-	String queueConnectionString = null;
+	String zooConnectString = null;
 	String numThreads = null;
 	String pollingInterval = null;
         StorageServiceInit storageServiceInit = null;
@@ -108,14 +108,14 @@ public class StoreConsumer extends HttpServlet
 	}
 
 	try {
-            queueConnectionString = storageService.getStorageConfig().getQueueService();
-	    if (StringUtil.isNotEmpty(queueConnectionString)) {
-	    	System.out.println("[info] " + MESSAGE + "Setting queue connection string: " + queueConnectionString);
-		this.queueConnectionString = queueConnectionString;
+            zooConnectString = storageService.getStorageConfig().getQueueService();
+	    if (StringUtil.isNotEmpty(zooConnectString)) {
+	    	System.out.println("[info] " + MESSAGE + "Setting queue connection string: " + zooConnectString);
+		this.zooConnectString = zooConnectString;
 	    }
 	} catch (Exception e) {
-	    System.err.println("[warn] " + MESSAGE + "Could not set queue connection string: " + queueConnectionString +
-		 "  - using default: " + this.queueConnectionString);
+	    System.err.println("[warn] " + MESSAGE + "Could not set queue connection string: " + zooConnectString +
+		 "  - using default: " + this.zooConnectString);
 	}
 
 	try {
@@ -163,7 +163,7 @@ public class StoreConsumer extends HttpServlet
                 return;
             }
 
-            StoreConsumerDaemon storeConsumerDaemon = new StoreConsumerDaemon(queueConnectionString,
+            StoreConsumerDaemon storeConsumerDaemon = new StoreConsumerDaemon(zooConnectString,
 		servletConfig, pollingInterval, numThreads);
 
             consumerThread =  new Thread(storeConsumerDaemon);
@@ -203,7 +203,7 @@ class StoreConsumerDaemon implements Runnable
     private StorageServiceInit storageServiceInit = null;
     private StorageServiceInf storageService = null;
 
-    private String queueConnectionString = null;
+    private String zooConnectString = null;
     private Integer pollingInterval = null;
     private Integer poolSize = null;
     private int keepAliveTime = 60;     // when poolSize is exceeded
@@ -217,10 +217,10 @@ class StoreConsumerDaemon implements Runnable
 
 
     // Constructor
-    public StoreConsumerDaemon(String queueConnectionString, ServletConfig servletConfig, 
+    public StoreConsumerDaemon(String zooConnectString, ServletConfig servletConfig, 
 		Integer pollingInterval, Integer poolSize)
     {
-        this.queueConnectionString = queueConnectionString;
+        this.zooConnectString = zooConnectString;
 	this.pollingInterval = pollingInterval;
 	this.poolSize = poolSize;
 
@@ -231,7 +231,7 @@ class StoreConsumerDaemon implements Runnable
             if (! ZookeeperUtil.validateZK(zooKeeper)) {
                 try {
                    // Refresh ZK connection
-                   zooKeeper = new ZooKeeper(queueConnectionString, ZookeeperUtil.ZK_SESSION_TIMEOUT, new Ignorer());
+                   zooKeeper = new ZooKeeper(zooConnectString, ZookeeperUtil.ZK_SESSION_TIMEOUT, new Ignorer());
                } catch  (Exception e ) {
                  e.printStackTrace(System.err);
                }
@@ -259,7 +259,7 @@ class StoreConsumerDaemon implements Runnable
             if (! ZookeeperUtil.validateZK(zooKeeper)) {
                 try {
                    // Refresh ZK connection
-                   zooKeeper = new ZooKeeper(queueConnectionString, ZookeeperUtil.ZK_SESSION_TIMEOUT, new Ignorer());
+                   zooKeeper = new ZooKeeper(zooConnectString, ZookeeperUtil.ZK_SESSION_TIMEOUT, new Ignorer());
                } catch  (Exception e ) {
                  e.printStackTrace(System.err);
                }
@@ -303,7 +303,7 @@ class StoreConsumerDaemon implements Runnable
         		    if (! ZookeeperUtil.validateZK(zooKeeper)) {
             		        try {
                		            // Refresh ZK connection
-               		            zooKeeper = new ZooKeeper(queueConnectionString, ZookeeperUtil.ZK_SESSION_TIMEOUT, new Ignorer());
+               		            zooKeeper = new ZooKeeper(zooConnectString, ZookeeperUtil.ZK_SESSION_TIMEOUT, new Ignorer());
            		        } catch  (Exception e ) {
              		            e.printStackTrace(System.err);
            		        }
@@ -315,7 +315,7 @@ class StoreConsumerDaemon implements Runnable
                                 System.err.println(MESSAGE + "[WARN] error acquiring job: " + e.getMessage());
                                 try {
         	    		   Thread.currentThread().sleep(ZookeeperUtil.SLEEP_ZK_RETRY); 
-               			   zooKeeper = new ZooKeeper(queueConnectionString, ZookeeperUtil.ZK_SESSION_TIMEOUT, new Ignorer());
+               			   zooKeeper = new ZooKeeper(zooConnectString, ZookeeperUtil.ZK_SESSION_TIMEOUT, new Ignorer());
                                 } catch (Exception e4) {
                                 } finally {
                                    if (job != null) job.unlock(zooKeeper);
@@ -334,7 +334,7 @@ class StoreConsumerDaemon implements Runnable
                                    break;
                                 }
 
-                                executorService.execute(new StoreConsumeData(storageService, job, queueConnectionString, storeZoo));
+                                executorService.execute(new StoreConsumeData(storageService, job, zooConnectString, storeZoo));
                                 Thread.currentThread().sleep(5 * 1000);
                             } else {
                                 break;
@@ -399,7 +399,7 @@ class StoreConsumerDaemon implements Runnable
             if (! ZookeeperUtil.validateZK(zooKeeper)) {
                 try {
                    // Refresh ZK connection
-                   zooKeeper = new ZooKeeper(queueConnectionString, ZookeeperUtil.ZK_SESSION_TIMEOUT, new Ignorer());
+                   zooKeeper = new ZooKeeper(zooConnectString, ZookeeperUtil.ZK_SESSION_TIMEOUT, new Ignorer());
                } catch  (Exception e ) {
                  e.printStackTrace(System.err);
                }
@@ -433,20 +433,21 @@ class StoreConsumeData implements Runnable
     private static final boolean DEBUG = true;
     protected static final String FS = System.getProperty("file.separator");
 
-    private String queueConnectionString = null;
+    private String zooConnectString = null;
     private ZooKeeper zooKeeper = null;
     private Job job = null;
+    private String objectID = null;
     private StorageServiceInf storageService = null;
     private StoreZoo storeZoo = null;
 
     // Constructor
-    public StoreConsumeData(StorageServiceInf storageService, Job job, String queueConnectionString, StoreZoo storeZoo)
+    public StoreConsumeData(StorageServiceInf storageService, Job job, String zooConnectString, StoreZoo storeZoo)
     {
         this.zooKeeper = zooKeeper;
 	this.job = job;
 	this.storageService = storageService;
 
-        this.queueConnectionString = queueConnectionString;
+        this.zooConnectString = zooConnectString;
         this.storeZoo = storeZoo;
     }
 
@@ -459,7 +460,7 @@ class StoreConsumeData implements Runnable
             if (! ZookeeperUtil.validateZK(zooKeeper)) {
                 try {
                    // Refresh ZK connection
-                   zooKeeper = new ZooKeeper(queueConnectionString, ZookeeperUtil.ZK_SESSION_TIMEOUT, new Ignorer());
+                   zooKeeper = new ZooKeeper(zooConnectString, ZookeeperUtil.ZK_SESSION_TIMEOUT, new Ignorer());
                } catch  (Exception e ) {
                  e.printStackTrace(System.err);
                }
@@ -469,7 +470,7 @@ class StoreConsumeData implements Runnable
                js = job.jsonProperty(zooKeeper, ZKKey.JOB_STORE);
             } catch (Exception e) {
                Thread.currentThread().sleep(ZookeeperUtil.SLEEP_ZK_RETRY);
-               zooKeeper = new ZooKeeper(queueConnectionString, ZookeeperUtil.ZK_SESSION_TIMEOUT, new Ignorer());
+               zooKeeper = new ZooKeeper(zooConnectString, ZookeeperUtil.ZK_SESSION_TIMEOUT, new Ignorer());
                js = job.jsonProperty(zooKeeper, ZKKey.JOB_STORE);
             }
             if (DEBUG) System.out.println(NAME + " [info] START: store consuming job queue " + job.id());
@@ -477,7 +478,6 @@ class StoreConsumeData implements Runnable
 	    String manifestURL = "";
 	    String action = "";
 	    int nodeID;
-	    String objectID = "";
 	    String delete = "";
 	    try { 
 	        manifestURL = js.getString("manifest_url");
@@ -492,6 +492,9 @@ class StoreConsumeData implements Runnable
                 e.printStackTrace(System.err);
 		throw new Exception(" [error] Store Job data could not be processed " + job.id());
 	    }
+
+	    
+            boolean lock = getLock(zooKeeper, objectID);
 
 	    String errMessage = "";
             VersionState response = null;
@@ -510,13 +513,14 @@ class StoreConsumeData implements Runnable
                 if (DEBUG) System.err.println(NAME + " [error] Store action failed: " + e.getMessage());
 		errMessage = NAME + " [error] Store action failed: " + e.getMessage();
                 e.printStackTrace(System.err);
+		// releaseLock(zooKeeper, objectID);
 		throw new Exception(NAME + " [error] Store action failed: " + e.getMessage());
 
 	    }
 
             if (! ZookeeperUtil.validateZK(zooKeeper)) {
               try {
-                  zooKeeper = new ZooKeeper(queueConnectionString, ZookeeperUtil.ZK_SESSION_TIMEOUT, new Ignorer());
+                  zooKeeper = new ZooKeeper(zooConnectString, ZookeeperUtil.ZK_SESSION_TIMEOUT, new Ignorer());
               } catch  (Exception e ) {
                   e.printStackTrace(System.err);
               }
@@ -534,7 +538,7 @@ class StoreConsumeData implements Runnable
 		} catch (Exception mse) {
 		   System.err.println(MESSAGE + "[WARN] error changing job status: " + mse.getMessage());
 		   Thread.currentThread().sleep(ZookeeperUtil.SLEEP_ZK_RETRY);
-		   zooKeeper = new ZooKeeper(queueConnectionString, ZookeeperUtil.ZK_SESSION_TIMEOUT, new Ignorer());
+		   zooKeeper = new ZooKeeper(zooConnectString, ZookeeperUtil.ZK_SESSION_TIMEOUT, new Ignorer());
                    job.setStatus(zooKeeper, job.status().success(), "Success");
 		}
 	    } else {
@@ -544,7 +548,7 @@ class StoreConsumeData implements Runnable
 		} catch (Exception see) {
                    System.err.println(MESSAGE + "[WARN] error changing job status: " + see.getMessage());
                    Thread.currentThread().sleep(ZookeeperUtil.SLEEP_ZK_RETRY);
-                   zooKeeper = new ZooKeeper(queueConnectionString, ZookeeperUtil.ZK_SESSION_TIMEOUT, new Ignorer());
+                   zooKeeper = new ZooKeeper(zooConnectString, ZookeeperUtil.ZK_SESSION_TIMEOUT, new Ignorer());
                    job.setStatus(zooKeeper, org.cdlib.mrt.zk.JobState.Failed, errMessage);
 		}
 	    } 
@@ -566,11 +570,93 @@ class StoreConsumeData implements Runnable
         } finally {
 	   try {
 	     job.unlock(zooKeeper);
+	     releaseLock(zooKeeper, objectID);
 	   } catch(Exception ze) {}
 	   try {
              zooKeeper.close();
 	   } catch(Exception ze) {}
         }
+    }
+
+    /*
+     * Lock on primary identifier.  Will loop unitil lock obtained.
+     *
+     * @param String primary ID of object (ark)
+     * @param String jobID
+     * @return Boolean result of obtaining lock
+     */
+    private boolean getLock(ZooKeeper zooKeeper, String primaryID) {
+    try {
+
+        boolean locked = false;
+
+        if (! ZookeeperUtil.validateZK(zooKeeper)) {
+            try {
+               // Refresh ZK connection
+               zooKeeper = new ZooKeeper(zooConnectString, ZookeeperUtil.ZK_SESSION_TIMEOUT, new Ignorer());
+           } catch  (Exception e ) {
+             e.printStackTrace(System.err);
+           }
+        }
+
+        while (! locked) {
+            try {
+               System.out.println("[info] " + MESSAGE + " Attempting to gain lock");
+               locked = MerrittLocks.lockObjectStorage(zooKeeper, primaryID);
+            } catch (Exception e) {
+              if (DEBUG) System.err.println("[debug] " + MESSAGE + " Exception in gaining lock: " + primaryID);
+            }
+            if (locked) break;
+            System.out.println("[info] " + MESSAGE + " UNABLE to Gain lock for ID: " + primaryID + " Waiting 15 seconds before retry");
+            Thread.currentThread().sleep(15 * 1000);    // Wait 15 seconds before attempting to gain lock for ID
+        }
+        if (DEBUG) System.out.println("[debug] " + MESSAGE + " Gained lock for ID: " + primaryID);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+            try {
+            } catch (Exception ze) {}
+        }
+    return true;
+    }
+
+
+    /**
+     * Release lock
+     *
+     * @param none needed inputs are global
+     * @return void
+     */
+    private void releaseLock(ZooKeeper zooKeeper, String primaryID) {
+
+        if (! ZookeeperUtil.validateZK(zooKeeper)) {
+            try {
+               // Refresh ZK connection
+               zooKeeper = new ZooKeeper(zooConnectString, ZookeeperUtil.ZK_SESSION_TIMEOUT, new Ignorer());
+           } catch  (Exception e ) {
+             e.printStackTrace(System.err);
+           }   
+        }  
+
+        try {
+            MerrittLocks.unlockObjectStorage(zooKeeper, primaryID);
+            if (DEBUG) System.out.println("[debug] " + MESSAGE + " Released lock for ID: " + primaryID);
+        } catch (KeeperException ke) {
+            try {
+                Thread.currentThread().sleep(ZookeeperUtil.SLEEP_ZK_RETRY);
+               zooKeeper = new ZooKeeper(zooConnectString, ZookeeperUtil.ZK_SESSION_TIMEOUT, new Ignorer());
+               if (DEBUG) System.out.println("[debug] " + MESSAGE + " Released lock for ID: " + primaryID);
+               MerrittLocks.unlockObjectStorage(zooKeeper, primaryID);
+            } catch (Exception ee) {}
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+            } catch (Exception ze) {}
+        }     
+
     }
 
    public class Ignorer implements Watcher {
@@ -579,5 +665,7 @@ class StoreConsumeData implements Runnable
                System.out.println("Disconnected: " + event.toString());
        }
    }
+
+
 }
 
