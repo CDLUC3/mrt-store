@@ -543,7 +543,7 @@ class StoreConsumeData implements Runnable
 		}
 	    } else {
 		try {
-                   System.out.println("[item]: StoreConsume Daemon - FAILED job message: ");
+                   System.out.println("[item]: StoreConsume Daemon - FAILED job message: " + errMessage);
                    job.setStatus(zooKeeper, org.cdlib.mrt.zk.JobState.Failed, errMessage);
 		} catch (Exception see) {
                    System.err.println(MESSAGE + "[WARN] error changing job status: " + see.getMessage());
