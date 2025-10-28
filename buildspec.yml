@@ -70,7 +70,7 @@ phases:
     - ${JAVA_HOME}/bin/jar uf $(ls store-war/target/mrt-storewar-*.war) -C /build static/build.content.txt
 
     - |
-      SERVICENAME=ingest
+      SERVICENAME=store
       mvn -ntp deploy:deploy-file \
         -Durl=${CODEARTIFACT_URL} \
         -DrepositoryId=cdlib-uc3-mrt-uc3-mrt-java \
@@ -178,13 +178,13 @@ phases:
             # perform get checkout get the specific dockerfile
             git checkout $TAG_ECS
 
-            #mkdir -p ingest-war/target
+            #mkdir -p store-war/target
 
             # this command will succeed if TAG_ECS is a valid tag
             mvn dependency:copy \
               -DrepoUrl=${CODEARTIFACT_URL} \
-              -Dartifact=org.cdlib.mrt:mrt-ingestwar:${TAG_ECS}:war \
-              -DoutputDirectory=ingest-war/target \
+              -Dartifact=org.cdlib.mrt:mrt-storewar:${TAG_ECS}:war \
+              -DoutputDirectory=store-war/target \
               -Dtransitive=false
             
             # if TAG_ECS is a branch, then rebuild the war
