@@ -8,7 +8,7 @@
   <url>http://uc3.cdlib.org</url>
   
     <properties>
-      <merritt-bom.version>4.0-SNAPSHOT</merritt-bom.version>
+      <!--merritt-bom.version>4.0-SNAPSHOT</merritt-bom.version-->
       <itDockerRegistry>it-docker-registry</itDockerRegistry>
       <propertyDir>test</propertyDir>
       <docker.skip>${env.SKIP_DOCKER_TEST}</docker.skip>

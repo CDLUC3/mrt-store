@@ -7,7 +7,7 @@
     <name>UC3-mrtStorePub-war</name>
   
     <properties>
-      <merritt-bom.version>4.0-SNAPSHOT</merritt-bom.version>
+      <!--merritt-bom.version>4.0-SNAPSHOT</merritt-bom.version-->
       <propertyDir>test</propertyDir>
     </properties>
 
