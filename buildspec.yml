@@ -9,6 +9,10 @@ phases:
   install:
     runtime-versions:
       java: corretto21
+    commands:
+    - python3 -m pip install --upgrade pip
+    - pip install yq
+
   pre_build:
     on-failure: ABORT
     commands:
@@ -31,16 +35,27 @@ phases:
     - COMMITDATE=`git --no-pager log -1 --pretty='format:%cd' --date='format:%Y-%m-%d %H:%M:%S'`
     - echo "Branchtag ${BRANCHTAG}; COMMITDATE=${COMMITDATE}; REPONAME=${REPONAME}; BRANCHNAME=${BRANCHNAME}"
 
+    - |
+      DEVBUCK=$(aws ssm get-parameter --name /uc3/mrt/config-bucket-dev --query Parameter.Value --output text)
+      aws s3 cp s3://${DEVBUCK}/uc3/mrt/mrt-ecs-manifest/ecs-release-manifest.yaml /tmp/ecs-release-manifest.yaml
+      TAG_ECS_DEV=$(yq -r ".\"ecs-tagmap\".\"${REPONAME}\".\"ecs-dev\"" /tmp/ecs-release-manifest.yaml)
+      echo TAG_ECS_DEV=$TAG_ECS_DEV
+      TAG_ECS_EPHEMERAL=$(yq -r ".\"ecs-tagmap\".\"${REPONAME}\".\"ecs-ephemeral\"" /tmp/ecs-release-manifest.yaml)
+      echo TAG_ECS_EPHEMERAL=$TAG_ECS_EPHEMERAL
+      TAG_ECS_STG=$(yq -r ".\"ecs-tagmap\".\"${REPONAME}\".\"ecs-stg\"" /tmp/ecs-release-manifest.yaml)
+      echo TAG_ECS_STG=$TAG_ECS_STG
+      TAG_ECS_PRD=$(yq -r ".\"ecs-tagmap\".\"${REPONAME}\".\"ecs-prd\"" /tmp/ecs-release-manifest.yaml)
+      echo TAG_ECS_PRD=$TAG_ECS_PRD
+
   build:
     on-failure: ABORT
     commands:
-    # - mvn -ntp clean install -Ddocker.skip -DskipITs -Dmaven.test.skip=true
-    - mvn -ntp clean install
+    - mvn -ntp clean install -Ddocker.skip -DskipITs -Dmaven.test.skip=true
+    # - mvn -ntp clean install
     - |
       if [[ "${BRANCHTAG}" == "main" ]]
       then
         SEMVER=''
-        DOCKTAG='dev'
       elif [[ "${TAG}" == "" ]]
       then
         SEMVER="-Dversion=${BRANCHTAG}-SNAPSHOT"
@@ -55,6 +70,7 @@ phases:
     - ${JAVA_HOME}/bin/jar uf $(ls store-war/target/mrt-storewar-*.war) -C /build static/build.content.txt
 
     - |
+      SERVICENAME=store
       mvn -ntp deploy:deploy-file \
         -Durl=${CODEARTIFACT_URL} \
         -DrepositoryId=cdlib-uc3-mrt-uc3-mrt-java \
@@ -63,49 +79,74 @@ phases:
     - |
       docker build --push --quiet \
         --build-arg ECR_REGISTRY=${ECR_REGISTRY} \
-        -t ${ECR_REGISTRY}/${REPONAME}:${DOCKTAG} .
+        -t ${ECR_REGISTRY}/${REPONAME}:${BRANCHTAG} .
 
-      if [[ "${DOCKTAG}" == "dev" ]]
+    - |
+      if [[ "$BRANCHTAG" == "$TAG_ECS_DEV" ]]
       then
-        docker build --push --quiet \
+        docker build --quiet --push \
           --build-arg ECR_REGISTRY=${ECR_REGISTRY} \
           -t ${ECR_REGISTRY}/${REPONAME}:ecs-dev .
+  
+        RUNNING_COUNT=$(aws ecs list-tasks \
+          --cluster mrt-ecs-dev-stack \
+          --service-name $SERVICENAME \
+          --desired-status RUNNING \
+          --query 'length(taskArns)' \
+          --output text)
+
+        echo "RUNNING_COUNT for ecs-dev: $RUNNING_COUNT"
+
+        if [ $RUNNING_COUNT -gt 0 ]
+        then
+          aws ecs update-service --cluster mrt-ecs-dev-stack --service $SERVICENAME \
+            --desired-count $RUNNING_COUNT --output text --no-cli-pager \
+            --query "service.deployments[0].[id,taskDefinition,status,desiredCount,createdAt]" \
+            --force-new-deployment || echo "Skip ecs-dev Deployment"
+        fi  
       fi
-    # report results
-    - mkdir -p reports
-    - RPT=reports/${REPONAME}.md
-    - echo "## Semantic Tags" > $RPT
-    - |
-      git for-each-ref --sort=-creatordate --format '- %(refname) (%(creatordate:short))' refs/tags \
-        | egrep "tags/[0-9]+\.[0-9]+\.[0-9]+ " \
-        | sed -e "s/refs\/tags\///" \
-        | head -10 >> $RPT
-    - echo "## Feature Tags" >> $RPT
-    - |
-      git for-each-ref --sort=-creatordate --format '- %(refname) (%(creatordate:short))' refs/tags \
-        | egrep -v "tags/[0-9]+\.[0-9]+\.[0-9]+ " \
-        | egrep -v "sprint-" \
-        | sed -e "s/refs\/tags\///" \
-        | head -10 >> $RPT
-    - echo "## Docker Image Tags ${REPONAME}" >> $RPT
-    - |
-      aws ecr list-images --repository-name ${REPONAME} --filter tagStatus=TAGGED --output=text \
-        | cut -f3 \
-        | sed -e "s/^/- /" \
-        | sort >> $RPT
+
+      if [[ "$BRANCHTAG" == "$TAG_ECS_EPHEMERAL" ]]
+      then
+        docker build --quiet --push \
+          --build-arg ECR_REGISTRY=${ECR_REGISTRY} \
+          -t ${ECR_REGISTRY}/${REPONAME}:ecs-ephemeral .
+
+        RUNNING_COUNT=$(aws ecs list-tasks \
+          --cluster mrt-ecs-ephemeral-stack \
+          --service-name $SERVICENAME \
+          --desired-status RUNNING \
+          --query 'length(taskArns)' \
+          --output text)
+
+        echo "RUNNING_COUNT for ecs-dev: $RUNNING_COUNT"
+
+        if [ $RUNNING_COUNT -gt 0 ]
+        then
+          aws ecs update-service --cluster mrt-ecs-ephemeral-stack --service $SERVICENAME \
+            --desired-count $RUNNING_COUNT --output text --no-cli-pager \
+            --query "service.deployments[0].[id,taskDefinition,status,desiredCount,createdAt]" \
+            --force-new-deployment || echo "Skip ecs-ephemeral Deployment"
+        fi  
+      fi
+
+      if [[ "$BRANCHTAG" == "$TAG_ECS_STG" ]]
+      then
+        docker build --quiet --push \
+          --build-arg ECR_REGISTRY=${ECR_REGISTRY} \
+          -t ${ECR_REGISTRY}/${REPONAME}:ecs-stg .
+      fi
+
+      if [[ "$BRANCHTAG" == "$TAG_ECS_PRD" ]]
+      then
+        docker build --quiet --push \
+          --build-arg ECR_REGISTRY=${ECR_REGISTRY} \
+          -t ${ECR_REGISTRY}/${REPONAME}:ecs-prd .
+      fi
 
     - |
       for pkg in mrt-storewar
       do
-        echo "## Code Artifact Packages for $pkg" >> $RPT
-        aws codeartifact list-package-versions \
-          --domain=cdlib-uc3-mrt --repository=uc3-mrt-java \
-          --format=maven --namespace=org.cdlib.mrt \
-          --package=$pkg --status=Published --output=text \
-          | grep Published \
-          | cut -f4 \
-          | sed -e "s/^/- /" \
-          | sort >> $RPT
         for ver in `aws codeartifact list-package-versions \
           --domain=cdlib-uc3-mrt --repository=uc3-mrt-java \
           --format=maven --namespace=org.cdlib.mrt \
@@ -119,5 +160,45 @@ phases:
         done
       done
 
-    - aws s3 cp $RPT s3://${S3CFBUCKET}/$RPT
-    - aws cloudfront create-invalidation --distribution-id ${CFDISTRIBUTIONID} --paths /reports/* --region us-east-1
+    - |
+      # daily / on-demand rebuild of deployed images
+      # note that this also applied to a main branch build
+      if [[ "$MODE" == "OnDemand" ]]
+      then
+        for stack in ecs-dev ecs-ephemeral ecs-stg ecs-prd
+        do
+          TAG_ECS=$(yq -r ".\"ecs-tagmap\".\"${REPONAME}\".\"$stack\"" /tmp/ecs-release-manifest.yaml)
+          if [[ "$TAG_ECS" == "null" ]]
+          then
+            echo "${TAG_ECS} undefined for ${stack}"
+          elif [[ "$BRANCHTAG" == "$TAG_ECS" ]]
+          then
+            echo "${TAG_ECS} Already Built for ${stack}"
+          else
+            # perform get checkout get the specific dockerfile
+            git checkout $TAG_ECS
+
+            #mkdir -p store-war/target
+
+            # this command will succeed if TAG_ECS is a valid tag
+            mvn dependency:copy \
+              -DrepoUrl=${CODEARTIFACT_URL} \
+              -Dartifact=org.cdlib.mrt:mrt-storewar:${TAG_ECS}:war \
+              -DoutputDirectory=store-war/target \
+              -Dtransitive=false
+            
+            # if TAG_ECS is a branch, then rebuild the war
+            if [[ $? -ne 0 ]]
+            then
+              mvn -ntp clean install -Ddocker.skip -DskipITs -Dmaven.test.skip=true              
+            fi
+
+            if [[ $? -eq 0 ]]
+            then
+              docker build --quiet --push \
+                --build-arg ECR_REGISTRY=${ECR_REGISTRY} \
+                -t ${ECR_REGISTRY}/${REPONAME}:$stack .
+            fi
+          fi
+        done
+      fi
