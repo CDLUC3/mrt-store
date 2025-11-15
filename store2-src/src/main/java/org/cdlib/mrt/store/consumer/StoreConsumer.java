@@ -500,10 +500,10 @@ class StoreConsumeData implements Runnable
             VersionState response = null;
 	    try {
 	        if (action.equals("update")) {
-                    if (DEBUG) System.out.println(NAME + " [info] START: Update request found for Store" + job.id() + " - " + js.toString());
+                    if (DEBUG) System.out.println(NAME + " [info] START: Update request found for Store: " + job.id() + " - " + js.toString());
 		    response = storeZoo.updateVersionZoo(nodeID, objectID, null, delete, manifestURL, null, null, null);
 	        } else if (action.equals("add")) {
-                    if (DEBUG) System.out.println(NAME + " [info] START: Add request found for Store" + job.id() + " - " + js.toString());
+                    if (DEBUG) System.out.println(NAME + " [info] START: Add request found for Store: " + job.id() + " - " + js.toString());
 		    response = storeZoo.addVersion(nodeID, objectID, null, manifestURL, null, null, null);
 	        } else {
                     System.err.println(NAME + " [error] Action not supported " + job.id() + " - " + action);
@@ -605,7 +605,17 @@ class StoreConsumeData implements Runnable
                locked = MerrittLocks.lockObjectStorage(zooKeeper, primaryID);
             } catch (Exception e) {
               if (DEBUG) System.err.println("[debug] " + MESSAGE + " Exception in gaining lock: " + primaryID);
+	      locked = false;
+              if (! ZookeeperUtil.validateZK(zooKeeper)) {
+                  try {
+                     // Refresh ZK connection
+                     zooKeeper = new ZooKeeper(zooConnectString, ZookeeperUtil.ZK_SESSION_TIMEOUT, new Ignorer());
+                 } catch  (Exception e2) {
+                   e2.printStackTrace(System.err);
+                 }
+              }
             }
+
             if (locked) break;
             System.out.println("[info] " + MESSAGE + " UNABLE to Gain lock for ID: " + primaryID + " Waiting 15 seconds before retry");
             Thread.currentThread().sleep(15 * 1000);    // Wait 15 seconds before attempting to gain lock for ID
