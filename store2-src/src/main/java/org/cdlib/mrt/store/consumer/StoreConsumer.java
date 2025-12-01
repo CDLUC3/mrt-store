@@ -335,7 +335,7 @@ class StoreConsumerDaemon implements Runnable
                                 }
 
                                 executorService.execute(new StoreConsumeData(storageService, job, zooConnectString, storeZoo));
-                                Thread.currentThread().sleep(5 * 1000);
+				Thread.currentThread().sleep(5 * 1000);
                             } else {
                                 break;
                             }
@@ -571,7 +571,7 @@ class StoreConsumeData implements Runnable
 	   try {
 	     job.unlock(zooKeeper);
 	     releaseLock(zooKeeper, objectID);
-	   } catch(Exception ze) {}
+	   } catch(Exception ze) {ze.printStackTrace(System.err); }
 	   try {
              zooKeeper.close();
 	   } catch(Exception ze) {}
@@ -589,6 +589,7 @@ class StoreConsumeData implements Runnable
     try {
 
         boolean locked = false;
+	String path = null;
 
         if (! ZookeeperUtil.validateZK(zooKeeper)) {
             try {
@@ -617,8 +618,8 @@ class StoreConsumeData implements Runnable
             }
 
             if (locked) break;
-            System.out.println("[info] " + MESSAGE + " UNABLE to Gain lock for ID: " + primaryID + " Waiting 15 seconds before retry");
-            Thread.currentThread().sleep(15 * 1000);    // Wait 15 seconds before attempting to gain lock for ID
+            System.out.println("[info] " + MESSAGE + " UNABLE to Gain lock for ID: " + primaryID + " Waiting 30 seconds before retry");
+            Thread.currentThread().sleep(30 * 1000);    // Wait before attempting to gain lock for ID
         }
         if (DEBUG) System.out.println("[debug] " + MESSAGE + " Gained lock for ID: " + primaryID);
 
@@ -629,7 +630,7 @@ class StoreConsumeData implements Runnable
             try {
             } catch (Exception ze) {}
         }
-    return true;
+        return true;
     }
 
 
@@ -655,16 +656,16 @@ class StoreConsumeData implements Runnable
             if (DEBUG) System.out.println("[debug] " + MESSAGE + " Released lock for ID: " + primaryID);
         } catch (KeeperException ke) {
             try {
-                Thread.currentThread().sleep(ZookeeperUtil.SLEEP_ZK_RETRY);
+               System.err.println("[error] " + MESSAGE + " Error in releasing lock for ID: " + primaryID + " Retrying...");
+               Thread.currentThread().sleep(ZookeeperUtil.SLEEP_ZK_RETRY);
                zooKeeper = new ZooKeeper(zooConnectString, ZookeeperUtil.ZK_SESSION_TIMEOUT, new Ignorer());
-               if (DEBUG) System.out.println("[debug] " + MESSAGE + " Released lock for ID: " + primaryID);
                MerrittLocks.unlockObjectStorage(zooKeeper, primaryID);
+               if (DEBUG) System.out.println("[debug] " + MESSAGE + " Released lock for ID: " + primaryID);
             } catch (Exception ee) {}
         } catch (Exception e) {
+            System.err.println("[error] " + MESSAGE + " Error in releasing lock for ID: " + primaryID);
             e.printStackTrace();
         } finally {
-            try {
-            } catch (Exception ze) {}
         }     
 
     }
