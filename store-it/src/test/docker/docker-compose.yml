@@ -44,7 +44,7 @@ services:
     entrypoint: ["catalina.sh", "jpda", "run"]
   zoo-it:
     container_name: zoo-it
-    image: public.ecr.aws/docker/library/zookeeper:3.9.3
+    image: public.ecr.aws/docker/library/zookeeper:3.9.4
     networks:
       merrittnet:
     restart: unless-stopped
