@@ -513,7 +513,7 @@ class StoreConsumeData implements Runnable
                 if (DEBUG) System.err.println(NAME + " [error] Store action failed: " + e.getMessage());
 		errMessage = NAME + " [error] Store action failed: " + e.getMessage();
                 e.printStackTrace(System.err);
-		// releaseLock(zooKeeper, objectID);
+                job.setStatus(zooKeeper, org.cdlib.mrt.zk.JobState.Failed, errMessage);
 		throw new Exception(NAME + " [error] Store action failed: " + e.getMessage());
 
 	    }
@@ -566,7 +566,6 @@ class StoreConsumeData implements Runnable
                 job.setStatus(zooKeeper, org.cdlib.mrt.zk.JobState.Failed, e.getMessage());
                 job.unlock(zooKeeper);
            } catch (Exception ex) { System.out.println("Exception [error] Error failing job: " + job.id());}
-           System.out.println("Exception [error] Consuming queue data");
         } finally {
 	   try {
 	     job.unlock(zooKeeper);
