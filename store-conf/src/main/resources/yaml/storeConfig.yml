@@ -39,8 +39,10 @@ store-info:
     SmallAccessHold: "{!SSM: store/zoo/SmallAccessHold !DEFAULT: access/SmallAccessHold}" 
     
     PollingInterval: "{!SSM: store/config/PollingInterval !DEFAULT: 15}"
+    PollingIntervalStore: "{!SSM: store/config/PollingIntervalStore !DEFAULT: 60}"
     NumThreadsSmall: "{!SSM: store/config/numThreadsSmall !DEFAULT: 5}"
     NumThreadsLarge: "{!SSM: store/config/numThreadsLarge !DEFAULT: 3}"
+    NumThreadsStore: "{!SSM: store/config/numThreadsStore !DEFAULT: 3}"
 
 
 store-info-docker: &docker
@@ -81,8 +83,10 @@ store-info-docker: &docker
     LargeAccessHold: "access/LargeAccessHold"
     SmallAccessHold: "access/SmallAccessHold" 
     PollingInterval: "15"
+    PollingIntervalStore: "20"
     NumThreadsSmall: "5"
     NumThreadsLarge: "3"
+    NumThreadsStore: "2"
 
 
 store-info-dev-docker: 
