@@ -86,8 +86,8 @@ public class StoreConsumer extends HttpServlet
 
     private String zooConnectString = "localhost:2181";	// default single server connection
     private String queuePath = null;
-    private int numThreads = 5;		// default size
-    private int pollingInterval = 15;	// default interval (seconds)
+    private int numThreads = 5;				// default size
+    private int pollingInterval = 15;			// default interval (seconds)
     private StoreZoo storeZoo = null;
 
     public void init(ServletConfig servletConfig)
