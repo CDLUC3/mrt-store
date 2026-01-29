@@ -191,9 +191,13 @@ phases:
             if [[ $? -ne 0 ]]
             then
               mvn -ntp clean install -Ddocker.skip -DskipITs -Dmaven.test.skip=true              
+              bstate=$?            
+              mkdir -p /build/static
+              echo "build_tag: ${TAG_ECS}" > /build/static/build.content.txt 
+              ${JAVA_HOME}/bin/jar uf $(ls store-war/target/mrt-storewar-*.war) -C /build static/build.content.txt
             fi
 
-            if [[ $? -eq 0 ]]
+            if [[ $bstate -eq 0 ]]
             then
               docker build --quiet --push \
                 --build-arg ECR_REGISTRY=${ECR_REGISTRY} \
