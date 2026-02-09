@@ -55,6 +55,7 @@ phases:
     - |
       if [[ "${BRANCHTAG}" == "main" ]]
       then
+        BRANCHTAG='dev'
         SEMVER=''
       elif [[ "${TAG}" == "" ]]
       then
