@@ -8,9 +8,9 @@
   <url>http://uc3.cdlib.org</url>
   
     <properties>
-      <merritt-zk.version>4.0-SNAPSHOT</merritt-zk.version>
-      <merritt-cloud.version>4.0-SNAPSHOT</merritt-cloud.version>
-      <merritt-core.version>4.0-SNAPSHOT</merritt-core.version>
+      <!--merritt-zk.version>4.0-SNAPSHOT</merritt-zk.version-->
+      <!--merritt-cloud.version>4.0-SNAPSHOT</merritt-cloud.version-->
+      <!--merritt-core.version>4.0-SNAPSHOT</merritt-core.version-->
       <!--merritt-bom.version>4.0-SNAPSHOT</merritt-bom.version-->
     </properties>
 
