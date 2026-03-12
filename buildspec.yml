@@ -34,6 +34,8 @@ phases:
     - DOCKTAG=$BRANCHTAG
     - COMMITDATE=`git --no-pager log -1 --pretty='format:%cd' --date='format:%Y-%m-%d %H:%M:%S'`
     - echo "Branchtag ${BRANCHTAG}; COMMITDATE=${COMMITDATE}; REPONAME=${REPONAME}; BRANCHNAME=${BRANCHNAME}"
+    - BUILDDATE=$(TZ='America/Los_Angeles' date +"%Y%m%d")
+    - echo "BUILDDATE=$BUILDDATE"
 
     - |
       DEVBUCK=$(aws ssm get-parameter --name /uc3/mrt/config-bucket-dev --query Parameter.Value --output text)
@@ -80,6 +82,10 @@ phases:
       docker build --push --quiet \
         --build-arg ECR_REGISTRY=${ECR_REGISTRY} \
         -t ${ECR_REGISTRY}/${REPONAME}:${BRANCHTAG} .
+
+      docker build --push --quiet \
+        --build-arg ECR_REGISTRY=${ECR_REGISTRY} \
+        -t ${ECR_REGISTRY}/${REPONAME}:archive-${BRANCHTAG}-${BUILDDATE} .
 
       if [[ "$BRANCHTAG" == "main" ]]
       then
@@ -135,20 +141,6 @@ phases:
             --query "service.deployments[0].[id,taskDefinition,status,desiredCount,createdAt]" \
             --force-new-deployment || echo "Skip ecs-ephemeral Deployment"
         fi  
-      fi
-
-      if [[ "$BRANCHTAG" == "$TAG_ECS_STG" ]]
-      then
-        docker build --quiet --push \
-          --build-arg ECR_REGISTRY=${ECR_REGISTRY} \
-          -t ${ECR_REGISTRY}/${REPONAME}:ecs-stg .
-      fi
-
-      if [[ "$BRANCHTAG" == "$TAG_ECS_PRD" ]]
-      then
-        docker build --quiet --push \
-          --build-arg ECR_REGISTRY=${ECR_REGISTRY} \
-          -t ${ECR_REGISTRY}/${REPONAME}:ecs-prd .
       fi
 
     - |
@@ -208,7 +200,11 @@ phases:
             then
               docker build --quiet --push \
                 --build-arg ECR_REGISTRY=${ECR_REGISTRY} \
-                -t ${ECR_REGISTRY}/${REPONAME}:$stack .
+                -t ${ECR_REGISTRY}/${REPONAME}:${TAG_ECS} .
+
+              docker build --quiet --push \
+                --build-arg ECR_REGISTRY=${ECR_REGISTRY} \
+                -t ${ECR_REGISTRY}/${REPONAME}:archive-${TAG_ECS}-${BUILDDATE} .
             fi
           fi
         done
