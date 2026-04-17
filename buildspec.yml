@@ -164,16 +164,18 @@ phases:
       # note that this also applied to a main branch build
       if [[ "$MODE" == "OnDemand" ]]
       then
+        BUILT="$BRANCHTAG;"
         for stack in ecs-dev ecs-ephemeral ecs-stg ecs-prd
         do
           TAG_ECS=$(yq -r ".\"ecs-tagmap\".\"${REPONAME}\".\"$stack\"" /tmp/ecs-release-manifest.yaml)
           if [[ "$TAG_ECS" == "null" ]]
           then
             echo "${TAG_ECS} undefined for ${stack}"
-          elif [[ "$BRANCHTAG" == "$TAG_ECS" ]]
+          elif [[ "$BUILT" == *"$TAG_ECS;"* ]]
           then
             echo "${TAG_ECS} Already Built for ${stack}"
           else
+            BUILT="$BUILT$TAG_ECS;"
             # perform get checkout get the specific dockerfile
             git checkout $TAG_ECS
 
