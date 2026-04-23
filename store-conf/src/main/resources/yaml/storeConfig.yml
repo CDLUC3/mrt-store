@@ -96,7 +96,7 @@ store-info-dev-docker:
 store-ecs-docker: 
   <<: *docker
   nodePath: "yaml:2"
-  archiveNode: 8888
+  archiveNode: {!ENV: ARCHIVE_NODE !DEFAULT: 8888}
 
 store-ecs-docker-v1: 
   <<: *docker
