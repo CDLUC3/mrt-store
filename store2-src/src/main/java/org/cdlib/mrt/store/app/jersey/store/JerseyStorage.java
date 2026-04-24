@@ -587,6 +587,7 @@ public class JerseyStorage
             @PathParam("sourceNode") String sourceNodeS,
             @PathParam("targetNode") String targetNodeS,
             @PathParam("objectid") String objectIDS,
+            @DefaultValue("empty") @QueryParam("fixity") String fixityS,
             @DefaultValue("xhtml") @QueryParam(KeyNameHttpInf.RESPONSEFORM) String formatType,
             @Context CloseableService cs,
             @Context ServletConfig sc)
@@ -601,7 +602,8 @@ public class JerseyStorage
         if (DEBUG) System.out.println("addVersionMultipart entered");
         int sourceNode = getNodeID(sourceNodeS);
         int targetNode = getNodeID(targetNodeS);
-        return replicObject(sourceNode, targetNode, objectIDS, formatType, cs, sc);
+        if (fixityS.equals("empty")) fixityS = null;
+        return replicObject(sourceNode, targetNode, objectIDS, fixityS, formatType, cs, sc);
     }
     
     /**

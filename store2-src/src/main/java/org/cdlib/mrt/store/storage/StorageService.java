@@ -49,6 +49,7 @@ import org.cdlib.mrt.core.FileContent;
 import org.cdlib.mrt.core.FileComponent;
 import org.cdlib.mrt.core.PingState;
 import org.cdlib.mrt.s3.service.NodeIO;
+import org.cdlib.mrt.s3.tools.CloudManifestCopyS3ToS3;
 import org.cdlib.mrt.s3.tools.CloudManifestCopyVersion;
 import org.cdlib.mrt.store.fix.BuildTokenCC;
 import org.cdlib.mrt.store.StorageConfig;
@@ -224,8 +225,10 @@ public class StorageService
     public ObjectState replicObject (
             int sourceNodeID,
             int targetNodeID,
-            Identifier objectID)
+            Identifier objectID,
+            boolean doFixity)
     throws TException
+            
     {
         long startTime = DateUtil.getEpochUTCDate();
         long inNode = sourceNodeID;
@@ -243,19 +246,17 @@ public class StorageService
             throw new TException.INVALID_OR_MISSING_PARM("replicObject objectID not set");
         }
         NodeIO nodeIO = storageConfig.getNodeIO();
-        CloudManifestCopyVersion cloudManifestCopyVersion = CloudManifestCopyVersion.getCloudManifestCopyVersion(
-            nodeIO,
-            inNode,
-            outNode,
-            logger
-        );
-        CloudManifestCopyVersion.Stat stat = new CloudManifestCopyVersion.Stat(objectID.getValue());
-        boolean completion = copyContentCloud(objectID,cloudManifestCopyVersion, stat);
+        String objectIDS = objectID.getValue();
+        CloudManifestCopyS3ToS3 cmcs2s =  CloudManifestCopyS3ToS3.getCloudManifestCopyS3ToS3(doFixity, nodeIO, inNode, outNode, logger);
+        CloudManifestCopyS3ToS3.Stat stat = new CloudManifestCopyS3ToS3.Stat(objectIDS);
+        boolean completion = copyContentCloud(objectIDS,cmcs2s, stat);
+        System.out.println(stat.dump("***dump***"));
         System.out.println("replicObject"
                 + " - inNode=" + inNode
                 + " - outNode=" + outNode
-                + " - objectID=" + objectID.getValue()
+                + " - objectID=" + objectIDS
                 + " - completion=" + completion
+                + " - doFixity=" + doFixity
         );
         ObjectState state = getObjectState (targetNodeID, objectID);
         bump("copyObject", startTime);
@@ -263,13 +264,13 @@ public class StorageService
     }
     
     protected boolean copyContentCloud(
-            Identifier objectID,
-            CloudManifestCopyVersion cmct,
-            CloudManifestCopyVersion.Stat stat) 
+            String objectIDS,
+            CloudManifestCopyS3ToS3 cmcs2s,
+            CloudManifestCopyS3ToS3.Stat stat) 
         throws TException
     {
         try {
-            cmct.copyObject(objectID.getValue(), stat);
+            cmcs2s.copyObject(objectIDS, stat);
             return true;
             
         } catch (TException.REQUESTED_ITEM_NOT_FOUND rinf) {
@@ -284,8 +285,6 @@ public class StorageService
             throw new TException(ex);
             
         }
-        
-        
     }
 
     @Override

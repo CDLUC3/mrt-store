@@ -297,13 +297,15 @@ public interface StorageServiceInf
      * @param sourceNodeID source Node for copy
      * @param targetNodeID target Node for copy
      * @param objectID object identifier of object to be copied
+     * @param doFixity true=perform fixity check on copied content
      * @return Object State of copied object
      * @throws TException system exception
      */
     public ObjectState replicObject (
             int sourceNodeID,
             int targetNodeID,
-            Identifier objectID)
+            Identifier objectID,
+            boolean doFixity)
     throws TException;
     
     /**

@@ -1192,6 +1192,7 @@ public class JerseyBase
             int sourceNode,
             int targetNode,
             String objectIDS,
+            String fixityS,
             String formatType,
             CloseableService cs,
             ServletConfig sc)
@@ -1213,7 +1214,14 @@ public class JerseyBase
             StorageServiceInit storageServiceInit = StorageServiceInit.getStorageServiceInit(sc);
             StorageServiceInf storageService = storageServiceInit.getStorageService();
             logger = getNodeLogger(sourceNode, storageService);
-            StateInf responseState = storageService.replicObject(sourceNode, targetNode, objectID);
+            boolean doFixity = true;
+            if (!StringUtil.isAllBlank(fixityS)) {
+                Boolean fixity = setBoolean(fixityS);
+                if (fixity != null) {
+                    doFixity = fixity;
+                }
+            }
+            StateInf responseState = storageService.replicObject(sourceNode, targetNode, objectID, doFixity);
             return getStateResponse(responseState, formatType, logger, cs, sc);
 
         } catch (TException tex) {
