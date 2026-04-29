@@ -28,6 +28,7 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 OF THE POSSIBILITY OF SUCH DAMAGE.
 ---------------
 Force rebuild: 260414-3.0.2-fss3b
+Force rebuild: 3.0.3-s2sb
 *********************************************************************/
 package org.cdlib.mrt.store.app.jersey.store;
 
