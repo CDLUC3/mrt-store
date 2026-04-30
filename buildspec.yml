@@ -179,7 +179,7 @@ phases:
             # perform get checkout get the specific dockerfile
             git checkout $TAG_ECS
 
-            #mkdir -p store-war/target
+            mvn clean
 
             # this command will succeed if TAG_ECS is a valid tag
             mvn dependency:copy \
