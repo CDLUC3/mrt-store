@@ -457,22 +457,10 @@ class ConsumerDaemon implements Runnable
 	    }
         } catch (InterruptedException ie) {
 	    try {
-		try {
-	    	    zooKeeper.close();
-		} catch (Exception ze) {}
-                System.out.println(MESSAGE + "shutting down consumer daemon.");
-                log4j.info("hutting down consumer daemon.");
+                long numActive = executorService.getActiveCount();
+                System.out.println(MESSAGE + "Interrupt detected. Active tasks: " + numActive + " -  Forcing failure.");
+                log4j.info(MESSAGE + "Interrupt detected. Active tasks: " + numActive + " -  Forcing failure.");
 	        executorService.shutdown();
-
-		int cnt = 0;
-		while (! executorService.awaitTermination(15L, TimeUnit.SECONDS)) {
-                    System.out.println(MESSAGE + "waiting for tasks to complete.");
-		    cnt++;
-		    if (cnt == 8) {	// 2 minutes
-			// force shutdown
-	        	executorService.shutdownNow();
-		    }
-		}
             } catch (Exception e) {
 		e.printStackTrace(System.err);
             }
@@ -595,6 +583,12 @@ class ConsumeData implements Runnable
                     + " - access.status():" + access.status() + "\n"
                     + " - access.isDeletable()():" + access.status().isDeletable() + "\n"
             );
+        } catch (InterruptedException ie) {
+            String errmsg = "Interrupted detected while Access processing - failing Job";
+            System.err.println(NAME + "[error] Consuming Job queue data: " + errmsg);
+            try { 
+               access.setStatus(zooKeeper, access.status().fail(), errmsg);
+            } catch (Exception ex) {}
         }  catch (Exception e) {
             e.printStackTrace(System.err);
             System.out.println("[error] Consuming queue data:" + e);
