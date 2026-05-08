@@ -460,14 +460,14 @@ class ConsumerDaemon implements Runnable
                 long numActive = executorService.getActiveCount();
                 System.out.println(MESSAGE + "Interrupt detected. Active tasks: " + numActive + " -  Forcing failure.");
                 log4j.info(MESSAGE + "Interrupt detected. Active tasks: " + numActive + " -  Forcing failure.");
-	        executorService.shutdown();
+	        executorService.shutdownNow();
             } catch (Exception e) {
 		e.printStackTrace(System.err);
             }
 	} catch (Exception e) {
             System.out.println(MESSAGE + "Exception detected, shutting down consumer daemon.");
 	    e.printStackTrace(System.err);
-	    executorService.shutdown();
+	    executorService.shutdownNow();
         } finally {
 	}
     }

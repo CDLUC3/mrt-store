@@ -360,29 +360,17 @@ class StoreConsumerDaemon implements Runnable
 		}
 	    }
         } catch (InterruptedException ie) {
-	    try {
-		try {
-	    	    zooKeeper.close();
-		} catch (Exception ze) {}
-                System.out.println(MESSAGE + "shutting down consumer daemon.");
-	        executorService.shutdown();
-
-		int cnt = 0;
-		while (! executorService.awaitTermination(15L, TimeUnit.SECONDS)) {
-                    System.out.println(MESSAGE + "waiting for tasks to complete.");
-		    cnt++;
-		    if (cnt == 8) {	// 2 minutes
-			// force shutdown
-	        	executorService.shutdownNow();
-		    }
-		}
+            try {           
+                long numActive = executorService.getActiveCount();
+                System.out.println(MESSAGE + "Interrupt detected. Active tasks: " + numActive + " -  Forcing failure.");
+                executorService.shutdownNow();
             } catch (Exception e) {
-		e.printStackTrace(System.err);
-            }
+                e.printStackTrace(System.err);
+            }       
 	} catch (Exception e) {
             System.out.println(MESSAGE + "Exception detected, shutting down store consumer daemon.");
 	    e.printStackTrace(System.err);
-	    executorService.shutdown();
+            executorService.shutdownNow();
         } finally {
            try {
                 zooKeeper.close();
@@ -515,7 +503,6 @@ class StoreConsumeData implements Runnable
                 e.printStackTrace(System.err);
                 job.setStatus(zooKeeper, org.cdlib.mrt.zk.JobState.Failed, errMessage);
 		throw new Exception(NAME + " [error] Store action failed: " + e.getMessage());
-
 	    }
 
             if (! ZookeeperUtil.validateZK(zooKeeper)) {
@@ -554,6 +541,12 @@ class StoreConsumeData implements Runnable
 	    } 
             job.unlock(zooKeeper);
 
+        } catch (InterruptedException ie) {
+            String errmsg = "Interrupted detected while Store processing - failing Job";
+            System.err.println(NAME + "[error] Consuming Job queue data: " + errmsg);
+            try { 
+               job.setStatus(zooKeeper, org.cdlib.mrt.zk.JobState.Failed, errmsg);
+            } catch (Exception ex) {}
         } catch (SessionExpiredException see) {
             see.printStackTrace(System.err);
 	    System.out.println(NAME + "[error] Consuming queue data: Could not recreate session.");
