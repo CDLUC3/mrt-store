@@ -89,6 +89,8 @@ public class StoreConsumer extends HttpServlet
     private int numThreads = 5;				// default size
     private int pollingInterval = 15;			// default interval (seconds)
     private StoreZoo storeZoo = null;
+    private int interruptDelay = 5;     		// delay after interrupting daemon
+
 
     public void init(ServletConfig servletConfig)
             throws ServletException {
@@ -185,8 +187,13 @@ public class StoreConsumer extends HttpServlet
 
     public void destroy() {
 	try {
-	    System.out.println("[info] " + MESSAGE + "interrupting store onsumer daemon");
+	    System.out.println("[info] " + MESSAGE + "interrupting store Consumer daemon");
+            System.out.println("[info] " + MESSAGE + "destroy() " +   consumerThread.activeCount());
+            System.out.println("[info] " + MESSAGE + "Waiting " + interruptDelay + " seconds after interrupt for threads to die");
             consumerThread.interrupt();
+
+            Thread.sleep(interruptDelay * 1000);
+            System.out.println("[info] " + MESSAGE + "Wait complete, interrupting daemon");
 	} catch (Exception e) {
 	    e.printStackTrace(System.err);
 	}
@@ -373,7 +380,7 @@ class StoreConsumerDaemon implements Runnable
             executorService.shutdownNow();
         } finally {
            try {
-                zooKeeper.close();
+                // zooKeeper.close();
            } catch(Exception ze) {}
         }
 
@@ -497,10 +504,17 @@ class StoreConsumeData implements Runnable
                     System.err.println(NAME + " [error] Action not supported " + job.id() + " - " + action);
 		    throw new Exception(NAME + " [error] Action not supported");
 	        }
+            } catch (InterruptedException ie) {
+                String errmsg = "Interrupt detected while Store processing - failing Job";
+                System.err.println(NAME + "[error] Consuming Job queue data: " + errmsg);
+                job.setStatus(zooKeeper, org.cdlib.mrt.zk.JobState.Failed, errmsg);
+
+		throw new Exception(NAME + " [error] Store action failed: " + ie.getMessage());
 	    } catch (Exception e) {
                 if (DEBUG) System.err.println(NAME + " [error] Store action failed: " + e.getMessage());
 		errMessage = NAME + " [error] Store action failed: " + e.getMessage();
                 e.printStackTrace(System.err);
+
                 job.setStatus(zooKeeper, org.cdlib.mrt.zk.JobState.Failed, errMessage);
 		throw new Exception(NAME + " [error] Store action failed: " + e.getMessage());
 	    }
@@ -542,11 +556,11 @@ class StoreConsumeData implements Runnable
             job.unlock(zooKeeper);
 
         } catch (InterruptedException ie) {
-            String errmsg = "Interrupted detected while Store processing - failing Job";
+            String errmsg = "Interrupt detected while Store processing - failing Job";
             System.err.println(NAME + "[error] Consuming Job queue data: " + errmsg);
-            try { 
+	    try {
                job.setStatus(zooKeeper, org.cdlib.mrt.zk.JobState.Failed, errmsg);
-            } catch (Exception ex) {}
+	    } catch (Exception ke) { System.out.println("Error: Could not set ZK job to fail."); }
         } catch (SessionExpiredException see) {
             see.printStackTrace(System.err);
 	    System.out.println(NAME + "[error] Consuming queue data: Could not recreate session.");

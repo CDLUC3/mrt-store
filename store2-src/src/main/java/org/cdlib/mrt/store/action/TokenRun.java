@@ -207,7 +207,8 @@ public class TokenRun
     
     public void run()
     {
-        try {
+	try {
+
             if (runStatus == TokenRunStatus.Error) {
                 System.out.println("Failed to start run");
                 return;

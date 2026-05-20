@@ -88,6 +88,7 @@ public class Consumer extends HttpServlet
     private int numThreads = 5;		// default size
     private int pollingInterval = 2;	// default interval (minutes)
     public static long queueSizeLimit = 500000000;	// default size for large/small worker (bytes)
+    private int interruptDelay = 5;                     // delay after interrupting daemon
 
     public void init(ServletConfig servletConfig)
             throws ServletException {
@@ -255,13 +256,17 @@ public class Consumer extends HttpServlet
     }
 
     public void destroy() {
-	try {
-	    System.out.println("[info] " + MESSAGE + "interrupting consumer daemon");
+        try {
+            System.out.println("[info] " + MESSAGE + "interrupting access Consumer daemon");
+            System.out.println("[info] " + MESSAGE + "destroy() " +   consumerThread.activeCount());
+            System.out.println("[info] " + MESSAGE + "Waiting " + interruptDelay + " seconds after interrupt for threads to die");
             consumerThread.interrupt();
-	    saveState();
-	} catch (Exception e) {
-	    e.printStackTrace(System.err);
-	}
+
+            Thread.sleep(interruptDelay * 1000);
+            System.out.println("[info] " + MESSAGE + "Wait complete, interrupting daemon");
+        } catch (Exception e) {
+            e.printStackTrace(System.err);
+        }
     }
 
     public void saveState() {
