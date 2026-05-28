@@ -326,7 +326,7 @@ public class CloudArchive
 			if (! Thread.currentThread().isInterrupted()) {
 			   addFile(archiveComponent, versionDir);
                         } else {
-                           String err = MESSAGE + "Process Interrupted";
+                           String err = MESSAGE + "Process Interrupted.";
                            throw new TException.GENERAL_EXCEPTION(err);
 			}
                     }
