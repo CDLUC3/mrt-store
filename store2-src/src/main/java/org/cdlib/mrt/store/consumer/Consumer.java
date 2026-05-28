@@ -88,7 +88,7 @@ public class Consumer extends HttpServlet
     private int numThreads = 5;		// default size
     private int pollingInterval = 2;	// default interval (minutes)
     public static long queueSizeLimit = 500000000;	// default size for large/small worker (bytes)
-    private int interruptDelay = 5;                     // delay after interrupting daemon
+    private int interruptDelay = 8;                     // delay after interrupting daemon
 
     public void init(ServletConfig servletConfig)
             throws ServletException {
@@ -593,7 +593,9 @@ class ConsumeData implements Runnable
             System.err.println(NAME + "[error] Consuming Job queue data: " + errmsg);
             try { 
                access.setStatus(zooKeeper, access.status().fail(), errmsg);
-            } catch (Exception ex) {}
+            } catch (Exception ex) {
+                System.out.println("Unable to set access status - Zookeeper exception:" + ex);
+	    }
         }  catch (Exception e) {
             e.printStackTrace(System.err);
             System.out.println("[error] Consuming queue data:" + e);
@@ -602,7 +604,7 @@ class ConsumeData implements Runnable
                 access.setStatus(zooKeeper, access.status().fail());
                 access.unlock(zooKeeper);
             } catch (Exception ze) {
-                System.out.println("Unable to set acccee status - Zookeeper exception:" + ze);
+                System.out.println("Unable to set access status - Zookeeper exception:" + ze);
             }
                 
         } finally {
