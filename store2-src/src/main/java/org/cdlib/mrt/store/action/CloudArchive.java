@@ -82,7 +82,8 @@ public class CloudArchive
     private static final String MESSAGE = NAME + ": ";
 
     private static final String NL = System.getProperty("line.separator");
-    private static final boolean DEBUG = false;
+    // private static final boolean DEBUG = false;
+    private static final boolean DEBUG = true;
     
     protected File workBase = null;
     protected File copyBase = null;
