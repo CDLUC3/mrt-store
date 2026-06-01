@@ -52,7 +52,12 @@ public class ArchiveComponent
             String fileName = null;
             String filePath = null;
             int pos = fileID.lastIndexOf('/');
-            if (pos < 0) return null;
+            if (pos < 0) {
+                throw new TException.INVALID_DATA_FORMAT("Invalid Merritt fileID format requiring a system/ or producer/ prefix"
+                        + " - fileID:" + fileID
+                        + " - key:" + key
+                );
+            } //if (pos < 0) return null;
             
             fileName = fileID.substring(pos + 1);
             filePath = fileID.substring(0, pos);
