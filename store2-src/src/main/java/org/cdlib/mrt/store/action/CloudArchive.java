@@ -322,6 +322,7 @@ public class CloudArchive
                     String key = component.getLocalID();
                     if (returnFullObject || key.contains("|" + xver + "|")) {
                         ArchiveComponent archiveComponent = ArchiveComponent.fromKey(key);
+                        if (archiveComponent == null) continue;
                         addFile(archiveComponent, versionDir);
                     }
                 }
@@ -364,6 +365,7 @@ public class CloudArchive
             for (FileComponent component  : components) {
                 String key = component.getLocalID();
                 ArchiveComponent archiveComponent = ArchiveComponent.fromKey(key);
+                if (archiveComponent == null) continue;
                 addFile(archiveComponent, copyBase);
             }
             System.out.println("addListVersion size=" + FileUtil.getDirectorySize(copyBase));
@@ -404,6 +406,7 @@ public class CloudArchive
             for (FileComponent component  : components) {
                 String key = component.getLocalID();
                 ArchiveComponent archiveComponent = ArchiveComponent.fromKey(key);
+                if (archiveComponent == null) continue;
                 archiveComponent = pc.edit(archiveComponent);
                 if (archiveComponent == null) continue;
                 addFile(archiveComponent, copyBase);
