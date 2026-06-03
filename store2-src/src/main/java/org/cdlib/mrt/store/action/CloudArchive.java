@@ -322,13 +322,14 @@ public class CloudArchive
                     String key = component.getLocalID();
                     if (returnFullObject || key.contains("|" + xver + "|")) {
                         ArchiveComponent archiveComponent = ArchiveComponent.fromKey(key);
+                        if (archiveComponent == null) continue;
 
-			if (! Thread.currentThread().isInterrupted()) {
-			   addFile(archiveComponent, versionDir);
+			                  if (! Thread.currentThread().isInterrupted()) {
+			                      addFile(archiveComponent, versionDir);
                         } else {
                            String err = MESSAGE + "Process Interrupted.";
                            throw new TException.GENERAL_EXCEPTION(err);
-			}
+			                  }
                     }
                 }
             }
@@ -370,6 +371,7 @@ public class CloudArchive
             for (FileComponent component  : components) {
                 String key = component.getLocalID();
                 ArchiveComponent archiveComponent = ArchiveComponent.fromKey(key);
+                if (archiveComponent == null) continue;
                 addFile(archiveComponent, copyBase);
             }
             System.out.println("addListVersion size=" + FileUtil.getDirectorySize(copyBase));
@@ -410,6 +412,7 @@ public class CloudArchive
             for (FileComponent component  : components) {
                 String key = component.getLocalID();
                 ArchiveComponent archiveComponent = ArchiveComponent.fromKey(key);
+                if (archiveComponent == null) continue;
                 archiveComponent = pc.edit(archiveComponent);
                 if (archiveComponent == null) continue;
                 addFile(archiveComponent, copyBase);
