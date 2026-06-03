@@ -324,12 +324,12 @@ public class CloudArchive
                         ArchiveComponent archiveComponent = ArchiveComponent.fromKey(key);
                         if (archiveComponent == null) continue;
 
-			                  if (! Thread.currentThread().isInterrupted()) {
-			                      addFile(archiveComponent, versionDir);
+			if (! Thread.currentThread().isInterrupted()) {
+			   addFile(archiveComponent, versionDir);
                         } else {
                            String err = MESSAGE + "Process Interrupted.";
                            throw new TException.GENERAL_EXCEPTION(err);
-			                  }
+			}
                     }
                 }
             }
@@ -372,7 +372,14 @@ public class CloudArchive
                 String key = component.getLocalID();
                 ArchiveComponent archiveComponent = ArchiveComponent.fromKey(key);
                 if (archiveComponent == null) continue;
-                addFile(archiveComponent, copyBase);
+
+                if (! Thread.currentThread().isInterrupted()) {
+                    addFile(archiveComponent, copyBase);
+                } else {
+                    String err = MESSAGE + "Process Interrupted.";
+                    throw new TException.GENERAL_EXCEPTION(err);
+                }
+
             }
             System.out.println("addListVersion size=" + FileUtil.getDirectorySize(copyBase));
             
@@ -415,7 +422,14 @@ public class CloudArchive
                 if (archiveComponent == null) continue;
                 archiveComponent = pc.edit(archiveComponent);
                 if (archiveComponent == null) continue;
-                addFile(archiveComponent, copyBase);
+
+                if (! Thread.currentThread().isInterrupted()) {
+                   addFile(archiveComponent, copyBase);
+                } else {
+                   String err = MESSAGE + "Process Interrupted.";
+                   throw new TException.GENERAL_EXCEPTION(err);
+                }
+
             }
             
         } catch (TException tex) {
