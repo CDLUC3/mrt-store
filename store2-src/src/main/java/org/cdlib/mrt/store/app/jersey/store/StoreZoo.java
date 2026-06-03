@@ -29,8 +29,6 @@ OF THE POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 package org.cdlib.mrt.store.app.jersey.store;
 
-
-
 import java.io.File;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -124,7 +122,8 @@ public class StoreZoo extends HttpServlet
             String sizeS,
             String digestType, // use null default if not available
             String digestValue)
-        throws TException
+        throws TException,InterruptedException
+
     {
         //LoggerInf logger = defaultLogger;
         File manifest = null;
@@ -138,6 +137,8 @@ public class StoreZoo extends HttpServlet
                     + " - digestType=" + digestType
                     + " - digestValue=" + digestValue
                     );
+
+	    Thread.sleep(1);	// prevent compilation error when catching interrupt
 
             sizeS = StringUtil.normParm(sizeS);
             digestType = StringUtil.normParm(digestType);
@@ -172,6 +173,11 @@ public class StoreZoo extends HttpServlet
         } catch (TException tex) {
             throw tex;
 
+        } catch (InterruptedException ie) {
+            String errmsg = "StoreZoo: updateVersionZoo - Caught Interrupt signal";
+            System.out.println(errmsg);
+            throw new InterruptedException(errmsg);
+
         } catch (Exception ex) {
             System.out.println("TRACE:" + StringUtil.stackTrace(ex));
             throw new TException.GENERAL_EXCEPTION(MESSAGE + "Exception:" + ex);
@@ -201,7 +207,7 @@ public class StoreZoo extends HttpServlet
             String sizeS,
             String digestType, // use null default if not available
             String digestValue)  // use null default if not available
-        throws TException
+        throws TException,InterruptedException
     {
         File manifest = null;
         
@@ -215,6 +221,8 @@ public class StoreZoo extends HttpServlet
                     + " - digestType=" + digestType
                     + " - digestValue=" + digestValue
                     );
+
+	    Thread.sleep(1);	// prevent compilation error when catching interrupt
 
             sizeS = StringUtil.normParm(sizeS);
             digestType = StringUtil.normParm(digestType);
@@ -240,6 +248,11 @@ public class StoreZoo extends HttpServlet
         } catch (TException tex) {
             throw tex;
 
+        } catch (InterruptedException ie) {
+            String errmsg = "StoreZoo: addVersion - Caught Interrupt signal";
+            System.out.println(errmsg);
+            throw new InterruptedException(errmsg);
+            
         } catch (Exception ex) {
             System.out.println("TRACE:" + StringUtil.stackTrace(ex));
             throw new TException.GENERAL_EXCEPTION(MESSAGE + "Exception:" + ex);

@@ -88,6 +88,7 @@ public class Consumer extends HttpServlet
     private int numThreads = 5;		// default size
     private int pollingInterval = 2;	// default interval (minutes)
     public static long queueSizeLimit = 500000000;	// default size for large/small worker (bytes)
+    private int interruptDelay = 8;                     // delay after interrupting daemon
 
     public void init(ServletConfig servletConfig)
             throws ServletException {
@@ -255,13 +256,17 @@ public class Consumer extends HttpServlet
     }
 
     public void destroy() {
-	try {
-	    System.out.println("[info] " + MESSAGE + "interrupting consumer daemon");
+        try {
+            System.out.println("[info] " + MESSAGE + "interrupting access Consumer daemon");
+            System.out.println("[info] " + MESSAGE + "destroy() " +   consumerThread.activeCount());
+            System.out.println("[info] " + MESSAGE + "Waiting " + interruptDelay + " seconds after interrupt for threads to die");
             consumerThread.interrupt();
-	    saveState();
-	} catch (Exception e) {
-	    e.printStackTrace(System.err);
-	}
+
+            Thread.sleep(interruptDelay * 1000);
+            System.out.println("[info] " + MESSAGE + "Wait complete, interrupting daemon");
+        } catch (Exception e) {
+            e.printStackTrace(System.err);
+        }
     }
 
     public void saveState() {
@@ -457,29 +462,17 @@ class ConsumerDaemon implements Runnable
 	    }
         } catch (InterruptedException ie) {
 	    try {
-		try {
-	    	    zooKeeper.close();
-		} catch (Exception ze) {}
-                System.out.println(MESSAGE + "shutting down consumer daemon.");
-                log4j.info("hutting down consumer daemon.");
-	        executorService.shutdown();
-
-		int cnt = 0;
-		while (! executorService.awaitTermination(15L, TimeUnit.SECONDS)) {
-                    System.out.println(MESSAGE + "waiting for tasks to complete.");
-		    cnt++;
-		    if (cnt == 8) {	// 2 minutes
-			// force shutdown
-	        	executorService.shutdownNow();
-		    }
-		}
+                long numActive = executorService.getActiveCount();
+                System.out.println(MESSAGE + "Interrupt detected. Active tasks: " + numActive + " -  Forcing failure.");
+                log4j.info(MESSAGE + "Interrupt detected. Active tasks: " + numActive + " -  Forcing failure.");
+	        executorService.shutdownNow();
             } catch (Exception e) {
 		e.printStackTrace(System.err);
             }
 	} catch (Exception e) {
             System.out.println(MESSAGE + "Exception detected, shutting down consumer daemon.");
 	    e.printStackTrace(System.err);
-	    executorService.shutdown();
+	    executorService.shutdownNow();
         } finally {
 	}
     }
@@ -595,6 +588,14 @@ class ConsumeData implements Runnable
                     + " - access.status():" + access.status() + "\n"
                     + " - access.isDeletable()():" + access.status().isDeletable() + "\n"
             );
+        } catch (InterruptedException ie) {
+            String errmsg = "Interrupted detected while Access processing - failing Job";
+            System.err.println(NAME + "[error] Consuming Job queue data: " + errmsg);
+            try { 
+               access.setStatus(zooKeeper, access.status().fail(), errmsg);
+            } catch (Exception ex) {
+                System.out.println("Unable to set access status - Zookeeper exception:" + ex);
+	    }
         }  catch (Exception e) {
             e.printStackTrace(System.err);
             System.out.println("[error] Consuming queue data:" + e);
@@ -603,7 +604,7 @@ class ConsumeData implements Runnable
                 access.setStatus(zooKeeper, access.status().fail());
                 access.unlock(zooKeeper);
             } catch (Exception ze) {
-                System.out.println("Unable to set acccee status - Zookeeper exception:" + ze);
+                System.out.println("Unable to set access status - Zookeeper exception:" + ze);
             }
                 
         } finally {
