@@ -44,7 +44,6 @@ import org.cdlib.mrt.utility.StringUtil;
 import org.cdlib.mrt.utility.TException;
 import org.cdlib.mrt.utility.LoggerInf;
 import org.cdlib.mrt.s3.service.CloudStoreInf;
-import org.cdlib.mrt.s3.aws.AWSS3Cloud;
 //import org.cdlib.mrt.s3.sdsc.SDSCCloud;
 import org.cdlib.mrt.s3.openstack.OpenstackCloud;
 import org.cdlib.mrt.s3.pairtree.PairtreeCloud;
@@ -137,50 +136,6 @@ public class CloudUtil
             Properties xmlProp = new Properties();
             xmlProp.load(propStream);
             return getOpenstackService(logger, xmlProp, bucket);
-
-            
-        } catch (TException tex) {
-            throw tex;
-            
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            throw new TException.GENERAL_EXCEPTION(MESSAGE + "unable to build getSDSCService", ex);
-        }
-    }
-    
-    public static CloudObjectService getAWSService(LoggerInf logger,  String logicalVolume)
-        throws TException
-    {
-        try {
-            if (StringUtil.isAllBlank(logicalVolume)) {
-                throw new TException.GENERAL_EXCEPTION(MESSAGE + "unable to load AWS Service logicalVolume required");
-            }               
-            String [] parts = logicalVolume.split("\\|");
-            String bucketName = null;
-            String storageClass = null;
-            if (parts.length == 1) {
-                bucketName = parts[0];
-                storageClass = "Standard";
-                
-            } else if (parts.length == 2) {
-                bucketName = parts[0];
-                storageClass = parts[1];
-                
-            } else {
-                System.out.println("logicalVolume=" + logicalVolume + " - length=" + parts.length);
-                for (String part : parts) {
-                    System.out.println("part=" + part);
-                }
-                throw new TException.INVALID_ARCHITECTURE(MESSAGE 
-                        + "getAWSService requires that logicalVolume contain either bucketName or bucketName|storageClass:" 
-                        + logicalVolume);
-            }
-            if (DEBUG) System.out.println(MESSAGE +  "getAWSService:"
-                    + " - bucketName=" + bucketName
-                    + " - storageClass=" + storageClass
-            );
-            CloudStoreInf s3service =  AWSS3Cloud.getAWSS3(storageClass, logger);
-            return CloudObjectService.getCloudObjectState(s3service, bucketName, logger);
 
             
         } catch (TException tex) {

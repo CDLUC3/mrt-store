@@ -115,9 +115,6 @@ public abstract class ObjectStoreAbs
             } else if (nodeState.getExternalProvider().contains("sdsc")) {
                 return CloudUtil.getOpenstackService(logger, bucket);
                 
-            } else if (nodeState.getExternalProvider().contains("aws")) {
-                return CloudUtil.getAWSService(logger, bucket);
-                
             } else if (nodeState.getExternalProvider().contains("nodeio")) {
                 return CloudUtil.getNodeIOService(logger, bucket);
                 

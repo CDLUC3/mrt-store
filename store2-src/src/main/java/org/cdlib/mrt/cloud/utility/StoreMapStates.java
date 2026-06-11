@@ -118,7 +118,7 @@ public class StoreMapStates
         objectState.setLastDeleteVersion(map.getLastDeleteVersion());
         objectState.setNumFiles(map.getTotalCnt());
         objectState.setSize(map.getTotalSize());
-        objectState.setNumActualFiles(new Long(map.getActualCnt()));
+        objectState.setNumActualFiles(map.getActualCnt());
         objectState.setTotalActualSize(map.getActualSize());
         
         return objectState;
