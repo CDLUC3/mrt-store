@@ -124,7 +124,7 @@ public class StoreConsumer extends HttpServlet
 	    numThreads = storageService.getStorageConfig().getQueueNumThreadsStore();
 	    if (StringUtil.isNotEmpty(numThreads)) {
 	    	System.out.println("[info] " + MESSAGE + "Setting thread pool size: " + numThreads);
-		this.numThreads = new Integer(numThreads).intValue();
+		this.numThreads = Integer.parseInt(numThreads);
 	    }
 	} catch (Exception e) {
 	    System.err.println("[warn] " + MESSAGE + "Could not set thread pool size: " + numThreads + "  - using default: " + this.numThreads);
