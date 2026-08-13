@@ -86,8 +86,7 @@ store-info-docker: &docker
     PollingIntervalStore: "20"
     NumThreadsSmall: "5"
     NumThreadsLarge: "3"
-    NumThreadsStore: "2"
-
+    NumThreadsStore: "{!ENV: NUM_THREADS_STORE !DEFAULT: 2}"
 
 store-info-dev-docker: 
   <<: *docker
