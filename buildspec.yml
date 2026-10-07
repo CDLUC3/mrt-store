@@ -16,6 +16,8 @@ phases:
   pre_build:
     on-failure: ABORT
     commands:
+    - javac -version
+    - mvn -version
     - cp settings.xml ~/.m2/
     - export CODEARTIFACT_AUTH_TOKEN=`aws codeartifact get-authorization-token --domain cdlib-uc3-mrt --domain-owner $AWS_ACCOUNT_ID --region $AWS_REGION --query authorizationToken --output text`
     - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin ${ECR_REGISTRY}
@@ -52,7 +54,6 @@ phases:
   build:
     on-failure: ABORT
     commands:
-    - mvn -version
     # - mvn -ntp clean install -Ddocker.skip -DskipITs -Dmaven.test.skip=true
     - mvn -ntp clean install
     - |
