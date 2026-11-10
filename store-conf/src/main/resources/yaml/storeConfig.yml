@@ -1,50 +1,5 @@
 ---
 which-store-info: "{!ENV: MERRITT_STORE_INFO !DEFAULT: store-info}"
-store-info:
-  baseURI: "{!SSM: store/config/baseURI !DEFAULT: http://store-stage.cdlib.org:35121}"
-  servicePattern: "{!SSM: store/config/servicePattern !DEFAULT: http://$hostname.cdlib.org:35121/service/$serviceType}"
-  supportURI: mailto:merritt-support@ucop.edu
-  verifyOnRead: "{!SSM: store/config/verifyOnRead !DEFAULT: true}"
-  verifyOnWrite: "{!SSM: store/config/verifyOnWrite !DEFAULT: true}"
-  producerFilter:
-    - mrt-erc.txt
-    - mrt-eml.txt
-    - mrt-dc.xml
-    - mrt-delete.txt
-    - mrt-dua.txt
-    - mrt-dataone-manifest.txt
-    - mrt-datacite.xml
-    - mrt-embargo.txt
-    - mrt-oaidc.xml
-    - mrt-provenance.xml
-    - stash-wrapper.xml
-  archiveNode: 7001
-  nodePath: "{!SSM: store/config/nodePath  !DEFAULT: yaml:2}"
-  backOutOnException: "{!SSM: store/config/backOutOnException  !DEFAULT: false}"
-  fileLogger:
-    messageMaximumLevel: "{!SSM: store/config/log/messageMaximumLevel !DEFAULT: 5}"
-    messageMaximumError: "{!SSM: store/config/log/messageMaximumError !DEFAULT: 10}"
-    path: "{!ENV: LOG_STORE !DEFAULT: /apps/dpr2store/mrtHomes/store2/}"
-    name: store
-    qualifier: yyMMdd
-    trace: 5
-  queueInfo:
-    QueueService: "{!SSM: inventory/zoo/queueService !DEFAULT: localhost:2181}"
-    QueueLargeWorker: "{!SSM: store/zoo/AccessLarge !DEFAULT: localhost}"
-    QueueLockBase: "{!SSM: store/zoo/QueueLockBase !DEFAULT: /mrt.lock}"
-    QueueHoldLock: "{!SSM: store/zoo/QueueHoldFile !DEFAULT: access/LargeAccessHold}"
-    QueueSizeLimit: "{!SSM: store/zoo/AccessQSize !DEFAULT: 500000000}"
-    QueueTimeout: "{!SSM: store/zoo/Timeout !DEFAULT: 40000}"
-    LargeAccessHold: "{!SSM: store/zoo/LargeAccessHold !DEFAULT: access/LargeAccessHold}"
-    SmallAccessHold: "{!SSM: store/zoo/SmallAccessHold !DEFAULT: access/SmallAccessHold}" 
-    
-    PollingInterval: "{!SSM: store/config/PollingInterval !DEFAULT: 15}"
-    PollingIntervalStore: "{!SSM: store/config/PollingIntervalStore !DEFAULT: 60}"
-    NumThreadsSmall: "{!SSM: store/config/numThreadsSmall !DEFAULT: 5}"
-    NumThreadsLarge: "{!SSM: store/config/numThreadsLarge !DEFAULT: 3}"
-    NumThreadsStore: "{!SSM: store/config/numThreadsStore !DEFAULT: 3}"
-
-
 store-info-docker: &docker
   baseURI: "http://{!ENV: SVC_STORE !DEFAULT: store:8080/store}"
   supportURI: mailto:merritt-support@ucop.edu
@@ -88,16 +43,7 @@ store-info-docker: &docker
     NumThreadsLarge: "3"
     NumThreadsStore: "{!ENV: NUM_THREADS_STORE !DEFAULT: 2}"
 
-store-info-dev-docker: 
-  <<: *docker
-  archiveNode: 5003
-
 store-ecs-docker: 
   <<: *docker
   nodePath: "yaml:2"
   archiveNode: "{!ENV: ARCHIVE_NODE !DEFAULT: 8888}"
-
-store-ecs-docker-v1: 
-  <<: *docker
-  nodePath: "yaml:1"
-  archiveNode: 8888
