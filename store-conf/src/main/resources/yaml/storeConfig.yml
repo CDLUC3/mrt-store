@@ -1,5 +1,6 @@
 ---
-which-store-info: "{!ENV: MERRITT_STORE_INFO !DEFAULT: store-info}"
+which-store-info: "{!ENV: MERRITT_STORE_INFO !DEFAULT: store-info-docker}"
+
 store-info-docker: &docker
   baseURI: "http://{!ENV: SVC_STORE !DEFAULT: store:8080/store}"
   supportURI: mailto:merritt-support@ucop.edu
