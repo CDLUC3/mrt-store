@@ -169,7 +169,7 @@
                       <port>it-server.port:8080</port>
                     </ports>
                     <wait>
-                      <time>5000</time>
+                      <time>8000</time>
                     </wait>
                     <volumes>
                       <bind>
