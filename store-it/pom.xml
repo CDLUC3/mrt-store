@@ -172,11 +172,9 @@
                       <time>5000</time>
                     </wait>
                     <dependsOn>
-                      <depend>
-                        <alias>zoo-it</alias>
-                        <alias>minio-server</alias>
-                        <alias>mock-merritt-it</alias>
-                      </depend>
+                      <container>zoo-it</container>
+                      <container>minio-server</container>
+                      <container>mock-merritt-it</container>
                     </dependsOn>
                     <volumes>
                       <bind>
