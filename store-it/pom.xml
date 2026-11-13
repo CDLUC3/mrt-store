@@ -123,7 +123,7 @@
                       <port>minio-server.port:9000</port>
                     </ports>
                     <wait>
-                      <time>2000</time>
+                      <time>5000</time>
                     </wait>
                   </run>
                 </image>
@@ -169,8 +169,15 @@
                       <port>it-server.port:8080</port>
                     </ports>
                     <wait>
-                      <time>10000</time>
+                      <time>5000</time>
                     </wait>
+                    <dependsOn>
+                      <depend>
+                        <alias>zoo-it</alias>
+                        <alias>minio-server</alias>
+                        <alias>mock-merritt-it</alias>
+                      </depend>
+                    </dependsOn>
                     <volumes>
                       <bind>
                         <volume>
