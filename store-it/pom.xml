@@ -123,7 +123,7 @@
                       <port>minio-server.port:9000</port>
                     </ports>
                     <wait>
-                      <time>5000</time>
+                      <time>2000</time>
                     </wait>
                   </run>
                 </image>
@@ -169,7 +169,7 @@
                       <port>it-server.port:8080</port>
                     </ports>
                     <wait>
-                      <time>5000</time>
+                      <time>8000</time>
                     </wait>
                     <dependsOn>
                       <container>zoo-it</container>
