@@ -152,7 +152,7 @@
                       <alias>zoo-it</alias>
                     </network>
                     <wait>
-                      <time>2000</time>
+                      <time>5000</time>
                     </wait>
                   </run>
                 </image>
@@ -169,13 +169,8 @@
                       <port>it-server.port:8080</port>
                     </ports>
                     <wait>
-                      <time>8000</time>
+                      <time>12000</time>
                     </wait>
-                    <dependsOn>
-                      <container>zoo-it</container>
-                      <container>minio-server</container>
-                      <container>mock-merritt-it</container>
-                    </dependsOn>
                     <volumes>
                       <bind>
                         <volume>
