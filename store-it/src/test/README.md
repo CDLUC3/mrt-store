@@ -13,24 +13,29 @@ mvn verify
 
 ## To run from the command line or in a debugger
 
-Make sure that the war is up to date
+### Make sure that the war is up to date
 ```
 mvn install -Ddocker.skip -DskipITs -Dmaven.test.skip=true
 ```
 
-If running on a desktop
-```
-export ECR_REGISTRY=it-docker-registry
-```
-
-Launch Containers
-```
+### Launch Containers
+```bash
 MDIR=$(pwd) docker compose -f store-it/src/test/docker/docker-compose.yml up -d
 ```
 
-Run the junit test in VSCode
+### Run Tests (command line or in VSCode)
 
-Stop Containers
+Run all tests
+```bash
+mvn -f store-it/pom.xml failsafe:integration-test failsafe:verify -Dit.test=ServiceDriverIT
 ```
+
+Run a single test by method name
+```bash
+mvn -f store-it/pom.xml failsafe:integration-test failsafe:verify -Dit.test=ServiceDriverIT#SimpleTest
+```
+
+### Stop Containers
+```bash
 MDIR=$(pwd) docker compose -f store-it/src/test/docker/docker-compose.yml down
 ```
